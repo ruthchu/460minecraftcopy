@@ -9,7 +9,7 @@
 #include "cube.h"
 
 
-using namespace std;
+//using namespace std;
 
 // Helper functions to convert (x, z) to and from hash map key
 int64_t toKey(int x, int z);
@@ -26,7 +26,7 @@ private:
     // We combine the X and Z coordinates of the Chunk's corner into one 64-bit int
     // so that we can use them as a key for the map, as objects like std::pairs or
     // glm::ivec2s are not hashable by default, so they cannot be used as keys.
-    unordered_map<int64_t, uPtr<Chunk>> m_chunks;
+    std::unordered_map<int64_t, uPtr<Chunk>> m_chunks;
 
     // We will designate every 64 x 64 area of the world's x-z plane
     // as one "terrain generation zone". Every time the player moves
@@ -41,7 +41,7 @@ private:
     // While only the 3 x 3 collection of terrain generation zones
     // surrounding the Player should be rendered, the Chunks
     // in the Terrain will never be deleted until the program is terminated.
-    unordered_set<int64_t> m_generatedTerrain;
+    std::unordered_set<int64_t> m_generatedTerrain;
 
     // TODO: DELETE ALL REFERENCES TO m_geomCube AS YOU WILL NOT USE
     // IT IN YOUR FINAL PROGRAM!
