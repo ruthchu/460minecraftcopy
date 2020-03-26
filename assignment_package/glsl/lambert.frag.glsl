@@ -56,7 +56,7 @@ float cubicTriMix(vec3 p) {
     return mySmoothStep(mixLo, mixHi, pFract.y);
 }
 
-float fbm(vec3 p) {
+vec3 fbm(vec3 p) {
     float amp = 0.5;
     float freq = 4.0;
     vec3 sum = vec3(0.0);
@@ -72,7 +72,7 @@ void main()
 {
     // Material base color (before shading)
         vec4 diffuseColor = fs_Col;
-        diffuseColor = diffuseColor * (0.5 * fbm(fs_Pos.xyz) + 0.5);
+        diffuseColor = diffuseColor * (0.5 * vec4(fbm(fs_Pos.xyz), 1) + 0.5);
 
         // Calculate the diffuse term for Lambert shading
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
