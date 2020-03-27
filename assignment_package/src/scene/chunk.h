@@ -1,6 +1,7 @@
 #pragma once
 #include "smartpointerhelp.h"
 #include "glm_includes.h"
+#include "drawable.h"
 #include <array>
 #include <unordered_map>
 #include <cstddef>
@@ -40,7 +41,8 @@ struct EnumHash {
 // to render the world block by block.
 
 // TODO have Chunk inherit from Drawable
-class Chunk {
+class Chunk : public Drawable
+{
 private:
     // All of the blocks contained within this Chunk
     std::array<BlockType, 65536> m_blocks;
@@ -51,7 +53,10 @@ private:
     std::unordered_map<Direction, Chunk*, EnumHash> m_neighbors;
 
 public:
-    Chunk();
+    Chunk(OpenGLContext* context);
+    virtual ~Chunk(){};
+    void create() override;
+
     BlockType getBlockAt(unsigned int x, unsigned int y, unsigned int z) const;
     BlockType getBlockAt(int x, int y, int z) const;
     void setBlockAt(unsigned int x, unsigned int y, unsigned int z, BlockType t);
