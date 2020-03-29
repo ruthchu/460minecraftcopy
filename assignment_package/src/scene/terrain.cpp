@@ -115,7 +115,7 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 }
 
 Chunk* Terrain::createChunkAt(int x, int z) {
-    uPtr<Chunk> chunk = mkU<Chunk>(mp_context);
+    uPtr<Chunk> chunk = mkU<Chunk>(mp_context, x, z);
     Chunk *cPtr = chunk.get();
     m_chunks[toKey(x, z)] = move(chunk);
     return cPtr;
