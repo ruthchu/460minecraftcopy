@@ -250,3 +250,9 @@ void Chunk::generateData(std::vector<glm::vec4>&data, const std::vector<std::vec
     // Create a VBO on our GPU and store its handle in bufData
     mp_context->glGenBuffers(1, &m_bufData);
 }
+
+void Chunk::uninterleaveData(std::vector<glm::vec4>&data, std::vector<GLuint> idx)
+{
+    // write this
+}
+
