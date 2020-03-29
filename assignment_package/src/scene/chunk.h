@@ -62,6 +62,7 @@ private:
     void generateData(std::vector<glm::vec4> &data, const std::vector<std::vector<glm::vec4>*> &vbos, int size);
     // TODO -- write this
     void uninterleaveData(std::vector<glm::vec4>&data, std::vector<GLuint> idx);
+
 protected:
     GLuint m_bufData;
 public:
