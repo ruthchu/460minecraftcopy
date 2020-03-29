@@ -189,12 +189,14 @@ void Chunk::create()
 
     // Push vbo assets into one vector
     vbos.push_back(&pos);
-    vbos.push_back(&col);
     vbos.push_back(&nor);
+    vbos.push_back(&col);
     // Combine assets into one data VBO and generate data buffer
-    generateData(data, vbos, vertCount);
+    combineData(data, vbos, vertCount);
+    // Generate data buffer
+    generateAll();
     // Bind data buffer
-    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_bufData);
+    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
     // Buffer data to GPU
     mp_context->glBufferData(GL_ARRAY_BUFFER, vertCount * vbos.size() * sizeof(glm::vec4), data.data(), GL_STATIC_DRAW);
 }
@@ -237,7 +239,7 @@ void Chunk::pushColor(std::vector<glm::vec4>&col, BlockType type, int amount)
     }
 }
 
-void Chunk::generateData(std::vector<glm::vec4>&data, const std::vector<std::vector<glm::vec4>*>&vbos, int size)
+void Chunk::combineData(std::vector<glm::vec4>&data, const std::vector<std::vector<glm::vec4>*>&vbos, int size)
 {
     int i = 0;
     while (i < size) {
@@ -247,8 +249,6 @@ void Chunk::generateData(std::vector<glm::vec4>&data, const std::vector<std::vec
         }
         i++;
     }
-    // Create a VBO on our GPU and store its handle in bufData
-    mp_context->glGenBuffers(1, &m_bufData);
 }
 
 void Chunk::uninterleaveData(std::vector<glm::vec4>&data, std::vector<GLuint> idx)
