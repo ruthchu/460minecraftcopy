@@ -27,14 +27,14 @@ void Chunk::setBlockAt(unsigned int x, unsigned int y, unsigned int z, BlockType
 
 void Chunk::create()
 {
-    //GLuint m_bufVerData;
-    //mp_context->glGenBuffers(1, &m_bufVerData);
     std::vector<glm::vec4> pos;
     std::vector<glm::vec4> col;
-    std::vector<glm::vec4> norm;
+    std::vector<glm::vec4> nor;
     std::vector<GLuint> idx;
+    std::vector<glm::vec4> data;
+    std::vector<std::vector<glm::vec4>*> vbos;
+    int indexCount = 0;
 
-    int index = 0;
     // Iterate over all blocks in chunk
     for (int i = 0; i < 16; i++) { // x
         for (int j = 0; j < 256; j++) { // y
@@ -65,11 +65,11 @@ void Chunk::create()
                     //LR
                     pos.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     // Back face normal is -k
-                    pushNormal(norm, glm::vec4(0.f, 0.f, -1.f, 0.f), 4);
+                    pushNormal(nor, glm::vec4(0.f, 0.f, -1.f, 0.f), 4);
                     numColor += 4;
                     // Add indices
-                    pushIndexForFace(idx, index);
-                    index += 4;
+                    pushIndexForFace(idx, indexCount);
+                    indexCount += 4;
                 }
 
                 // Front face
@@ -85,11 +85,11 @@ void Chunk::create()
                     //LR
                     pos.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     // Front face normal is +k
-                    pushNormal(norm, glm::vec4(0.f, 0.f, 1.f, 0.f), 4);
+                    pushNormal(nor, glm::vec4(0.f, 0.f, 1.f, 0.f), 4);
                     numColor += 4;
                     // Add indices
-                    pushIndexForFace(idx, index);
-                    index += 4;
+                    pushIndexForFace(idx, indexCount);
+                    indexCount += 4;
                 }
 
                 // Left face
@@ -105,11 +105,11 @@ void Chunk::create()
                     //LR
                     pos.push_back(worldPos);
                     // Left face normal is -i
-                    pushNormal(norm, glm::vec4(-1.f, 0.f, 0.f, 0.f), 4);
+                    pushNormal(nor, glm::vec4(-1.f, 0.f, 0.f, 0.f), 4);
                     numColor += 4;
                     // Add indices
-                    pushIndexForFace(idx, index);
-                    index += 4;
+                    pushIndexForFace(idx, indexCount);
+                    indexCount += 4;
                 }
 
                 // Right face
@@ -125,11 +125,11 @@ void Chunk::create()
                     //LR
                     pos.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     // Right face normal is +i
-                    pushNormal(norm, glm::vec4(1.f, 0.f, 0.f, 0.f), 4);
+                    pushNormal(nor, glm::vec4(1.f, 0.f, 0.f, 0.f), 4);
                     numColor += 4;
                     // Add indices
-                    pushIndexForFace(idx, index);
-                    index += 4;
+                    pushIndexForFace(idx, indexCount);
+                    indexCount += 4;
                 }
 
                 // Bottom face
@@ -145,15 +145,15 @@ void Chunk::create()
                     //LR
                     pos.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     // Bottom face normal is -j
-                    pushNormal(norm, glm::vec4(0.f, -1.f, 0.f, 0.f), 4);
+                    pushNormal(nor, glm::vec4(0.f, -1.f, 0.f, 0.f), 4);
                     numColor += 4;
                     // Add indices
-                    pushIndexForFace(idx, index);
-                    index += 4;
+                    pushIndexForFace(idx, indexCount);
+                    indexCount += 4;
                 }
 
                 // Top face
-                BlockType blockTop = getBlockAt(i, std::min(j + 1, 255), k);
+                BlockType blockTop = getBlockAt(i, std::min(255, j + 1), k);
                 if (blockTop == EMPTY || j == 255) {
                     // Top face positions
                     //UL
@@ -165,18 +165,38 @@ void Chunk::create()
                     //LR
                     pos.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     // Top face normal is +j
-                    pushNormal(norm, glm::vec4(0.f, 1.f, 0.f, 0.f), 4);
+                    pushNormal(nor, glm::vec4(0.f, 1.f, 0.f, 0.f), 4);
                     numColor += 4;
                     // Add indices
-                    pushIndexForFace(idx, index);
-                    index += 4;
+                    pushIndexForFace(idx, indexCount);
+                    indexCount += 4;
                 }
-
                 // Push back colors
                 pushColor(col, t, numColor);
             }
         }
     }
+
+    m_count = indexCount;
+    int vertCount = pos.size();
+
+    // Generate index buffer
+    generateIdx();
+    // Bind index buffer
+    mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufIdx);
+    // Buffer index data
+    mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof (GLuint), idx.data(), GL_STATIC_DRAW);
+
+    // Push vbo assets into one vector
+    vbos.push_back(&pos);
+    vbos.push_back(&col);
+    vbos.push_back(&nor);
+    // Combine assets into one data VBO and generate data buffer
+    generateData(data, vbos, vertCount);
+    // Bind data buffer
+    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_bufData);
+    // Buffer data to GPU
+    mp_context->glBufferData(GL_ARRAY_BUFFER, vertCount * vbos.size() * sizeof(glm::vec4), data.data(), GL_STATIC_DRAW);
 }
 
 void Chunk::pushIndexForFace(std::vector<GLuint>&idx, int index)
@@ -217,7 +237,16 @@ void Chunk::pushColor(std::vector<glm::vec4>&col, BlockType type, int amount)
     }
 }
 
-std::vector<glm::vec4> Chunk::combineData(std::vector<std::vector<glm::vec4>> data)
+void Chunk::generateData(std::vector<glm::vec4>&data, const std::vector<std::vector<glm::vec4>*>&vbos, int size)
 {
+    int i = 0;
+    while (i < size) {
+        for (const std::vector<glm::vec4>*ptr : vbos) {
+            std::vector<glm::vec4> vbo = *ptr;
+            data.push_back(vbo[i]);
+        }
+        i++;
+    }
+    // Create a VBO on our GPU and store its handle in bufData
+    mp_context->glGenBuffers(1, &m_bufData);
 }
-

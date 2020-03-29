@@ -55,10 +55,12 @@ private:
     int X;
     int Z;
     // combines data
-    std::vector<glm::vec4> combineData(std::vector<std::vector<glm::vec4>> data);
+    void generateData(std::vector<glm::vec4> &data, const std::vector<std::vector<glm::vec4>*> &vbos, int size);
     void pushColor(std::vector<glm::vec4>&col, BlockType type, int amount);
     void pushNormal(std::vector<glm::vec4>&norm, glm::vec4 dir, int amount);
-    void pushIndexForFace(std::vector<glm::vec4>&idx, int index);
+    void pushIndexForFace(std::vector<GLuint>&idx, int index);
+protected:
+    GLuint m_bufData;
 public:
     Chunk(OpenGLContext* context, int X, int Z);
     virtual ~Chunk(){};
