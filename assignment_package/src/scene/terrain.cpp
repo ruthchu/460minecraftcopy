@@ -128,34 +128,41 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
     for(int x = minX; x < maxX; x += 16) {
         for(int z = minZ; z < maxZ; z += 16) {
             const uPtr<Chunk> &chunk = getChunkAt(x, z);
-            for(int i = 0; i < 16; ++i) {
-                for(int j = 0; j < 256; ++j) {
-                    for(int k = 0; k < 16; ++k) {
-                        BlockType t = chunk->getBlockAt(i, j, k);
-                        switch(t) {
-                        case GRASS:
-                            shaderProgram->setGeometryColor(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
-                            break;
-                        case DIRT:
-                            shaderProgram->setGeometryColor(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
-                            break;
-                        case STONE:
-                            shaderProgram->setGeometryColor(glm::vec4(0.5f));
-                            break;
-                        default:
-                            // Other block types are not yet handled, so we default to black
-                            shaderProgram->setGeometryColor(glm::vec4(0.f));
-                            break;
-                        }
-                        if(t != EMPTY) {
-                            shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(i + x, j, k + z)));
-                            shaderProgram->draw(m_geomCube);
-                        }
-                    }
-                }
-            }
+            shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(x, 0, z)));
+            shaderProgram->draw(*chunk);
         }
     }
+//    for(int x = minX; x < maxX; x += 16) {
+//        for(int z = minZ; z < maxZ; z += 16) {
+//            const uPtr<Chunk> &chunk = getChunkAt(x, z);
+//            for(int i = 0; i < 16; ++i) {
+//                for(int j = 0; j < 256; ++j) {
+//                    for(int k = 0; k < 16; ++k) {
+//                        BlockType t = chunk->getBlockAt(i, j, k);
+//                        switch(t) {
+//                        case GRASS:
+//                            shaderProgram->setGeometryColor(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
+//                            break;
+//                        case DIRT:
+//                            shaderProgram->setGeometryColor(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
+//                            break;
+//                        case STONE:
+//                            shaderProgram->setGeometryColor(glm::vec4(0.5f));
+//                            break;
+//                        default:
+//                            // Other block types are not yet handled, so we default to black
+//                            shaderProgram->setGeometryColor(glm::vec4(0.f));
+//                            break;
+//                        }
+//                        if(t != EMPTY) {
+//                            shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(i + x, j, k + z)));
+//                            shaderProgram->draw(m_geomCube);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
 
 void Terrain::CreateTestScene()
