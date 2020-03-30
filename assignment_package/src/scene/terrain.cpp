@@ -210,6 +210,7 @@ void Terrain::CreateTestScene()
 
     for(int x = 0; x < 64; x += 16) {
         for(int z = 0; z < 64; z += 16) {
+            std::cout << "hello" << std::endl;
             const uPtr<Chunk> &chunk = getChunkAt(x, z);
             chunk->create();
         }

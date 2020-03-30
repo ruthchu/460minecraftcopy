@@ -55,7 +55,8 @@ void Chunk::create()
 
                 // Back face (face with LL vertex at worldPos)
                 BlockType blockBehind = getBlockAt(i, j, std::max(0, k - 1));
-                if (blockBehind == EMPTY && k != 0) {
+                //if (blockBehind == EMPTY && k != 0) {
+                if (blockBehind == EMPTY || k == 0) {
                     // Back face positions
                     //UL
                     pos.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
@@ -75,7 +76,8 @@ void Chunk::create()
 
                 // Front face
                 BlockType blockFront = getBlockAt(i, j, std::min(15, k + 1));
-                if (blockFront == EMPTY && k != 15) {
+                //if (blockFront == EMPTY && k != 15) {
+                if (blockFront == EMPTY || k == 15) {
                     // Front face positions
                     //UL
                     pos.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
@@ -95,7 +97,8 @@ void Chunk::create()
 
                 // Left face
                 BlockType blockLeft = getBlockAt(std::max(0, i - 1), j, k);
-                if (blockLeft == EMPTY && i != 0) {
+                //if (blockLeft == EMPTY && i != 0) {
+                if (blockLeft == EMPTY || i == 0) {
                     // Left face positions
                     //UL
                     pos.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
@@ -115,7 +118,8 @@ void Chunk::create()
 
                 // Right face
                 BlockType blockRight = getBlockAt(std::min(15, i + 1), j, k);
-                if (blockRight == EMPTY && i != 15) {
+                if (blockRight == EMPTY || i == 15) {
+//                    if (blockRight == EMPTY && i != 15) {
                     // Right face positions
                     //UL
                     pos.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
