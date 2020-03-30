@@ -50,7 +50,7 @@ private:
     // for every non-EMPTY block within its Chunks. This is horribly
     // inefficient, and will cause your game to run very slowly until
     // milestone 1's Chunk VBO setup is completed.
-    Cube m_geomCube;
+    //Cube m_geomCube;
 
     OpenGLContext* mp_context;
 

@@ -4,11 +4,12 @@
 #include <iostream>
 
 Terrain::Terrain(OpenGLContext *context)
-    : m_chunks(), m_generatedTerrain(), m_geomCube(context), mp_context(context)
+    : m_chunks(), m_generatedTerrain(), mp_context(context)
+//     , m_geomCube(context)
 {}
 
 Terrain::~Terrain() {
-    m_geomCube.destroy();
+    //m_geomCube.destroy();
 }
 
 // Combine two 32-bit ints into one 64-bit int
@@ -128,6 +129,7 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
     for(int x = minX; x < maxX; x += 16) {
         for(int z = minZ; z < maxZ; z += 16) {
             const uPtr<Chunk> &chunk = getChunkAt(x, z);
+            //std::cout << "hello" << std::endl;
             shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(x, 0, z)));
             shaderProgram->draw(*chunk);
         }
@@ -168,7 +170,7 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
 void Terrain::CreateTestScene()
 {
     // TODO: DELETE THIS LINE WHEN YOU DELETE m_geomCube!
-    m_geomCube.create();
+    //m_geomCube.create();
 
     // Create the Chunks that will
     // store the blocks for our
@@ -204,5 +206,12 @@ void Terrain::CreateTestScene()
     // Add a central column
     for(int y = 129; y < 140; ++y) {
         setBlockAt(32, y, 32, GRASS);
+    }
+
+    for(int x = 0; x < 64; x += 16) {
+        for(int z = 0; z < 64; z += 16) {
+            const uPtr<Chunk> &chunk = getChunkAt(x, z);
+            chunk->create();
+        }
     }
 }
