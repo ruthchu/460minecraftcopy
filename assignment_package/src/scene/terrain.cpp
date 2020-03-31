@@ -5,7 +5,7 @@
 
 Terrain::Terrain(OpenGLContext *context)
     : m_chunks(), m_generatedTerrain(), mp_context(context)
-//     , m_geomCube(context)
+     , m_geomCube(context)
 {}
 
 Terrain::~Terrain() {
@@ -129,8 +129,8 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
     for(int x = minX; x < maxX; x += 16) {
         for(int z = minZ; z < maxZ; z += 16) {
             const uPtr<Chunk> &chunk = getChunkAt(x, z);
-            //std::cout << "hello" << std::endl;
-            shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(x, 0, z)));
+            //shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(x, 0, z)));
+            shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
             shaderProgram->draw(*chunk);
         }
     }
@@ -215,4 +215,5 @@ void Terrain::CreateTestScene()
             chunk->create();
         }
     }
+    std::cout << "hello" << std::endl;
 }

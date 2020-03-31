@@ -169,17 +169,16 @@ void ShaderProgram::draw(Drawable &d)
     }
 
 //    if (attrPos != -1 && attrCol != -1 && attrNor != -1 && d.bindAll()) {
+//        int stride = 12 * sizeof (float);
 //        // Position
 //        context->glEnableVertexAttribArray(attrPos);
-//        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, 2, static_cast<char*>(0));
+//        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, stride, (void*)(0));
 //        // Normal
 //        context->glEnableVertexAttribArray(attrNor);
-//        char normOffset = sizeof(glm::vec4);
-//        context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, 2, static_cast<char*>(&normOffset));
+//        context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, stride, (void*)(4 * sizeof(float)));
 //        // Color
-//        char colOffset = 2 * sizeof(glm::vec4);
 //        context->glEnableVertexAttribArray(attrCol);
-//        context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, 2, static_cast<char*>(&colOffset));
+//        context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, stride, (void*)(8 * sizeof(float)));
 //    }
 
     // Bind the index buffer and then draw shapes from it.
