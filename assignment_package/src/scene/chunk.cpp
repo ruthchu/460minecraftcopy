@@ -35,6 +35,7 @@ void Chunk::create()
     std::vector<std::vector<glm::vec4>*> vbos;
     int indexCount = 0;
 
+
     // Iterate over all blocks in chunk
     for (int i = 0; i < 16; i++) { // x
         for (int j = 0; j < 256; j++) { // y
@@ -49,22 +50,24 @@ void Chunk::create()
                 // Number of color attributes
                 int numColor = 0;
                 // Block's local position
-                glm::vec4 localPos = glm::vec4(i, j, k, 1.f);
+                //glm::vec4 localPos = glm::vec4(i, j, k, 1.f);
+                glm::vec4 localPos = glm::vec4(this->X, 0.f, this->Z, 0.f) + glm::vec4(i, j, k, 1.f);
+//                glm::vec4 localPos = glm::vec4(i, j, k, 1.f);
                 // Block's bottom left corner in world space
-                glm::vec4 worldPos = glm::vec4(this->X, 0.f, this->Z, 0.f) + localPos;
+                //glm::vec4 worldPos = glm::vec4(this->X, 0.f, this->Z, 0.f) + localPos;
 
                 // Back face (face with LL vertex at worldPos)
                 BlockType blockBehind = getBlockAt(i, j, std::max(0, k - 1));
-                if (blockBehind == EMPTY && k != 0) {
+                if (blockBehind == EMPTY || k == 0) {
                     // Back face positions
                     //UL
-                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     //LL
-                    pos.push_back(worldPos);
+                    pos.push_back(localPos);
                     //LR
-                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     //UR
-                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     // Back face normal is -k
                     pushNormal(nor, glm::vec4(0.f, 0.f, -1.f, 0.f), 4);
                     numColor += 4;
@@ -75,16 +78,16 @@ void Chunk::create()
 
                 // Front face
                 BlockType blockFront = getBlockAt(i, j, std::min(15, k + 1));
-                if (blockFront == EMPTY && k != 15) {
+                if (blockFront == EMPTY || k == 15) {
                     // Front face positions
                     //UL
-                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     //LL
-                    pos.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     //LR
-                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     //UR
-                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     // Front face normal is +k
                     pushNormal(nor, glm::vec4(0.f, 0.f, 1.f, 0.f), 4);
                     numColor += 4;
@@ -95,16 +98,16 @@ void Chunk::create()
 
                 // Left face
                 BlockType blockLeft = getBlockAt(std::max(0, i - 1), j, k);
-                if (blockLeft == EMPTY && i != 0) {
+                if (blockLeft == EMPTY || i == 0) {
                     // Left face positions
                     //UL
-                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     //LL
-                    pos.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     //LR
-                    pos.push_back(worldPos);
+                    pos.push_back(localPos);
                     //UR
-                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     // Left face normal is -i
                     pushNormal(nor, glm::vec4(-1.f, 0.f, 0.f, 0.f), 4);
                     numColor += 4;
@@ -115,16 +118,16 @@ void Chunk::create()
 
                 // Right face
                 BlockType blockRight = getBlockAt(std::min(15, i + 1), j, k);
-                if (blockRight == EMPTY && i != 15) {
+                if (blockRight == EMPTY || i == 15) {
                     // Right face positions
                     //UL
-                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     //LL
-                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     //LR
-                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     //UR
-                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     // Right face normal is +i
                     pushNormal(nor, glm::vec4(1.f, 0.f, 0.f, 0.f), 4);
                     numColor += 4;
@@ -138,13 +141,13 @@ void Chunk::create()
                 if (blockBottom == EMPTY || j == 0) {
                     // Bottom face positions
                     //UL
-                    pos.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     //LL
-                    pos.push_back(worldPos);
+                    pos.push_back(localPos);
                     //LR
-                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     //UR
-                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     // Bottom face normal is -j
                     pushNormal(nor, glm::vec4(0.f, -1.f, 0.f, 0.f), 4);
                     numColor += 4;
@@ -158,13 +161,13 @@ void Chunk::create()
                 if (blockTop == EMPTY || j == 255) {
                     // Top face positions
                     //UL
-                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     //LL
-                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     //LR
-                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     //UR
-                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
+                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     // Top face normal is +j
                     pushNormal(nor, glm::vec4(0.f, 1.f, 0.f, 0.f), 4);
                     numColor += 4;
@@ -173,12 +176,13 @@ void Chunk::create()
                     indexCount += 4;
                 }
                 // Push back colors
+                //std::cout << "type: " << t << std::endl;
                 pushColor(col, t, numColor);
             }
         }
     }
 
-    m_count = indexCount;
+    m_count = idx.size();
     int vertCount = pos.size();
 
     // Generate index buffer
@@ -186,7 +190,7 @@ void Chunk::create()
     // Bind index buffer
     mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufIdx);
     // Buffer index data
-    mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof (GLuint), idx.data(), GL_STATIC_DRAW);
+    mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof (GLuint), idx.data(), GL_STATIC_DRAW);
 
 
     // The next few sets of function calls are basically the same as above, except bufPos and bufNor are
@@ -203,7 +207,7 @@ void Chunk::create()
     mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_bufCol);
     mp_context->glBufferData(GL_ARRAY_BUFFER, vertCount * sizeof(glm::vec4), col.data(), GL_STATIC_DRAW);
 
-//    // Push vbo assets into one vector
+    // Push vbo assets into one vector
 //    vbos.push_back(&pos);
 //    vbos.push_back(&nor);
 //    vbos.push_back(&col);
@@ -234,18 +238,19 @@ void Chunk::pushNormal(std::vector<glm::vec4>&norm, glm::vec4 dir, int amount)
     }
 }
 
-void Chunk::pushColor(std::vector<glm::vec4>&col, BlockType type, int amount)
+void Chunk::pushColor(std::vector<glm::vec4>&col, BlockType &type, int amount)
 {
+    //std::cout << "type INSIDE: " << type << std::endl;
     for (int i = 0; i < amount; i++) {
         switch(type) {
-        case GRASS:
-            col.push_back(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
-            break;
         case DIRT:
             col.push_back(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
             break;
         case STONE:
             col.push_back(glm::vec4(0.5f));
+            break;
+        case GRASS:
+            col.push_back(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
             break;
         default:
             // Other block types are not yet handled, so we default to black
