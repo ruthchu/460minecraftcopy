@@ -29,9 +29,7 @@ void Chunk::create()
 {
     std::vector<GLuint> idx;
     std::vector<glm::vec4> data;
-    std::vector<std::vector<glm::vec4>*> vbos;
     int indexCount = 0;
-
 
     // Iterate over all blocks in chunk
     for (int i = 0; i < 16; i++) { // x
@@ -51,7 +49,12 @@ void Chunk::create()
 
                 // Back face (face with LL vertex at worldPos)
                 BlockType blockBehind = getBlockAt(i, j, std::max(0, k - 1));
-                if (blockBehind == EMPTY || k == 0) {
+                if (k == 0) {
+                    if (m_neighbors.at(ZNEG) != nullptr) {
+                        blockBehind = m_neighbors.at(ZNEG)->getBlockAt(i, j, 15);
+                    }
+                }
+                if (blockBehind == EMPTY || (k == 0 && m_neighbors.at(ZNEG) == nullptr)) {
                     // Back face positions
                     // Back face normal is -k
                     glm::vec4 norm = glm::vec4(0.f, 0.f, -1.f, 0.f);
@@ -78,7 +81,12 @@ void Chunk::create()
 
                 // Front face
                 BlockType blockFront = getBlockAt(i, j, std::min(15, k + 1));
-                if (blockFront == EMPTY || k == 15) {
+                if (k == 15) {
+                    if (m_neighbors.at(ZPOS) != nullptr) {
+                        blockFront = m_neighbors.at(ZPOS)->getBlockAt(i, j, 0);
+                    }
+                }
+                if (blockFront == EMPTY || (k == 15 && m_neighbors.at(ZPOS) == nullptr)) {
                     // Front face positions
                     // Front face normal is +k
                     glm::vec4 norm = glm::vec4(0.f, 0.f, 1.f, 0.f);
@@ -105,7 +113,12 @@ void Chunk::create()
 
                 // Left face
                 BlockType blockLeft = getBlockAt(std::max(0, i - 1), j, k);
-                if (blockLeft == EMPTY || i == 0) {
+                if (i == 0) {
+                    if (m_neighbors.at(XNEG) != nullptr) {
+                        blockLeft = m_neighbors.at(XNEG)->getBlockAt(15, j, k);
+                    }
+                }
+                if (blockLeft == EMPTY || (i == 0 && m_neighbors.at(XNEG) == nullptr)) {
                     // Left face positions
                     // Left face normal is -i
                     glm::vec4 norm = glm::vec4(-1.f, 0.f, 0.f, 0.f);
@@ -132,7 +145,12 @@ void Chunk::create()
 
                 // Right face
                 BlockType blockRight = getBlockAt(std::min(15, i + 1), j, k);
-                if (blockRight == EMPTY || i == 15) {
+                if (i == 15) {
+                    if (m_neighbors.at(XPOS) != nullptr) {
+                        blockRight = m_neighbors.at(XPOS)->getBlockAt(0, j, k);
+                    }
+                }
+                if (blockRight == EMPTY || (i == 15 && m_neighbors.at(XPOS) == nullptr)) {
                     // Right face positions
                     // Right face normal is +i
                     glm::vec4 norm = glm::vec4(1.f, 0.f, 0.f, 0.f);
@@ -184,7 +202,7 @@ void Chunk::create()
                     indexCount += 4;
                 }
 
-                // Top face
+                //Top face
                 BlockType blockTop = getBlockAt(i, std::min(255, j + 1), k);
                 if (blockTop == EMPTY || j == 255) {
                     // Top face positions

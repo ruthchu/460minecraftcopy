@@ -117,6 +117,7 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 
 Chunk* Terrain::createChunkAt(int x, int z) {
     uPtr<Chunk> chunk = mkU<Chunk>(mp_context, x, z);
+    // todo -- add neighbors
     Chunk *cPtr = chunk.get();
     m_chunks[toKey(x, z)] = move(chunk);
     return cPtr;
@@ -195,6 +196,8 @@ void Terrain::CreateTestScene()
             }
         }
     }
+
+
     // Add "walls" for collision testing
     for(int x = 0; x < 64; ++x) {
         setBlockAt(x, 129, 0, GRASS);
@@ -205,6 +208,10 @@ void Terrain::CreateTestScene()
     // Add a central column
     for(int y = 129; y < 140; ++y) {
         setBlockAt(32, y, 32, GRASS);
+    }
+
+    for (int z = 15; z < 50; z++) {
+        setBlockAt(32, 180, z, STONE);
     }
 
     for(int x = 0; x < 64; x += 16) {
