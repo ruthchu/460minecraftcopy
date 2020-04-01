@@ -115,11 +115,35 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
     }
 }
 
+//Chunk* Terrain::createChunkAt(int x, int z) {
+//    uPtr<Chunk> chunk = mkU<Chunk>(mp_context, x, z);
+//    // todo -- add neighbors
+//    Chunk *cPtr = chunk.get();
+//    m_chunks[toKey(x, z)] = move(chunk);
+//    return cPtr;
+//}
+
 Chunk* Terrain::createChunkAt(int x, int z) {
     uPtr<Chunk> chunk = mkU<Chunk>(mp_context, x, z);
-    // todo -- add neighbors
     Chunk *cPtr = chunk.get();
     m_chunks[toKey(x, z)] = move(chunk);
+    // Set the neighbor pointers of itself and its neighbors
+    if(hasChunkAt(x, z + 16)) {
+        auto &chunkNorth = m_chunks[toKey(x, z + 16)];
+        cPtr->linkNeighbor(chunkNorth, ZPOS);
+    }
+    if(hasChunkAt(x, z - 16)) {
+        auto &chunkSouth = m_chunks[toKey(x, z - 16)];
+        cPtr->linkNeighbor(chunkSouth, ZNEG);
+    }
+    if(hasChunkAt(x + 16, z)) {
+        auto &chunkEast = m_chunks[toKey(x + 16, z)];
+        cPtr->linkNeighbor(chunkEast, XPOS);
+    }
+    if(hasChunkAt(x - 16, z)) {
+        auto &chunkWest = m_chunks[toKey(x - 16, z)];
+        cPtr->linkNeighbor(chunkWest, XNEG);
+    }
     return cPtr;
 }
 

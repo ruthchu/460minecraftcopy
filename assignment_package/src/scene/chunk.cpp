@@ -10,6 +10,13 @@ Chunk::Chunk(OpenGLContext* context, int X, int Z)
     std::fill_n(m_blocks.begin(), 65536, EMPTY);
 }
 
+void Chunk::linkNeighbor(uPtr<Chunk> &neighbor, Direction dir) {
+    if(neighbor != nullptr) {
+        this->m_neighbors[dir] = neighbor.get();
+        neighbor->m_neighbors[oppositeDirection.at(dir)] = this;
+    }
+}
+
 // Does bounds checking with at()
 BlockType Chunk::getBlockAt(unsigned int x, unsigned int y, unsigned int z) const {
     return m_blocks.at(x + 16 * y + 16 * 256 * z);

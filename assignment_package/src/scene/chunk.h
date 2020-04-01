@@ -33,6 +33,15 @@ struct EnumHash {
     }
 };
 
+const static std::unordered_map<Direction, Direction, EnumHash> oppositeDirection {
+    {XPOS, XNEG},
+    {XNEG, XPOS},
+    {YPOS, YNEG},
+    {YNEG, YPOS},
+    {ZPOS, ZNEG},
+    {ZNEG, ZPOS}
+};
+
 // One Chunk is a 16 x 256 x 16 section of the world,
 // containing all the Minecraft blocks in that area.
 // We divide the world into Chunks in order to make
@@ -67,4 +76,5 @@ public:
     BlockType getBlockAt(unsigned int X, unsigned int y, unsigned int Z) const;
     BlockType getBlockAt(int X, int y, int Z) const;
     void setBlockAt(unsigned int X, unsigned int y, unsigned int Z, BlockType t);
+    void linkNeighbor(uPtr<Chunk> &neighbor, Direction dir);
 };
