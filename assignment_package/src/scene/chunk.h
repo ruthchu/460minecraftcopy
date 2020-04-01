@@ -55,11 +55,8 @@ private:
     int X;
     int Z;
 
-    void pushColor(std::vector<glm::vec4>&col, BlockType &type, int amount);
-    void pushNormal(std::vector<glm::vec4>&norm, glm::vec4 dir, int amount);
+    glm::vec4 getColor(BlockType &type);
     void pushIndexForFace(std::vector<GLuint>&idx, int index);
-
-    void combineData(std::vector<glm::vec4> &data, const std::vector<std::vector<glm::vec4>*> &vbos, int size);
     // TODO -- write this
     void uninterleaveData(std::vector<glm::vec4>&data, std::vector<GLuint> idx);
 public:
