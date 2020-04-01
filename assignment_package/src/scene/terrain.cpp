@@ -129,7 +129,6 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
     for(int x = minX; x < maxX; x += 16) {
         for(int z = minZ; z < maxZ; z += 16) {
             const uPtr<Chunk> &chunk = getChunkAt(x, z);
-            //shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(x, 0, z)));
             shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
             shaderProgram->draw(*chunk);
         }
@@ -210,10 +209,8 @@ void Terrain::CreateTestScene()
 
     for(int x = 0; x < 64; x += 16) {
         for(int z = 0; z < 64; z += 16) {
-            std::cout << "hello" << std::endl;
             const uPtr<Chunk> &chunk = getChunkAt(x, z);
             chunk->create();
         }
     }
-    std::cout << "hello" << std::endl;
 }

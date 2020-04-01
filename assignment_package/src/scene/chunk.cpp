@@ -49,25 +49,21 @@ void Chunk::create()
 
                 // Number of color attributes
                 int numColor = 0;
-                // Block's local position
-                //glm::vec4 localPos = glm::vec4(i, j, k, 1.f);
-                glm::vec4 localPos = glm::vec4(this->X, 0.f, this->Z, 0.f) + glm::vec4(i, j, k, 1.f);
-//                glm::vec4 localPos = glm::vec4(i, j, k, 1.f);
-                // Block's bottom left corner in world space
-                //glm::vec4 worldPos = glm::vec4(this->X, 0.f, this->Z, 0.f) + localPos;
+                // World pos = chunk position + block local position
+                glm::vec4 worldPos = glm::vec4(this->X, 0.f, this->Z, 0.f) + glm::vec4(i, j, k, 1.f);
 
                 // Back face (face with LL vertex at worldPos)
                 BlockType blockBehind = getBlockAt(i, j, std::max(0, k - 1));
                 if (blockBehind == EMPTY || k == 0) {
                     // Back face positions
                     //UL
-                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     //LL
-                    pos.push_back(localPos);
+                    pos.push_back(worldPos);
                     //LR
-                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     //UR
-                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     // Back face normal is -k
                     pushNormal(nor, glm::vec4(0.f, 0.f, -1.f, 0.f), 4);
                     numColor += 4;
@@ -81,13 +77,13 @@ void Chunk::create()
                 if (blockFront == EMPTY || k == 15) {
                     // Front face positions
                     //UL
-                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     //LL
-                    pos.push_back(localPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     //LR
-                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     //UR
-                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     // Front face normal is +k
                     pushNormal(nor, glm::vec4(0.f, 0.f, 1.f, 0.f), 4);
                     numColor += 4;
@@ -101,13 +97,13 @@ void Chunk::create()
                 if (blockLeft == EMPTY || i == 0) {
                     // Left face positions
                     //UL
-                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     //LL
-                    pos.push_back(localPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     //LR
-                    pos.push_back(localPos);
+                    pos.push_back(worldPos);
                     //UR
-                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     // Left face normal is -i
                     pushNormal(nor, glm::vec4(-1.f, 0.f, 0.f, 0.f), 4);
                     numColor += 4;
@@ -121,13 +117,13 @@ void Chunk::create()
                 if (blockRight == EMPTY || i == 15) {
                     // Right face positions
                     //UL
-                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     //LL
-                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     //LR
-                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     //UR
-                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     // Right face normal is +i
                     pushNormal(nor, glm::vec4(1.f, 0.f, 0.f, 0.f), 4);
                     numColor += 4;
@@ -141,13 +137,13 @@ void Chunk::create()
                 if (blockBottom == EMPTY || j == 0) {
                     // Bottom face positions
                     //UL
-                    pos.push_back(localPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     //LL
-                    pos.push_back(localPos);
+                    pos.push_back(worldPos);
                     //LR
-                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     //UR
-                    pos.push_back(localPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     // Bottom face normal is -j
                     pushNormal(nor, glm::vec4(0.f, -1.f, 0.f, 0.f), 4);
                     numColor += 4;
@@ -161,13 +157,13 @@ void Chunk::create()
                 if (blockTop == EMPTY || j == 255) {
                     // Top face positions
                     //UL
-                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     //LL
-                    pos.push_back(localPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     //LR
-                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     //UR
-                    pos.push_back(localPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
+                    pos.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     // Top face normal is +j
                     pushNormal(nor, glm::vec4(0.f, 1.f, 0.f, 0.f), 4);
                     numColor += 4;
@@ -195,30 +191,30 @@ void Chunk::create()
 
     // The next few sets of function calls are basically the same as above, except bufPos and bufNor are
     // array buffers rather than element array buffers, as they store vertex attributes like position.
-    generatePos();
-    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_bufPos);
-    mp_context->glBufferData(GL_ARRAY_BUFFER, vertCount * sizeof(glm::vec4), pos.data(), GL_STATIC_DRAW);
+    //generatePos();
+//    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_bufPos);
+//    mp_context->glBufferData(GL_ARRAY_BUFFER, vertCount * sizeof(glm::vec4), pos.data(), GL_STATIC_DRAW);
 
-    generateNor();
-    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_bufNor);
-    mp_context->glBufferData(GL_ARRAY_BUFFER, vertCount * sizeof(glm::vec4), nor.data(), GL_STATIC_DRAW);
+//    generateNor();
+//    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_bufNor);
+//    mp_context->glBufferData(GL_ARRAY_BUFFER, vertCount * sizeof(glm::vec4), nor.data(), GL_STATIC_DRAW);
 
-    generateCol();
-    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_bufCol);
-    mp_context->glBufferData(GL_ARRAY_BUFFER, vertCount * sizeof(glm::vec4), col.data(), GL_STATIC_DRAW);
+//    generateCol();
+//    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_bufCol);
+//    mp_context->glBufferData(GL_ARRAY_BUFFER, vertCount * sizeof(glm::vec4), col.data(), GL_STATIC_DRAW);
 
     // Push vbo assets into one vector
-//    vbos.push_back(&pos);
-//    vbos.push_back(&nor);
-//    vbos.push_back(&col);
-//    // Combine assets into one data VBO and generate data buffer
-//    combineData(data, vbos, vertCount);
-//    // Generate data buffer
-//    generateAll();
-//    // Bind data buffer
-//    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
-//    // Buffer data to GPU
-//    mp_context->glBufferData(GL_ARRAY_BUFFER, vertCount * vbos.size() * sizeof(glm::vec4), data.data(), GL_STATIC_DRAW);
+    vbos.push_back(&pos);
+    vbos.push_back(&nor);
+    vbos.push_back(&col);
+    // Combine assets into one data VBO and generate data buffer
+    combineData(data, vbos, vertCount);
+    // Generate data buffer
+    generateAll();
+    // Bind data buffer
+    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
+    // Buffer data to GPU
+    mp_context->glBufferData(GL_ARRAY_BUFFER, vertCount * 3 * sizeof(glm::vec4), data.data(), GL_STATIC_DRAW);
 }
 
 void Chunk::pushIndexForFace(std::vector<GLuint>&idx, int index)
