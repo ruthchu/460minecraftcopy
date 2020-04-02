@@ -153,26 +153,21 @@ void ShaderProgram::draw(Drawable &d)
     // meaning that glVertexAttribPointer associates vs_Pos
     // (referred to by attrPos) with that VBO
 
-   int stridee = 12 * sizeof (float);
-
 //    if (attrPos != -1 && d.bindPos()) {
 //        context->glEnableVertexAttribArray(attrPos);
 //        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, 0, NULL);
-//        //context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, stride, (void*)(0));
 
 //    }
 
 //    if (attrNor != -1 && d.bindNor()) {
 //        context->glEnableVertexAttribArray(attrNor);
 //        context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, 0, NULL);
-//        //context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, stride, (void*)(4 * sizeof(float)));
 
 //    }
 
 //    if (attrCol != -1 && d.bindCol()) {
 //        context->glEnableVertexAttribArray(attrCol);
 //        context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, 0, NULL);
-//        //context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, stride, (void*)(8 * sizeof(float)));
 
 //    }
 

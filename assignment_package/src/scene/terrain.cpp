@@ -177,7 +177,7 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
 //                            break;
 //                        default:
 //                            // Other block types are not yet handled, so we default to black
-//                            shaderProgram->setGeometryColor(glm::vec4(0.f));
+//                          shaderProgram->setGeometryColor(glm::vec4(0.f));
 //                            break;
 //                        }
 //                        if(t != EMPTY) {
