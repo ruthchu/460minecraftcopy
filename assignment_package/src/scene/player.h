@@ -16,6 +16,7 @@ public:
     // Readonly public reference to our camera
     // for easy access from MyGL
     const Camera& mcr_camera;
+    bool m_flightOn; // Boolean to toggle flight mode
 
     Player(glm::vec3 pos, const Terrain &terrain);
     virtual ~Player() override;
