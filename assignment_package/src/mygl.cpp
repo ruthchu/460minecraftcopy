@@ -93,6 +93,7 @@ void MyGL::resizeGL(int w, int h) {
 // all per-frame actions here, such as performing physics updates on all
 // entities in the scene.
 void MyGL::tick() {
+    m_terrain.expandTerrainBasedOnPlayer(m_player.getPos());
     update(); // Calls paintGL() as part of a larger QOpenGLWidget pipeline
     sendPlayerDataToGUI(); // Updates the info in the secondary window displaying player data
 }
@@ -133,7 +134,6 @@ void MyGL::paintGL() {
 // for more info)
 void MyGL::renderTerrain() {
     //m_terrain.draw(0, 64, 0, 64, &m_progLambert);
-    m_terrain.expandTerrainBasedOnPlayer(m_player.getPos());
     int xFloor = static_cast<int>(glm::floor(m_player.getPos().x / 16.f));
     int zFloor = static_cast<int>(glm::floor(m_player.getPos().z / 16.f));
     m_terrain.draw(16 * xFloor - 16, 16 * xFloor + 16,
