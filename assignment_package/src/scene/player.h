@@ -47,4 +47,7 @@ public:
     QString velAsQString() const;
     QString accAsQString() const;
     QString lookAsQString() const;
+
+    // For generating the terrain based on play position
+    glm::vec3 getPos();
 };

@@ -285,3 +285,9 @@ void Chunk::bufferToDrawableVBOs(std::vector<glm::vec4>&data)
     mp_context->glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec4), data.data(), GL_STATIC_DRAW);
 }
 
+bool Chunk::hasXPOSneighbor() { return m_neighbors.at(XPOS) != nullptr; }
+bool Chunk::hasXNEGneighbor() { return m_neighbors.at(XNEG) != nullptr; }
+bool Chunk::hasZPOSneighbor() { return m_neighbors.at(ZPOS) != nullptr; }
+bool Chunk::hasZNEGneighbor() { return m_neighbors.at(ZNEG) != nullptr; }
+
+

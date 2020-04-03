@@ -69,6 +69,7 @@ private:
     void bufferToDrawableVBOs(std::vector<glm::vec4>&data);
 public:
     Chunk(OpenGLContext* context, int X, int Z);
+    Chunk(OpenGLContext* context, int X, int Z, bool test);
     virtual ~Chunk(){};
     void create() override;
 
@@ -76,4 +77,9 @@ public:
     BlockType getBlockAt(int X, int y, int Z) const;
     void setBlockAt(unsigned int X, unsigned int y, unsigned int Z, BlockType t);
     void linkNeighbor(uPtr<Chunk> &neighbor, Direction dir);
+
+    bool hasXPOSneighbor();
+    bool hasXNEGneighbor();
+    bool hasZPOSneighbor();
+    bool hasZNEGneighbor();
 };

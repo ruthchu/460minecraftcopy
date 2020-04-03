@@ -98,3 +98,8 @@ QString Player::lookAsQString() const {
     std::string str("( " + std::to_string(m_forward.x) + ", " + std::to_string(m_forward.y) + ", " + std::to_string(m_forward.z) + ")");
     return QString::fromStdString(str);
 }
+
+glm::vec3 Player::getPos() {
+    return m_position;
+}
+

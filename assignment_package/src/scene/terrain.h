@@ -8,7 +8,6 @@
 #include "shaderprogram.h"
 #include "cube.h"
 
-
 //using namespace std;
 
 // Helper functions to convert (x, z) to and from hash map key
@@ -54,6 +53,7 @@ private:
 
     OpenGLContext* mp_context;
 
+
 public:
     Terrain(OpenGLContext *context);
     ~Terrain();
@@ -62,6 +62,7 @@ public:
     // our chunk map at the given coordinates.
     // Returns a pointer to the created Chunk.
     Chunk* createChunkAt(int x, int z);
+
     // Do these world-space coordinates lie within
     // a Chunk that exists?
     bool hasChunkAt(int x, int z) const;
@@ -88,4 +89,10 @@ public:
     // Initializes the Chunks that store the 64 x 256 x 64 block scene you
     // see when the base code is run.
     void CreateTestScene();
+
+    // Expands the terrain based on player position
+    void expandTerrainBasedOnPlayer(glm::vec3 pos);
+
+    // Create a grass terrain chunk and its VBO
+    void createMoreTerrainAt(int x, int z);
 };
