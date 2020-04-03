@@ -248,13 +248,9 @@ void Chunk::create()
     // Buffer index data
     mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof (GLuint), idx.data(), GL_STATIC_DRAW);
 
-    // Generate data buffer
-    generateAll();
-    // Bind data buffer
-    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
-    // Buffer data to GPU
-    mp_context->glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec4), data.data(), GL_STATIC_DRAW);
+    bufferToDrawableVBOs(data);
 }
+
 
 void Chunk::pushIndexForFace(std::vector<GLuint>&idx, int index)
 {
@@ -279,8 +275,13 @@ glm::vec4 Chunk::getColor(BlockType &type)
     }
 }
 
-void Chunk::uninterleaveData(std::vector<glm::vec4>&data, std::vector<GLuint> idx)
+void Chunk::bufferToDrawableVBOs(std::vector<glm::vec4>&data)
 {
-    // write this
+    // Generate data buffer
+    generateAll();
+    // Bind data buffer
+    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
+    // Buffer data to GPU
+    mp_context->glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec4), data.data(), GL_STATIC_DRAW);
 }
 

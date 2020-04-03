@@ -66,8 +66,7 @@ private:
 
     glm::vec4 getColor(BlockType &type);
     void pushIndexForFace(std::vector<GLuint>&idx, int index);
-    // TODO -- write this
-    void uninterleaveData(std::vector<glm::vec4>&data, std::vector<GLuint> idx);
+    void bufferToDrawableVBOs(std::vector<glm::vec4>&data);
 public:
     Chunk(OpenGLContext* context, int X, int Z);
     virtual ~Chunk(){};
