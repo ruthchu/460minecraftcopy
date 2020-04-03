@@ -3,7 +3,7 @@
 
 Chunk::Chunk() : m_blocks(), m_neighbors{{XPOS, nullptr}, {XNEG, nullptr}, {ZPOS, nullptr}, {ZNEG, nullptr}}
 {
-    fill_n(m_blocks.begin(), 65536, EMPTY);
+    std::fill_n(m_blocks.begin(), 65536, EMPTY);
 }
 
 // Does bounds checking with at()

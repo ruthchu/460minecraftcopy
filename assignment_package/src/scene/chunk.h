@@ -3,9 +3,10 @@
 #include "glm_includes.h"
 #include <array>
 #include <unordered_map>
+#include <cstddef>
 
 
-using namespace std;
+//using namespace std;
 
 // C++ 11 allows us to define the size of an enum. This lets us use only one byte
 // of memory to store our different block types. By default, the size of a C++ enum
@@ -42,12 +43,12 @@ struct EnumHash {
 class Chunk {
 private:
     // All of the blocks contained within this Chunk
-    array<BlockType, 65536> m_blocks;
+    std::array<BlockType, 65536> m_blocks;
     // This Chunk's four neighbors to the north, south, east, and west
     // The third input to this map just lets us use a Direction as
     // a key for this map.
     // These allow us to properly determine
-    unordered_map<Direction, Chunk*, EnumHash> m_neighbors;
+    std::unordered_map<Direction, Chunk*, EnumHash> m_neighbors;
 
 public:
     Chunk();
