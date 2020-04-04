@@ -7,7 +7,7 @@
 #include <unordered_set>
 #include "shaderprogram.h"
 #include "cube.h"
-
+#include "noise.h"
 
 //using namespace std;
 
@@ -54,6 +54,9 @@ private:
 
     OpenGLContext* mp_context;
 
+    int heightGrassland(int x, int z);
+    int heightMountain(int x, int z);
+    void fillColumn(int x, int y, int z, BlockType t);
 public:
     Terrain(OpenGLContext *context);
     ~Terrain();

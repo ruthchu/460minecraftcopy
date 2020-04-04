@@ -176,26 +176,92 @@ void Terrain::CreateTestScene()
     // now exists.
     m_generatedTerrain.insert(toKey(0, 0));
 
-    // Create the basic terrain floor
+//    // Create the basic terrain floor
+//    for(int x = 0; x < 64; ++x) {
+//        for(int z = 0; z < 64; ++z) {
+//            if((x + z) % 2 == 0) {
+//                setBlockAt(x, 128, z, STONE);
+//            }
+//            else {
+//                setBlockAt(x, 128, z, DIRT);
+//            }
+//        }
+//    }
+
+    //grassland test
+//    for(int x = 0; x < 64; ++x) {
+//        for(int z = 0; z < 64; ++z) {
+//            int y = heightGrassland(x, z);
+//            setBlockAt(x, y, z, GRASS);
+//            fillColumn(x, y - 1, z, DIRT);
+//        }
+//    }
+
+    //mountain test
     for(int x = 0; x < 64; ++x) {
         for(int z = 0; z < 64; ++z) {
-            if((x + z) % 2 == 0) {
-                setBlockAt(x, 128, z, STONE);
+            int y = heightMountain(x, z);
+            setBlockAt(x, y, z, STONE);
+            for (int i = 1; i < 10; i++) {
+                setBlockAt(x, y - i, z, STONE);
             }
-            else {
-                setBlockAt(x, 128, z, DIRT);
-            }
+//            fillColumn(x, y, z, STONE);
         }
     }
-    // Add "walls" for collision testing
-    for(int x = 0; x < 64; ++x) {
-        setBlockAt(x, 129, 0, GRASS);
-        setBlockAt(x, 130, 0, GRASS);
-        setBlockAt(x, 129, 63, GRASS);
-        setBlockAt(0, 130, x, GRASS);
-    }
-    // Add a central column
-    for(int y = 129; y < 140; ++y) {
-        setBlockAt(32, y, 32, GRASS);
+
+//    // Add "walls" for collision testing
+//    for(int x = 0; x < 64; ++x) {
+//        setBlockAt(x, 129, 0, GRASS);
+//        setBlockAt(x, 130, 0, GRASS);
+//        setBlockAt(x, 129, 63, GRASS);
+//        setBlockAt(0, 130, x, GRASS);
+//    }
+//    // Add a central column
+//    for(int y = 129; y < 140; ++y) {
+//        setBlockAt(32, y, 32, GRASS);
+//    }
+}
+
+int Terrain::heightGrassland(int x, int z) {
+    int baseHeight = 128;
+    int heightRange = 128 / 8;
+    float xNew = float(x) / 64.0f;
+    float zNew = float(z) / 64.0f;
+    float filterIdx = 0.90f;
+    glm::vec2 uv = glm::vec2(xNew, zNew);
+    float y = std::pow(Noise::worleyNoise(uv), filterIdx);
+    y *= heightRange;
+    y += baseHeight;
+    return y;
+}
+
+int Terrain::heightMountain(int x, int z) {
+    int baseHeight = 150;
+    int heightRange = 255 - baseHeight;
+    float xNew = float(x) / 64.0f;
+    float zNew = float(z) / 64.0f;
+    float freq = 2.0f;
+    glm::vec2 uv = glm::vec2(xNew, zNew);
+    glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
+                                 Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
+    float y = (Noise::perlinNoise((uv + offset) * freq) * 0.5f) + 0.5f;
+    float filterIdx = 1.0f;
+    y = std::pow(y, filterIdx);
+    y = (1.f - abs(y));
+    y *= heightRange;
+    y += baseHeight;
+    return y;
+}
+
+void Terrain::fillColumn(int x, int y, int z, BlockType t) {
+    for (int i = y; i > 150; i--) {
+        BlockType bt = t;
+//        if (y >= 255 - 25) {
+//            bt = SNOW;
+//        }
+        if (y <= 128) {
+            bt = STONE;
+        }
+       setBlockAt(x, i, z, bt);
     }
 }
