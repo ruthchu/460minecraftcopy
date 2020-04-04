@@ -54,8 +54,6 @@ private:
 
     OpenGLContext* mp_context;
 
-    int heightGrassland(int x, int z);
-    int heightMountain(int x, int z);
     void fillColumn(int x, int y, int z, BlockType t);
 public:
     Terrain(OpenGLContext *context);
@@ -91,4 +89,6 @@ public:
     // Initializes the Chunks that store the 64 x 256 x 64 block scene you
     // see when the base code is run.
     void CreateTestScene();
+    int heightGrassland(int x, int z);
+    int heightMountain(int x, int z);
 };
