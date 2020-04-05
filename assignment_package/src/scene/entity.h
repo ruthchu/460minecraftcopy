@@ -2,13 +2,15 @@
 #include "glm_includes.h"
 
 struct InputBundle {
-    bool wPressed, aPressed, sPressed, dPressed;
+    bool wPressed, aPressed, sPressed, dPressed, qPressed, ePressed;
     bool spacePressed;
-    float mouseX, mouseY;
+    float mouseX, mouseY, prevMouseX, prevMouseY;
+    float phi;
 
     InputBundle()
         : wPressed(false), aPressed(false), sPressed(false),
-          dPressed(false), spacePressed(false), mouseX(0.f), mouseY(0.f)
+          dPressed(false), spacePressed(false), mouseX(0.f), mouseY(0.f),
+          prevMouseX(0.f), prevMouseY(0.f), phi(0.f)
     {}
 };
 

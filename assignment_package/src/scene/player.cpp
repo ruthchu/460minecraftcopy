@@ -1,5 +1,7 @@
 #include "player.h"
 #include <QString>
+#include <iostream>
+#include <iomanip>
 
 Player::Player(glm::vec3 pos, const Terrain &terrain)
     : Entity(pos), m_velocity(0,0,0), m_acceleration(0,0,0),
@@ -18,54 +20,78 @@ void Player::tick(float dT, InputBundle &input) {
 void Player::processInputs(InputBundle &inputs) {
     // TODO: Update the Player's velocity and acceleration based on the
     // state of the inputs.
-    //ramp up acceleration to max
-    if (inputs.wPressed == true) {
-        //psitive along forward
-        m_acceleration.z = glm::clamp(0.f, 10.f, m_acceleration.z + 1.f);
-    }
-    if (inputs.aPressed == true) {
-        //negative along right
-        m_acceleration.x = glm::clamp(0.f, 10.f, m_acceleration.x - 1.f);
-    }
-    if (inputs.sPressed == true) {
-        //negative along forward
-        m_acceleration.z = glm::clamp(0.f, 10.f, m_acceleration.z - 1.f);
-    }
-    if (inputs.dPressed == true) {
-        //pisitive along right
-        m_acceleration.x = glm::clamp(0.f, 10.f, m_acceleration.x + 1.f);
-    }
-    if (inputs.spacePressed == true) {
-        m_velocity.y = 5.f;
-    }
-    //set to 0
-    if (inputs.wPressed == false && inputs.sPressed == false) {
-        m_acceleration.z = 0.f;
-    }
-    if (inputs.aPressed == false && inputs.dPressed == false) {
-        m_acceleration.x = 0.f;
-    }
-    if (inputs.spacePressed == false) {
-        m_velocity.y = 0.f;
-    }
 
-    //WHNE TE KEY IS RELEASED SET ACCEL TO 0
-    //OTHERWISE SLOWLY RAMP IT UP
+    // Rotate the local axis' based on mouse input
+    rotateOnUpGlobal(inputs.mouseX);
+    if (inputs.phi < 90.f && inputs.phi > -90.f) {
+        rotateOnRightLocal
+            (glm::clamp(-90.f - inputs.phi, 90.f - inputs.phi, inputs.mouseY));
+    }
+    inputs.phi = glm::clamp(-90.f, 90.f, inputs.phi + inputs.mouseY);
+    inputs.mouseX = 0.f;
+    inputs.mouseY = 0.f;
+    m_acceleration = glm::vec3(0.f, 0.f, 0.f);
+    // Movement in flight mode
+    if (m_flightOn) {
+        if (inputs.wPressed == true) {
+            // Accelerate positively along forward vector
+            m_acceleration += 1.1f * m_forward;
+        }
+        if (inputs.aPressed == true) {
+            // Accelerate negatively along right vector
+            m_acceleration += -1.1f * m_right;
+        }
+        if (inputs.sPressed == true) {
+            // Accelerate negatively along forward vector
+            m_acceleration += -1.1f * m_forward;
+        }
+        if (inputs.dPressed == true) {
+            // Accelerate positively along right vector
+            m_acceleration += 1.1f * m_right;
+        }
+        if (inputs.qPressed == true) {
+            // Accelerate negatively along the up vector
+            m_acceleration += -1.1f * m_up;
+        }
+        if (inputs.ePressed == true) {
+            // Accelerate positively along the up vector
+            m_acceleration += 1.1f * m_up;
+        }
+    } else {
+        // Movement in non-flight mode
+        glm::vec3 flatForward =
+                glm::normalize(glm::vec3(m_forward.x, 0.f, m_forward.z));
+        if (inputs.wPressed == true) {
+            // Accelerate positively along projected forward vector
+            m_acceleration = 1.1f * flatForward;
+        }
+        if (inputs.sPressed == true) {
+            // Accelerate negatively along projected forward vector
+            m_acceleration = -1.1f * flatForward;
+        }
+        glm::vec3 flatRight =
+                glm::normalize(glm::vec3(m_right.x, 0.f, m_right.z));
+        if (inputs.aPressed == true) {
+            // Accelerate negatively along projected right vector
+            m_acceleration = -1.1f * flatRight;
+        }
+        if (inputs.dPressed == true) {
+            // Accelerate positively along projected right vector
+            m_acceleration = 1.1f * flatRight;
+        }
+        if (inputs.spacePressed == true) {
+            m_velocity.y = 5.f;
+            inputs.spacePressed = false;
+        }
+    }
 }
-
-
-//VELOCITY MIGHT HAVE A THING LEFT OVER SO BE CAREFUL
 
 void Player::computePhysics(float dT, const Terrain &terrain) {
     // TODO: Update the Player's position based on its acceleration
     // and velocity, and also perform collision detection.
 
-    //CALCULATE THE NEW VELOCITY AND DON'T FORGET TO ACCOUNT FOR DRAG
-    m_velocity = m_velocity * .9f + dT * m_acceleration;
-    m_position = m_position + dT * m_velocity;
-
-    //move the player
-    // this is called every tick!
+    m_velocity = m_velocity * .5f + dT * m_acceleration;
+    moveAlongVector(m_velocity * dT);
 }
 
 void Player::setCameraWidthHeight(unsigned int w, unsigned int h) {

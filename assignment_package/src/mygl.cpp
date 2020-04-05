@@ -4,13 +4,15 @@
 #include <iostream>
 #include <QApplication>
 #include <QKeyEvent>
+#include <QDateTime>
 
 
 MyGL::MyGL(QWidget *parent)
     : OpenGLContext(parent),
       m_worldAxes(this),
       m_progLambert(this), m_progFlat(this),
-      m_terrain(this), m_player(glm::vec3(48.f, 129.f, 48.f), m_terrain)
+      m_terrain(this), m_player(glm::vec3(48.f, 129.f, 48.f), m_terrain),
+      m_currTime(QDateTime::currentMSecsSinceEpoch() / 1000.f)
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -71,6 +73,11 @@ void MyGL::initializeGL()
     glBindVertexArray(vao);
 
     m_terrain.CreateTestScene();
+
+    // Move the cursor to the middle of the screen
+    moveMouseToCenter();
+    m_inputs.prevMouseX = width() / 2;
+    m_inputs.prevMouseY = height() / 2;
 }
 
 void MyGL::resizeGL(int w, int h) {
@@ -93,6 +100,11 @@ void MyGL::resizeGL(int w, int h) {
 // all per-frame actions here, such as performing physics updates on all
 // entities in the scene.
 void MyGL::tick() {
+    float dT = QDateTime::currentMSecsSinceEpoch() / 1000.f - m_currTime;
+    // dT is always registering as 0, so set it to 1 for now
+    dT = 1.f;
+    m_player.tick(dT, m_inputs);
+    m_currTime = QDateTime::currentMSecsSinceEpoch() / 1000.f;
     update(); // Calls paintGL() as part of a larger QOpenGLWidget pipeline
     sendPlayerDataToGUI(); // Updates the info in the secondary window displaying player data
 }
@@ -136,11 +148,7 @@ void MyGL::renderTerrain() {
 }
 
 
-void MyGL::keyPressEvent(QKeyEvent *e) {
-    float amount = 2.0f;
-    if(e->modifiers() & Qt::ShiftModifier){
-        amount = 10.0f;
-    }
+void MyGL::keyPressEvent(QKeyEvent *e) {    
     // http://doc.qt.io/qt-5/qt.html#Key-enum
     // This could all be much more efficient if a switch
     // statement were used, but I really dislike their
@@ -148,31 +156,46 @@ void MyGL::keyPressEvent(QKeyEvent *e) {
     // chain of if statements instead
     if (e->key() == Qt::Key_Escape) {
         QApplication::quit();
-    } else if (e->key() == Qt::Key_Right) {
-        m_player.rotateOnUpGlobal(-amount);
-    } else if (e->key() == Qt::Key_Left) {
-        m_player.rotateOnUpGlobal(amount);
-    } else if (e->key() == Qt::Key_Up) {
-        m_player.rotateOnRightLocal(-amount);
-    } else if (e->key() == Qt::Key_Down) {
-        m_player.rotateOnRightLocal(amount);
     } else if (e->key() == Qt::Key_W) {
-        m_player.moveForwardLocal(amount);
+        m_inputs.wPressed = true;
     } else if (e->key() == Qt::Key_S) {
-        m_player.moveForwardLocal(-amount);
+        m_inputs.sPressed = true;
     } else if (e->key() == Qt::Key_D) {
-        m_player.moveRightLocal(amount);
+        m_inputs.dPressed = true;
     } else if (e->key() == Qt::Key_A) {
-        m_player.moveRightLocal(-amount);
+        m_inputs.aPressed = true;
+    } else if (e->key() == Qt::Key_F) {
+       m_player.m_flightOn = !m_player.m_flightOn;
     } else if (e->key() == Qt::Key_Q) {
-        m_player.moveUpGlobal(-amount);
+        m_inputs.qPressed = true;
     } else if (e->key() == Qt::Key_E) {
-        m_player.moveUpGlobal(amount);
+        m_inputs.ePressed = true;
+    } else if (e->key() == Qt::Key_Space) {
+        m_inputs.spacePressed = true;
+    }
+}
+
+void MyGL::keyReleaseEvent(QKeyEvent *e) {
+    if (e->key() == Qt::Key_W) {
+        m_inputs.wPressed = false;
+    } else if (e->key() == Qt::Key_S) {
+        m_inputs.sPressed = false;
+    } else if (e->key() == Qt::Key_D) {
+        m_inputs.dPressed = false;
+    } else if (e->key() == Qt::Key_A) {
+        m_inputs.aPressed = false;
+    } else if (e->key() == Qt::Key_Q) {
+        m_inputs.qPressed = false;
+    } else if (e->key() == Qt::Key_E) {
+        m_inputs.ePressed = false;
     }
 }
 
 void MyGL::mouseMoveEvent(QMouseEvent *e) {
-    // TODO
+    // Moves camera
+    m_inputs.mouseX = (m_inputs.prevMouseX - e->x()) / 2.f;
+    m_inputs.mouseY = (m_inputs.prevMouseY - e->y()) / 2.f;
+    moveMouseToCenter();
 }
 
 void MyGL::mousePressEvent(QMouseEvent *e) {

@@ -29,6 +29,7 @@ private:
     InputBundle m_inputs; // A collection of variables to be updated in keyPressEvent, mouseMoveEvent, mousePressEvent, etc.
 
     QTimer m_timer; // Timer linked to tick(). Fires approximately 60 times per second.
+    float m_currTime; // Current time used to compute dT for player movement
 
     void moveMouseToCenter(); // Forces the mouse position to the screen's center. You should call this
                               // from within a mouse move event after reading the mouse movement so that
@@ -60,6 +61,9 @@ protected:
     // Automatically invoked when the user
     // presses a key on the keyboard
     void keyPressEvent(QKeyEvent *e);
+    // Automatically invoked when the user
+    // releases a key on the keyboard
+    void keyReleaseEvent(QKeyEvent *e);
     // Automatically invoked when the user
     // moves the mouse
     void mouseMoveEvent(QMouseEvent *e);
