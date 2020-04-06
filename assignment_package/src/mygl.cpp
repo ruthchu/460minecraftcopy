@@ -199,16 +199,21 @@ void MyGL::mouseMoveEvent(QMouseEvent *e) {
 void MyGL::mousePressEvent(QMouseEvent *e) {
     // Place or remove blocks
     glm::ivec3 hitBlock;
-    float outDist = 0.f;
-    glm::vec3 ray = {0.f, 0.f, 3.f}; // also probably wrong haahaha
+    float outLen = 0.f;
+    const glm::vec3 mid = m_player.mcr_camera.mcr_position;
+    glm::vec3 ray = glm::normalize(m_player.mcr_camera.getLookVec());
     if (e->button() == Qt::LeftButton) {
         // Remove block
-        if (m_player.gridMarch(m_player.mcr_camera.mcr_position, ray, m_terrain, &outDist, &hitBlock)) {
+        if (m_player.gridMarch(mid, ray * 3.f, m_terrain, &outLen, &hitBlock)) {
             m_terrain.setBlockAt(hitBlock.x, hitBlock.y, hitBlock.z, EMPTY);
         }
     } else if (e->button() == Qt::RightButton) {
-        if (m_player.gridMarch(m_player.mcr_camera.mcr_position, ray, m_terrain, &outDist, &hitBlock)) {
-            // this one is harder
+        if (m_player.gridMarch(mid, ray * 3.f, m_terrain, &outLen, &hitBlock)) {
+            // Determine where to place block based on ray direction
+            ray *= outLen * .9f;
+            m_terrain.setBlockAt(floor(mid.x + ray.x),
+                                 floor(mid.y + ray.y),
+                                 floor(mid.z + ray.z), DIRT);
         }
     }
 }

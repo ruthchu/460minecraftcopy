@@ -1,6 +1,5 @@
 #include "player.h"
 #include <QString>
-#include <iostream>
 
 Player::Player(glm::vec3 pos, const Terrain &terrain)
     : Entity(pos), m_velocity(0,0,0), m_acceleration(0,0,0),
@@ -13,7 +12,6 @@ Player::~Player()
 
 void Player::tick(float dT, InputBundle &input) {
     processInputs(input);
-    std::cout << dT << std::endl;
     computePhysics(dT, mcr_terrain);
 }
 
@@ -25,9 +23,9 @@ void Player::processInputs(InputBundle &inputs) {
     rotateOnUpGlobal(inputs.mouseX / 2.f);
     if (phi < 90.f && phi > -90.f) {
         rotateOnRightLocal
-            (glm::clamp(inputs.mouseY / 2.f, -89.9f - phi, 89.9f - phi));
+            (glm::clamp(inputs.mouseY / 2.f, -89.99f - phi, 89.99f - phi));
     }
-    phi = glm::clamp(phi + inputs.mouseY, -89.9f, 89.9f);
+    phi = glm::clamp(phi + inputs.mouseY, -89.99f, 89.99f);
     inputs.mouseX = 0.f;
     inputs.mouseY = 0.f;
     m_acceleration = {0.f, 0.f, 0.f};
@@ -78,7 +76,7 @@ void Player::processInputs(InputBundle &inputs) {
         }
         if (inputs.dPressed == true) {
             // Accelerate positively along projected right vector
-            m_acceleration += 1.1f * flatRight;
+            m_acceleration += 7.f * flatRight;
         }
         if (inputs.spacePressed == true) {
             if (m_velocity.y < -8.f) {
@@ -94,7 +92,6 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
     // and velocity, and also perform collision detection.
     m_velocity = m_velocity * .8f + dT * m_acceleration;
     glm::vec3 move = m_velocity * dT;
-    std::cout << m_velocity.y << std::endl;
     if (!m_flightOn) {
         float xDist;
         float yDist;
