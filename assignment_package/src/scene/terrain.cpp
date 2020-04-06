@@ -253,6 +253,14 @@ int Terrain::heightMountain(int x, int z) {
     return y;
 }
 
+int Terrain::blendMountainGrass(int grassHeight, int mountainHeight) {
+    float noiseScalar = Noise::perlinNoise(glm::vec2(grassHeight, mountainHeight));
+    // remap to [0,1]
+    noiseScalar = (noiseScalar + 1) / 2.f;
+    noiseScalar = glm::smoothstep(0.25f, 0.75f, noiseScalar);
+    return (1 - noiseScalar) * grassHeight + noiseScalar * mountainHeight;
+}
+
 void Terrain::fillColumn(int x, int y, int z, BlockType t) {
     for (int i = y; i > 150; i--) {
         BlockType bt = t;
