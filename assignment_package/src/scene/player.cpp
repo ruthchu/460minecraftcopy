@@ -57,30 +57,32 @@ void Player::processInputs(InputBundle &inputs) {
             m_acceleration += 1.1f * glm::vec3(0.f, 1.f, 0.f);
         }
     } else if (!m_flightOn) {
-        m_acceleration.y = -3.f;
+        m_acceleration.y = -2.5f;
         // Movement in non-flight mode
         glm::vec3 flatForward =
                 glm::normalize(glm::vec3(m_forward.x, 0.f, m_forward.z));
         if (inputs.wPressed == true) {
             // Accelerate positively along projected forward vector
-            m_acceleration = 1.1f * flatForward;
+            m_acceleration += 1.1f * flatForward;
         }
         if (inputs.sPressed == true) {
             // Accelerate negatively along projected forward vector
-            m_acceleration = -1.1f * flatForward;
+            m_acceleration += -1.1f * flatForward;
         }
         glm::vec3 flatRight =
                 glm::normalize(glm::vec3(m_right.x, 0.f, m_right.z));
         if (inputs.aPressed == true) {
             // Accelerate negatively along projected right vector
-            m_acceleration = -1.1f * flatRight;
+            m_acceleration += -1.1f * flatRight;
         }
         if (inputs.dPressed == true) {
             // Accelerate positively along projected right vector
-            m_acceleration = 1.1f * flatRight;
+            m_acceleration += 1.1f * flatRight;
         }
         if (inputs.spacePressed == true) {
-            m_velocity.y += 5.f;
+            if (m_velocity.y < -4.7) {
+                m_velocity.y += 18.f;
+            }
             inputs.spacePressed = false;
         }
     }
