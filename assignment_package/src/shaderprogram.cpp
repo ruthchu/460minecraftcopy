@@ -143,35 +143,6 @@ void ShaderProgram::draw(Drawable &d)
         throw std::out_of_range("Attempting to draw a drawable with m_count of " + std::to_string(d.elemCount()) + "!");
     }
 
-    // Each of the following blocks checks that:
-    //   * This shader has this attribute, and
-    //   * This Drawable has a vertex buffer for this attribute.
-    // If so, it binds the appropriate buffers to each attribute.
-
-    // Remember, by calling bindPos(), we call
-    // glBindBuffer on the Drawable's VBO for vertex position,
-    // meaning that glVertexAttribPointer associates vs_Pos
-    // (referred to by attrPos) with that VBO
-
-//    if (attrPos != -1 && d.bindPos()) {
-//        context->glEnableVertexAttribArray(attrPos);
-//        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, 0, NULL);
-
-//    }
-
-//    if (attrNor != -1 && d.bindNor()) {
-//        context->glEnableVertexAttribArray(attrNor);
-//        context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, 0, NULL);
-
-//    }
-
-//    if (attrCol != -1 && d.bindCol()) {
-//        context->glEnableVertexAttribArray(attrCol);
-//        context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, 0, NULL);
-
-//    }
-
-    //if (attrPos != -1 && attrCol != -1 && attrNor != -1 && d.bindAll()) {
    if (d.bindAll()) {
         int stride = 12 * sizeof (float);
         // Position

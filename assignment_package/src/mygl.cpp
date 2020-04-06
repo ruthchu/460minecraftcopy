@@ -133,7 +133,6 @@ void MyGL::paintGL() {
 // terrain that surround the player (refer to Terrain::m_generatedTerrain
 // for more info)
 void MyGL::renderTerrain() {
-    //m_terrain.draw(0, 64, 0, 64, &m_progLambert);
     int xFloor = static_cast<int>(glm::floor(m_player.getPos().x / 16.f));
     int zFloor = static_cast<int>(glm::floor(m_player.getPos().z / 16.f));
     m_terrain.draw(16 * xFloor - 16, 16 * xFloor + 16,

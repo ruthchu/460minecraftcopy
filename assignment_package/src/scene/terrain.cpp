@@ -4,8 +4,7 @@
 #include <iostream>
 
 Terrain::Terrain(OpenGLContext *context)
-    : m_chunks(), m_generatedTerrain(), mp_context(context)
-     , m_geomCube(context)
+    : m_chunks(), m_generatedTerrain(), mp_context(context), m_geomCube(context)
 {}
 
 Terrain::~Terrain() {
