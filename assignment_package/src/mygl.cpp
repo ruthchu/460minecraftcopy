@@ -12,7 +12,7 @@ MyGL::MyGL(QWidget *parent)
       m_worldAxes(this),
       m_progLambert(this), m_progFlat(this),
       m_terrain(this), m_player(glm::vec3(48.f, 129.f, 48.f), m_terrain),
-      m_currTime(QDateTime::currentMSecsSinceEpoch() / 1000.f)
+      m_currTime(QDateTime::currentMSecsSinceEpoch())
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -100,11 +100,9 @@ void MyGL::resizeGL(int w, int h) {
 // all per-frame actions here, such as performing physics updates on all
 // entities in the scene.
 void MyGL::tick() {
-    float dT = QDateTime::currentMSecsSinceEpoch() / 1000.f - m_currTime;
-    // dT is always registering as 0, so set it to 1 for now
-    dT = 1.f;
+    float dT = (QDateTime::currentMSecsSinceEpoch() - m_currTime) / 1000.f;
     m_player.tick(dT, m_inputs);
-    m_currTime = QDateTime::currentMSecsSinceEpoch() / 1000.f;
+    m_currTime = QDateTime::currentMSecsSinceEpoch();
     update(); // Calls paintGL() as part of a larger QOpenGLWidget pipeline
     sendPlayerDataToGUI(); // Updates the info in the secondary window displaying player data
 }
@@ -199,5 +197,18 @@ void MyGL::mouseMoveEvent(QMouseEvent *e) {
 }
 
 void MyGL::mousePressEvent(QMouseEvent *e) {
-    // TODO
+    // Place or remove blocks
+    glm::ivec3 hitBlock;
+    float outDist = 0.f;
+    glm::vec3 ray = {0.f, 0.f, 3.f}; // also probably wrong haahaha
+    if (e->button() == Qt::LeftButton) {
+        // Remove block
+        if (m_player.gridMarch(m_player.mcr_camera.mcr_position, ray, m_terrain, &outDist, &hitBlock)) {
+            m_terrain.setBlockAt(hitBlock.x, hitBlock.y, hitBlock.z, EMPTY);
+        }
+    } else if (e->button() == Qt::RightButton) {
+        if (m_player.gridMarch(m_player.mcr_camera.mcr_position, ray, m_terrain, &outDist, &hitBlock)) {
+            // this one is harder
+        }
+    }
 }
