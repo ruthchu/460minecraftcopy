@@ -8,6 +8,7 @@ private:
     glm::vec3 m_velocity, m_acceleration;
     Camera m_camera;
     const Terrain &mcr_terrain;
+    float phi; // Track camera angle to bound it properly
 
     void processInputs(InputBundle &inputs);
     void computePhysics(float dT, const Terrain &terrain);
@@ -20,6 +21,10 @@ public:
 
     Player(glm::vec3 pos, const Terrain &terrain);
     virtual ~Player() override;
+
+    // Used for collision and determining what block to remove
+    bool gridMarch(glm::vec3 rayOrigin, glm::vec3 rayDirection,
+            const Terrain &terrain, float *out_dist, glm::ivec3 *out_blockHit);
 
     void setCameraWidthHeight(unsigned int w, unsigned int h);
 
