@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include "shaderprogram.h"
 #include "cube.h"
+#include "noise.h"
 
 //using namespace std;
 
@@ -53,7 +54,7 @@ private:
 
     OpenGLContext* mp_context;
 
-
+    void fillColumn(int x, int y, int z, BlockType t);
 public:
     Terrain(OpenGLContext *context);
     ~Terrain();
@@ -89,7 +90,6 @@ public:
     // Initializes the Chunks that store the 64 x 256 x 64 block scene you
     // see when the base code is run.
     void CreateTestScene();
-
     // Expands the terrain
     void expandTerrainBasedOnPlayer(glm::vec3 pos);
 
@@ -98,4 +98,7 @@ public:
 
     // Create a grass terrain chunk and its VBO
     void createMoreTerrainAt(int x, int z);
+    std::pair<int, BlockType> blendMountainGrass(int grassHeight, int mountainHeight);
+    int heightGrassland(int x, int z);
+    int heightMountain(int x, int z);
 };
