@@ -272,13 +272,19 @@ void Terrain::createMoreTerrainAt(int xAt, int zAt)
             int mountain = heightMountain(x, z);
             float perlin = (Noise::perlinNoise(glm::vec2(float(x) / 64, float(z) / 64)) + 1) / 2.f;
             perlin = glm::smoothstep(0.25f, 0.75f, perlin);
+            float cutoff = 0.5f;
+            float diff = perlin - cutoff;
+            float skew;
             BlockType bt;
-            if (perlin > 0.5) {
+            if (perlin > cutoff) {
                 bt = STONE;
+                skew = glm::mix(0.5f, 1.f, perlin);
             } else {
                 bt = GRASS;
+                skew = glm::mix(0.0f, 0.5f, perlin);
             }
-            int y = glm::mix(grass, mountain, perlin);
+            float weight = perlin + diff * skew;
+            int y = mountain * weight + grass * (1 - weight);
             setBlockAt(x, y, z, bt);
             if (bt == GRASS) {
                 bt = DIRT;
@@ -324,7 +330,7 @@ void Terrain::fillColumn(int x, int y, int z, BlockType t) {
     if (DEBUGMODE) {
         worldBaseHeight = 120;
     }
-    for (int i = y; i >= y - 3/*worldBaseHeight*/; i--) {
+    for (int i = y; i >= y - 1/*worldBaseHeight*/; i--) {
         BlockType bt = t;
 //        if (y >= 255 - 55) {
 //            bt = SNOW;
