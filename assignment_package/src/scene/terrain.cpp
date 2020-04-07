@@ -142,6 +142,9 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
                         case STONE:
                             shaderProgram->setGeometryColor(glm::vec4(0.5f));
                             break;
+                        case SNOW:
+                            shaderProgram->setGeometryColor(glm::vec4(1.f));
+                            break;
                         default:
                             // Other block types are not yet handled, so we default to black
                             shaderProgram->setGeometryColor(glm::vec4(0.f));
@@ -200,10 +203,15 @@ void Terrain::CreateTestScene()
     //mountain test
 //    for(int x = 0; x < 64; ++x) {
 //        for(int z = 0; z < 64; ++z) {
+//            BlockType bt = STONE;
 //            int y = heightMountain(x, z);
-//            setBlockAt(x, y, z, STONE);
+//            if (y > 215) {
+//                bt = SNOW;
+//            }
+//            setBlockAt(x, y, z, bt);
 //            for (int i = 1; i < 10; i++) {
 //                setBlockAt(x, y - i, z, STONE);
+
 //            }
 ////            fillColumn(x, y, z, STONE);
 //        }
@@ -219,10 +227,10 @@ void Terrain::CreateTestScene()
             BlockType bt = blend.second;
             for (int i = 1; i < 10; i++) {
                 setBlockAt(x, y - i, z, bt);
-
             }
         }
     }
+
 //    // Add "walls" for collision testing
 //    for(int x = 0; x < 64; ++x) {
 //        setBlockAt(x, 129, 0, GRASS);
@@ -238,7 +246,7 @@ void Terrain::CreateTestScene()
 
 int Terrain::heightGrassland(int x, int z) {
     int baseHeight = 128;
-    int heightRange = 128 / 8;
+    int heightRange = 140 - baseHeight;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
     float filterIdx = 0.90f;
@@ -250,11 +258,11 @@ int Terrain::heightGrassland(int x, int z) {
 }
 
 int Terrain::heightMountain(int x, int z) {
-    int baseHeight = 150;
+    int baseHeight = 140;
     int heightRange = 255 - baseHeight;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
-    float freq = 2.0f;
+    float freq = 2.5f;
     glm::vec2 uv = glm::vec2(xNew, zNew);
     glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
                                  Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
@@ -274,19 +282,19 @@ std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mount
     glm::vec2 uv = glm::vec2(newGrass, newMountain);
     glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
                                  Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
-    std::cout << newGrass << ", " << newMountain << std::endl;
+//    std::cout << newGrass << ", " << newMountain << std::endl;
 
-    float noiseFactor = Noise::perlinNoise(uv + offset);
+    float noiseFactor = (Noise::perlinNoise(uv + offset) + 1) / 2.f;
 
+    std::cout << noiseFactor << std::endl;
     noiseFactor = glm::smoothstep(0.25f, 0.75f, noiseFactor);
-    noiseFactor = (noiseFactor + 1) / 2.f;
+    std::cout << noiseFactor << std::endl;
 
-    int height = (1 - noiseFactor) * grassHeight + noiseFactor * mountainHeight;
+    int height = glm::mix(grassHeight, mountainHeight, noiseFactor);
     BlockType bt = GRASS;
     if (noiseFactor > 0.5) {
         bt = STONE;
     }
-    std::cout << noiseFactor << std::endl;
     return std::make_pair(height, bt);
 }
 
