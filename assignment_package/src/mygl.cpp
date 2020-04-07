@@ -219,10 +219,36 @@ void MyGL::mousePressEvent(QMouseEvent *e) {
     } else if (e->button() == Qt::RightButton) {
         if (m_player.gridMarch(mid, ray * 3.f, m_terrain, &outLen, &hitBlock)) {
             // Determine where to place block based on ray direction
-            ray *= outLen * .9f;
-            m_terrain.setBlockAt(floor(mid.x + ray.x),
-                                 floor(mid.y + ray.y),
-                                 floor(mid.z + ray.z), DIRT);
+            // Find the middle of the block
+            glm::vec3 blockMid = {hitBlock.x + .5f,
+                                  hitBlock.y + .5f,
+                                  hitBlock.z + .5f};
+            // Find where the ray collides with the block
+            glm::vec3 rayHit = m_player.mcr_camera.mcr_position + ray * outLen;
+            // Find the difference between the two points
+            glm::vec3 diff = rayHit - blockMid;
+            glm::ivec3 mod = glm::ivec3(0);
+            if (abs(diff.x) > abs(diff.y) && abs(diff.x) > abs(diff.z)) {
+                if (diff.x > 0) {
+                    mod.x = 1;
+                } else {
+                    mod.x = -1;
+                }
+            } else if (abs(diff.y) > abs(diff.x) && abs(diff.y) > abs(diff.z)) {
+                if (diff.y > 0) {
+                    mod.y = 1;
+                } else {
+                    mod.y = -1;
+                }
+            } else if (abs(diff.z) > abs(diff.x) && abs(diff.z) > abs(diff.y)) {
+                if (diff.z > 0) {
+                    mod.z = 1;
+                } else {
+                    mod.z = -1;
+                }
+            }
+            m_terrain.setBlockAt(hitBlock.x + mod.x, hitBlock.y + mod.y,
+                                 hitBlock.z + mod.z, DIRT);
         }
     }
 }
