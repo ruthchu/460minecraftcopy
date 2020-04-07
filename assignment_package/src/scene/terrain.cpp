@@ -271,17 +271,17 @@ void Terrain::createMoreTerrainAt(int xAt, int zAt)
             int grass = heightGrassland(x, z);
             int mountain = heightMountain(x, z);
             float perlin = (Noise::perlinNoise(glm::vec2(float(x) / 64, float(z) / 64)) + 1) / 2.f;
-            perlin = glm::smoothstep(0.25f, 0.75f, perlin);
-            float cutoff = 0.6f;
+            perlin = glm::smoothstep(0.0f, 1.f, perlin);
+            float cutoff = 0.5f;
             float diff = perlin - cutoff;
             float skew;
             BlockType bt;
             if (perlin > cutoff) {
                 bt = STONE;
-                skew = glm::mix(0.5f, 1.f, perlin);
+                skew = glm::mix(0.6f, 1.f, perlin);
             } else {
                 bt = GRASS;
-                skew = glm::mix(0.0f, 0.5f, perlin);
+                skew = glm::mix(0.0f, 0.3f, perlin);
             }
             float weight = perlin + diff * skew;
             int y = mountain * weight + grass * (1 - weight);
@@ -312,7 +312,7 @@ int Terrain::heightMountain(int x, int z) {
     int heightRange = 255 - baseHeight;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
-    float freq = 2.5f;
+    float freq = 1.5f;
     glm::vec2 uv = glm::vec2(xNew, zNew);
     glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
                                  Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
