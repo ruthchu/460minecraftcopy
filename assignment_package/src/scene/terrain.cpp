@@ -198,17 +198,31 @@ void Terrain::CreateTestScene()
 //    }
 
     //mountain test
+//    for(int x = 0; x < 64; ++x) {
+//        for(int z = 0; z < 64; ++z) {
+//            int y = heightMountain(x, z);
+//            setBlockAt(x, y, z, STONE);
+//            for (int i = 1; i < 10; i++) {
+//                setBlockAt(x, y - i, z, STONE);
+//            }
+////            fillColumn(x, y, z, STONE);
+//        }
+//    }
+
+    //interpolate test
     for(int x = 0; x < 64; ++x) {
         for(int z = 0; z < 64; ++z) {
-            int y = heightMountain(x, z);
-            setBlockAt(x, y, z, STONE);
+            int grass = heightGrassland(x, z);
+            int mountain = heightMountain(x, z);
+            std::pair blend = blendMountainGrass(grass, mountain);
+            int y = blend.first;
+            BlockType bt = blend.second;
             for (int i = 1; i < 10; i++) {
-                setBlockAt(x, y - i, z, STONE);
+                setBlockAt(x, y - i, z, bt);
+
             }
-//            fillColumn(x, y, z, STONE);
         }
     }
-
 //    // Add "walls" for collision testing
 //    for(int x = 0; x < 64; ++x) {
 //        setBlockAt(x, 129, 0, GRASS);
@@ -253,12 +267,27 @@ int Terrain::heightMountain(int x, int z) {
     return y;
 }
 
-int Terrain::blendMountainGrass(int grassHeight, int mountainHeight) {
-    float noiseScalar = Noise::perlinNoise(glm::vec2(grassHeight, mountainHeight));
-    // remap to [0,1]
-    noiseScalar = (noiseScalar + 1) / 2.f;
-    noiseScalar = glm::smoothstep(0.25f, 0.75f, noiseScalar);
-    return (1 - noiseScalar) * grassHeight + noiseScalar * mountainHeight;
+std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mountainHeight) {
+    float newGrass = float(grassHeight) / 64.f;
+    float newMountain = float(mountainHeight) / 64.f;
+
+    glm::vec2 uv = glm::vec2(newGrass, newMountain);
+    glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
+                                 Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
+    std::cout << newGrass << ", " << newMountain << std::endl;
+
+    float noiseFactor = Noise::perlinNoise(uv + offset);
+
+    noiseFactor = glm::smoothstep(0.25f, 0.75f, noiseFactor);
+    noiseFactor = (noiseFactor + 1) / 2.f;
+
+    int height = (1 - noiseFactor) * grassHeight + noiseFactor * mountainHeight;
+    BlockType bt = GRASS;
+    if (noiseFactor > 0.5) {
+        bt = STONE;
+    }
+    std::cout << noiseFactor << std::endl;
+    return std::make_pair(height, bt);
 }
 
 void Terrain::fillColumn(int x, int y, int z, BlockType t) {
