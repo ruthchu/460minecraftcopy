@@ -203,18 +203,39 @@ void Terrain::CreateTestScene()
 
 }
 
+
+
+
 void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 {
-    if (hasChunkAt(pos.x, pos.z)) {
-        uPtr<Chunk> &chunk = getChunkAt(pos.x, pos.z);
-        int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
-        int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
-        if (!chunk->hasXNEGneighbor()) createMoreTerrainAt(16 * (xFloor - 1), 16 * zFloor);
-        if (!chunk->hasXPOSneighbor()) createMoreTerrainAt(16 * (xFloor + 1), 16 * zFloor);
-        if (!chunk->hasZNEGneighbor()) createMoreTerrainAt(16 * xFloor, 16 * (zFloor - 1));
-        if (!chunk->hasZPOSneighbor()) createMoreTerrainAt(16 * xFloor, 16 * (zFloor + 1));
+    int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
+    int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
+    int minX = 16 * xFloor - 16;
+    int maxX = 16 * xFloor + 16;
+    int minZ = 16 * zFloor - 16;
+    int maxZ = 16 * zFloor + 16;
+
+    for(int x = minX; x < maxX; x += 16) {
+        for(int z = minZ; z < maxZ; z += 16) {
+            expandTerrainAt(x, z);
+        }
     }
 }
+
+void Terrain::expandTerrainAt(float x, float z)
+{
+    if (!hasChunkAt(x, z)) {
+        createChunkAt(x, z);
+    }
+    uPtr<Chunk> &chunk = getChunkAt(x, z);
+    int xFloor = static_cast<int>(glm::floor(x / 16.f));
+    int zFloor = static_cast<int>(glm::floor(z / 16.f));
+    if (!chunk->hasXNEGneighbor()) createMoreTerrainAt(16 * (xFloor - 1), 16 * zFloor);
+    if (!chunk->hasXPOSneighbor()) createMoreTerrainAt(16 * (xFloor + 1), 16 * zFloor);
+    if (!chunk->hasZNEGneighbor()) createMoreTerrainAt(16 * xFloor, 16 * (zFloor - 1));
+    if (!chunk->hasZPOSneighbor()) createMoreTerrainAt(16 * xFloor, 16 * (zFloor + 1));
+}
+
 
 void Terrain::createMoreTerrainAt(int x, int z)
 {
