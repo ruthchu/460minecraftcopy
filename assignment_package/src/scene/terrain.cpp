@@ -4,7 +4,7 @@
 #include <iostream>
 
 Terrain::Terrain(OpenGLContext *context)
-    : m_chunks(), m_generatedTerrain(), mp_context(context), m_geomCube(context)
+    : m_chunks(), m_generatedTerrain(), mp_context(context)//, m_geomCube(context)
 {}
 
 Terrain::~Terrain() {
@@ -206,7 +206,6 @@ void Terrain::CreateTestScene()
 //                setBlockAt(x, y - i, z, STONE);
 
 //            }
-////            fillColumn(x, y, z, STONE);
 //        }
 //    }
 
@@ -218,9 +217,16 @@ void Terrain::CreateTestScene()
             std::pair blend = blendMountainGrass(grass, mountain);
             int y = blend.first;
             BlockType bt = blend.second;
-            for (int i = 1; i < 10; i++) {
-                setBlockAt(x, y - i, z, bt);
-            }
+//            for (int i = 1; i < 10; i++) {
+//                if (bt == GRASS) {
+//                    bt = DIRT;
+//                }
+//                if (y > 215) {
+//                    bt = SNOW;
+//                }
+//                setBlockAt(x, y - i, z, bt);
+//            }
+            fillColumn(x, y - 1, z, bt);
         }
     }
 
@@ -237,12 +243,52 @@ void Terrain::CreateTestScene()
 //    }
 }
 
+void Terrain::createMoreTerrainAt(int xAt, int zAt)
+{
+    createChunkAt(xAt, zAt);
+    for(int x = xAt; x < xAt + 16; ++x) {
+        for(int z = zAt; z < zAt + 16; ++z) {
+
+//            int y = heightGrassland(x, z);
+//            setBlockAt(x, y, z, GRASS);
+//            fillColumn(x, y - 1, z, DIRT);
+
+//            BlockType bt = STONE;
+//            int y = heightMountain(x, z);
+//            if (y > 215) {
+//                bt = SNOW;
+//            }
+//            setBlockAt(x, y, z, bt);
+//            for (int i = 1; i < 10; i++) {
+//                setBlockAt(x, y - i, z, STONE);
+//            }
+
+            int grass = heightGrassland(x, z);
+            int mountain = heightMountain(x, z);
+            float perlin = (Noise::perlinNoise(glm::vec2(float(x) / 64, float(z) / 64)) + 1) / 2.f;
+            perlin = glm::smoothstep(0.25f, 0.75f, perlin);
+            BlockType bt;
+            if (perlin > 0.5) {
+                bt = STONE;
+            } else {
+                bt = GRASS;
+            }
+            int y = glm::mix(grass, mountain, perlin);
+            setBlockAt(x, y, z, bt);
+            if (bt == GRASS) {
+                bt = DIRT;
+            }
+            fillColumn(x, y - 1, z, bt);
+        }
+    }
+}
+
 int Terrain::heightGrassland(int x, int z) {
     int baseHeight = 128;
-    int heightRange = 140 - baseHeight;
+    int heightRange = baseHeight / 8;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
-    float filterIdx = 0.90f;
+    float filterIdx = 0.80f;
     glm::vec2 uv = glm::vec2(xNew, zNew);
     float y = std::pow(Noise::worleyNoise(uv), filterIdx);
     y *= heightRange;
@@ -255,7 +301,7 @@ int Terrain::heightMountain(int x, int z) {
     int heightRange = 255 - baseHeight;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
-    float freq = 2.5f;
+    float freq = 3.5f;
     glm::vec2 uv = glm::vec2(xNew, zNew);
     glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
                                  Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
@@ -268,44 +314,23 @@ int Terrain::heightMountain(int x, int z) {
     return y;
 }
 
-std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mountainHeight) {
-    float newGrass = float(grassHeight) / 64.f;
-    float newMountain = float(mountainHeight) / 64.f;
 
-    glm::vec2 uv = glm::vec2(newGrass, newMountain);// + glm::vec2(100, 100);
-    glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
-                                 Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
-//    std::cout << newGrass << ", " << newMountain << std::endl;
-
-    float noiseFactor = (Noise::perlinNoise(uv + offset) + 1) / 2.f;
-
-    std::cout << noiseFactor << std::endl;
-    noiseFactor = glm::smoothstep(0.25f, 0.75f, noiseFactor);
-    std::cout << noiseFactor << std::endl;
-
-    int height = glm::mix(grassHeight, mountainHeight, noiseFactor);
-    BlockType bt = GRASS;
-    if (noiseFactor > 0.5) {
-        bt = STONE;
-    }
-    return std::make_pair(height, bt);
-}
 
 void Terrain::fillColumn(int x, int y, int z, BlockType t) {
-    for (int i = y; i > 150; i--) {
+    for (int i = y; i >= 0; i--) {
         BlockType bt = t;
-//        if (y >= 255 - 25) {
-//            bt = SNOW;
-//        }
+        if (y >= 255 - 55) {
+            bt = SNOW;
+        }
         if (y <= 128) {
             bt = STONE;
         }
        setBlockAt(x, i, z, bt);
     }
 
-    for (int z = 15; z < 50; z++) {
-        setBlockAt(32, 180, z, STONE);
-    }
+//    for (int z = 15; z < 50; z++) {
+//        setBlockAt(32, 180, z, STONE);
+//    }
 
 }
 
@@ -339,16 +364,26 @@ void Terrain::expandTerrainAt(float x, float z)
     if (!chunk->hasZPOSneighbor()) createMoreTerrainAt(16 * xFloor, 16 * (zFloor + 1));
 }
 
+std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mountainHeight) {
+    float newGrass = float(grassHeight) / 64.f;
+    float newMountain = float(mountainHeight) / 64.f;
 
-void Terrain::createMoreTerrainAt(int x, int z)
-{
-    createChunkAt(x, z);
-    for(int i = x; i < x + 16; ++i) {
-        for(int k = z; k < z + 16; ++k) {
-            setBlockAt(i, 128, k, GRASS);
-        }
+    glm::vec2 uv = glm::vec2(newGrass, newMountain);// + glm::vec2(100, 100);
+    glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
+                                 Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
+    float freq = 1.0f;
+    float noiseFactor = (Noise::perlinNoise((uv + offset) * freq) + 1) / 2.f;
+
+    noiseFactor = glm::smoothstep(0.25f, 0.75f, noiseFactor);
+
+    int height = glm::mix(mountainHeight, grassHeight, noiseFactor);
+    BlockType bt = GRASS;
+    if (noiseFactor > 0.5) {
+        bt = STONE;
     }
+    return std::make_pair(height, bt);
 }
+
 
 
 
