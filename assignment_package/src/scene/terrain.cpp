@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <iostream>
 
+const static bool DEBUGMODE = true;
+
 Terrain::Terrain(OpenGLContext *context)
     : m_chunks(), m_generatedTerrain(), mp_context(context)//, m_geomCube(context)
 {}
@@ -280,7 +282,6 @@ void Terrain::createMoreTerrainAt(int xAt, int zAt)
                 bt = DIRT;
             }
             fillColumn(x, y - 1, z, bt);
-
         }
     }
 }
@@ -290,7 +291,7 @@ int Terrain::heightGrassland(int x, int z) {
     int heightRange = baseHeight / 8;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
-    float filterIdx = 0.80f;
+    float filterIdx = 0.50f;
     glm::vec2 uv = glm::vec2(xNew, zNew);
     float y = std::pow(Noise::worleyNoise(uv), filterIdx);
     y *= heightRange;
@@ -303,7 +304,7 @@ int Terrain::heightMountain(int x, int z) {
     int heightRange = 255 - baseHeight;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
-    float freq = 3.5f;
+    float freq = 2.5f;
     glm::vec2 uv = glm::vec2(xNew, zNew);
     glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
                                  Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
@@ -319,7 +320,11 @@ int Terrain::heightMountain(int x, int z) {
 
 
 void Terrain::fillColumn(int x, int y, int z, BlockType t) {
-    for (int i = y; i >= 0; i--) {
+    int worldBaseHeight = 0;
+    if (DEBUGMODE) {
+        worldBaseHeight = 120;
+    }
+    for (int i = y; i >= worldBaseHeight; i--) {
         BlockType bt = t;
         if (y >= 255 - 55) {
             bt = SNOW;
