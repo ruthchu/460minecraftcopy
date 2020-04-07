@@ -247,9 +247,7 @@ void Terrain::CreateTestScene()
 
 void Terrain::createMoreTerrainAt(int xAt, int zAt)
 {
-    if (!hasChunkAt(xAt, zAt)) {
-        createChunkAt(xAt, zAt);
-    }
+    createChunkAt(xAt, zAt);
     for(int x = xAt; x < xAt + 16; ++x) {
         for(int z = zAt; z < zAt + 16; ++z) {
 
@@ -359,7 +357,9 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 
     for(int x = minX; x < maxX; x += 16) {
         for(int z = minZ; z < maxZ; z += 16) {
-            createMoreTerrainAt(x, z);
+            if (!hasChunkAt(x, z)) {
+                createMoreTerrainAt(x, z);
+            }
         }
     }
 }
