@@ -101,4 +101,6 @@ public:
     std::pair<int, BlockType> blendMountainGrass(int grassHeight, int mountainHeight);
     int heightGrassland(int x, int z);
     int heightMountain(int x, int z);
+
+    void CreateTestSceneDub();
 };

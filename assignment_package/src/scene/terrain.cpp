@@ -263,6 +263,7 @@ void Terrain::createMoreTerrainAt(int xAt, int zAt)
 //                setBlockAt(x, y - i, z, STONE);
 //            }
 
+            //>>> this is the right part
             int grass = heightGrassland(x, z);
             int mountain = heightMountain(x, z);
             float perlin = (Noise::perlinNoise(glm::vec2(float(x) / 64, float(z) / 64)) + 1) / 2.f;
@@ -279,6 +280,7 @@ void Terrain::createMoreTerrainAt(int xAt, int zAt)
                 bt = DIRT;
             }
             fillColumn(x, y - 1, z, bt);
+
         }
     }
 }
@@ -338,10 +340,11 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 {
     int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
     int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
-    int minX = 16 * (xFloor - 3);
-    int maxX = 16 * (xFloor + 3);
-    int minZ = 16 * (zFloor - 3);
-    int maxZ = 16 * (zFloor + 3);
+    int range = 9;
+    int minX = 16 * (xFloor - range);
+    int maxX = 16 * (xFloor + range);
+    int minZ = 16 * (zFloor - range);
+    int maxZ = 16 * (zFloor + range);
 
     for(int x = minX; x < maxX; x += 16) {
         for(int z = minZ; z < maxZ; z += 16) {
@@ -382,6 +385,61 @@ std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mount
         bt = STONE;
     }
     return std::make_pair(height, bt);
+}
+
+void Terrain::CreateTestSceneDub()
+{
+    // TODO: DELETE THIS LINE WHEN YOU DELETE m_geomCube!
+    //m_geomCube.create();
+
+    // Create the Chunks that will
+    // store the blocks for our
+    // initial world space
+    for(int x = 0; x < 64; x += 16) {
+        for(int z = 0; z < 64; z += 16) {
+            createChunkAt(x, z);
+        }
+    }
+    // Tell our existing terrain set that
+    // the "generated terrain zone" at (0,0)
+    // now exists.
+    m_generatedTerrain.insert(toKey(0, 0));
+
+    // Create the basic terrain floor
+    for(int x = 0; x < 64; ++x) {
+        for(int z = 0; z < 64; ++z) {
+            if((x + z) % 2 == 0) {
+                setBlockAt(x, 128, z, STONE);
+            }
+            else {
+                setBlockAt(x, 128, z, DIRT);
+            }
+        }
+    }
+
+
+    // Add "walls" for collision testing
+    for(int x = 0; x < 64; ++x) {
+        setBlockAt(x, 129, 0, GRASS);
+        setBlockAt(x, 130, 0, GRASS);
+        setBlockAt(x, 129, 63, GRASS);
+        setBlockAt(0, 130, x, GRASS);
+    }
+    // Add a central column
+    for(int y = 129; y < 140; ++y) {
+        setBlockAt(32, y, 32, GRASS);
+    }
+
+    for (int z = 15; z < 50; z++) {
+        setBlockAt(32, 180, z, STONE);
+    }
+
+    for(int x = 0; x < 64; x += 16) {
+        for(int z = 0; z < 64; z += 16) {
+            const uPtr<Chunk> &chunk = getChunkAt(x, z);
+            chunk->create();
+        }
+    }
 }
 
 
