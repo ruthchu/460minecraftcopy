@@ -1,9 +1,10 @@
 #include "player.h"
 #include <QString>
+#include <iostream>
 
 Player::Player(glm::vec3 pos, const Terrain &terrain)
     : Entity(pos), m_velocity(0,0,0), m_acceleration(0,0,0),
-      m_camera(pos + glm::vec3(0, 1.5f, 0)), mcr_terrain(terrain), phi(0.f),
+      m_camera(pos + glm::vec3(0, 1.5f, 0)), mcr_terrain(terrain), m_phi(0.f),
       mcr_camera(m_camera), m_flightOn(true)
 {}
 
@@ -16,16 +17,13 @@ void Player::tick(float dT, InputBundle &input) {
 }
 
 void Player::processInputs(InputBundle &inputs) {
-    // TODO: Update the Player's velocity and acceleration based on the
-    // state of the inputs.
-
     // Rotate the local axis' based on mouse input
     rotateOnUpGlobal(inputs.mouseX / 2.f);
-    if (phi < 90.f && phi > -90.f) {
+    if (m_phi < 90.f && m_phi > -90.f) {
         rotateOnRightLocal
-            (glm::clamp(inputs.mouseY / 2.f, -89.99f - phi, 89.99f - phi));
+            (glm::clamp(inputs.mouseY / 2.f, -89.99f - m_phi, 89.99f - m_phi));
     }
-    phi = glm::clamp(phi + inputs.mouseY, -89.99f, 89.99f);
+    m_phi = glm::clamp(m_phi + inputs.mouseY, -89.99f, 89.99f);
     inputs.mouseX = 0.f;
     inputs.mouseY = 0.f;
     m_acceleration = {0.f, 0.f, 0.f};
@@ -33,54 +31,54 @@ void Player::processInputs(InputBundle &inputs) {
     if (m_flightOn) {
         if (inputs.wPressed == true) {
             // Accelerate positively along forward vector
-            m_acceleration += 7.f * m_forward;
+            m_acceleration += 40.f * m_forward;
         }
         if (inputs.aPressed == true) {
             // Accelerate negatively along right vector
-            m_acceleration += -7.f * m_right;
+            m_acceleration += -30.f * m_right;
         }
         if (inputs.sPressed == true) {
             // Accelerate negatively along forward vector
-            m_acceleration += -7.f * m_forward;
+            m_acceleration += -30.f * m_forward;
         }
         if (inputs.dPressed == true) {
             // Accelerate positively along right vector
-            m_acceleration += 7.f * m_right;
+            m_acceleration += 30.f * m_right;
         }
         if (inputs.qPressed == true) {
             // Accelerate negatively along the up vector
-            m_acceleration += -7.f * glm::vec3(0.f, 1.f, 0.f);
+            m_acceleration += -30.f * glm::vec3(0.f, 1.f, 0.f);
         }
         if (inputs.ePressed == true) {
             // Accelerate positively along the up vector
-            m_acceleration += 7.f * glm::vec3(0.f, 1.f, 0.f);
+            m_acceleration += 30.f * glm::vec3(0.f, 1.f, 0.f);
         }
     } else if (!m_flightOn) {
-        m_acceleration.y = -20.f;
+        m_acceleration.y = -60.f;
         // Movement in non-flight mode
         glm::vec3 flatForward =
                 glm::normalize(glm::vec3(m_forward.x, 0.f, m_forward.z));
         if (inputs.wPressed == true) {
             // Accelerate positively along projected forward vector
-            m_acceleration += 7.f * flatForward;
+            m_acceleration += 40.f * flatForward;
         }
         if (inputs.sPressed == true) {
             // Accelerate negatively along projected forward vector
-            m_acceleration += -7.f * flatForward;
+            m_acceleration += -30.f * flatForward;
         }
         glm::vec3 flatRight =
                 glm::normalize(glm::vec3(m_right.x, 0.f, m_right.z));
         if (inputs.aPressed == true) {
             // Accelerate negatively along projected right vector
-            m_acceleration += -7.f * flatRight;
+            m_acceleration += -30.f * flatRight;
         }
         if (inputs.dPressed == true) {
             // Accelerate positively along projected right vector
-            m_acceleration += 7.f * flatRight;
+            m_acceleration += 30.f * flatRight;
         }
         if (inputs.spacePressed == true) {
-            if (m_velocity.y < -8.f) {
-                m_velocity.y += 27.f;
+            if (m_velocity.y < -4.f) {
+                m_velocity.y += 35.f;
             }
             inputs.spacePressed = false;
         }

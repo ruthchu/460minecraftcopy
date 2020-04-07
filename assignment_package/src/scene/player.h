@@ -8,7 +8,7 @@ private:
     glm::vec3 m_velocity, m_acceleration;
     Camera m_camera;
     const Terrain &mcr_terrain;
-    float phi; // Track camera angle to bound it properly
+    float m_phi; // Track camera angle to bound it properly
 
     void processInputs(InputBundle &inputs);
     void computePhysics(float dT, const Terrain &terrain);
@@ -53,4 +53,5 @@ public:
     QString velAsQString() const;
     QString accAsQString() const;
     QString lookAsQString() const;
+
 };

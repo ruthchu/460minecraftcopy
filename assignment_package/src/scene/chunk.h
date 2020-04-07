@@ -1,6 +1,7 @@
 #pragma once
 #include "smartpointerhelp.h"
 #include "glm_includes.h"
+#include "drawable.h"
 #include <array>
 #include <unordered_map>
 #include <cstddef>
@@ -32,6 +33,15 @@ struct EnumHash {
     }
 };
 
+const static std::unordered_map<Direction, Direction, EnumHash> oppositeDirection {
+    {XPOS, XNEG},
+    {XNEG, XPOS},
+    {YPOS, YNEG},
+    {YNEG, YPOS},
+    {ZPOS, ZNEG},
+    {ZNEG, ZPOS}
+};
+
 // One Chunk is a 16 x 256 x 16 section of the world,
 // containing all the Minecraft blocks in that area.
 // We divide the world into Chunks in order to make
@@ -40,7 +50,8 @@ struct EnumHash {
 // to render the world block by block.
 
 // TODO have Chunk inherit from Drawable
-class Chunk {
+class Chunk : public Drawable
+{
 private:
     // All of the blocks contained within this Chunk
     std::array<BlockType, 65536> m_blocks;
@@ -49,10 +60,26 @@ private:
     // a key for this map.
     // These allow us to properly determine
     std::unordered_map<Direction, Chunk*, EnumHash> m_neighbors;
+    // Chunk's lower-left corner X and Z coordinates according to world
+    int X;
+    int Z;
 
+    glm::vec4 getColor(BlockType &type);
+    void pushIndexForFace(std::vector<GLuint>&idx, int index);
+    void bufferToDrawableVBOs(std::vector<glm::vec4>&data);
 public:
-    Chunk();
-    BlockType getBlockAt(unsigned int x, unsigned int y, unsigned int z) const;
-    BlockType getBlockAt(int x, int y, int z) const;
-    void setBlockAt(unsigned int x, unsigned int y, unsigned int z, BlockType t);
+    Chunk(OpenGLContext* context, int X, int Z);
+    Chunk(OpenGLContext* context, int X, int Z, bool test);
+    virtual ~Chunk(){};
+    void create() override;
+
+    BlockType getBlockAt(unsigned int X, unsigned int y, unsigned int Z) const;
+    BlockType getBlockAt(int X, int y, int Z) const;
+    void setBlockAt(unsigned int X, unsigned int y, unsigned int Z, BlockType t);
+    void linkNeighbor(uPtr<Chunk> &neighbor, Direction dir);
+
+    bool hasXPOSneighbor();
+    bool hasXNEGneighbor();
+    bool hasZPOSneighbor();
+    bool hasZNEGneighbor();
 };

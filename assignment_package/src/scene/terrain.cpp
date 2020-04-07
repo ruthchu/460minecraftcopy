@@ -4,11 +4,11 @@
 #include <iostream>
 
 Terrain::Terrain(OpenGLContext *context)
-    : m_chunks(), m_generatedTerrain(), m_geomCube(context), mp_context(context)
+    : m_chunks(), m_generatedTerrain(), mp_context(context), m_geomCube(context)
 {}
 
 Terrain::~Terrain() {
-    m_geomCube.destroy();
+    //m_geomCube.destroy();
 }
 
 // Combine two 32-bit ints into one 64-bit int
@@ -115,9 +115,26 @@ void Terrain::setBlockAt(int x, int y, int z, BlockType t)
 }
 
 Chunk* Terrain::createChunkAt(int x, int z) {
-    uPtr<Chunk> chunk = mkU<Chunk>();
+    uPtr<Chunk> chunk = mkU<Chunk>(mp_context, x, z);
     Chunk *cPtr = chunk.get();
     m_chunks[toKey(x, z)] = move(chunk);
+    // Set the neighbor pointers of itself and its neighbors
+    if(hasChunkAt(x, z + 16)) {
+        auto &chunkNorth = m_chunks[toKey(x, z + 16)];
+        cPtr->linkNeighbor(chunkNorth, ZPOS);
+    }
+    if(hasChunkAt(x, z - 16)) {
+        auto &chunkSouth = m_chunks[toKey(x, z - 16)];
+        cPtr->linkNeighbor(chunkSouth, ZNEG);
+    }
+    if(hasChunkAt(x + 16, z)) {
+        auto &chunkEast = m_chunks[toKey(x + 16, z)];
+        cPtr->linkNeighbor(chunkEast, XPOS);
+    }
+    if(hasChunkAt(x - 16, z)) {
+        auto &chunkWest = m_chunks[toKey(x - 16, z)];
+        cPtr->linkNeighbor(chunkWest, XNEG);
+    }
     return cPtr;
 }
 
@@ -127,32 +144,10 @@ Chunk* Terrain::createChunkAt(int x, int z) {
 void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shaderProgram) {
     for(int x = minX; x < maxX; x += 16) {
         for(int z = minZ; z < maxZ; z += 16) {
-            const uPtr<Chunk> &chunk = getChunkAt(x, z);
-            for(int i = 0; i < 16; ++i) {
-                for(int j = 0; j < 256; ++j) {
-                    for(int k = 0; k < 16; ++k) {
-                        BlockType t = chunk->getBlockAt(i, j, k);
-                        switch(t) {
-                        case GRASS:
-                            shaderProgram->setGeometryColor(glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f);
-                            break;
-                        case DIRT:
-                            shaderProgram->setGeometryColor(glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f);
-                            break;
-                        case STONE:
-                            shaderProgram->setGeometryColor(glm::vec4(0.5f));
-                            break;
-                        default:
-                            // Other block types are not yet handled, so we default to black
-                            shaderProgram->setGeometryColor(glm::vec4(0.f));
-                            break;
-                        }
-                        if(t != EMPTY) {
-                            shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(i + x, j, k + z)));
-                            shaderProgram->draw(m_geomCube);
-                        }
-                    }
-                }
+            if (hasChunkAt(x, z)) {
+                const uPtr<Chunk> &chunk = getChunkAt(x, z);
+                shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
+                shaderProgram->draw(*chunk);
             }
         }
     }
@@ -161,7 +156,7 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
 void Terrain::CreateTestScene()
 {
     // TODO: DELETE THIS LINE WHEN YOU DELETE m_geomCube!
-    m_geomCube.create();
+    //m_geomCube.create();
 
     // Create the Chunks that will
     // store the blocks for our
@@ -187,6 +182,8 @@ void Terrain::CreateTestScene()
             }
         }
     }
+
+
     // Add "walls" for collision testing
     for(int x = 0; x < 64; ++x) {
         setBlockAt(x, 129, 0, GRASS);
@@ -198,4 +195,43 @@ void Terrain::CreateTestScene()
     for(int y = 129; y < 140; ++y) {
         setBlockAt(32, y, 32, GRASS);
     }
+
+    for (int z = 15; z < 50; z++) {
+        setBlockAt(32, 180, z, STONE);
+    }
+
+    for(int x = 0; x < 64; x += 16) {
+        for(int z = 0; z < 64; z += 16) {            
+            const uPtr<Chunk> &chunk = getChunkAt(x, z);
+            chunk->create();
+        }
+    }
 }
+
+void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
+{
+    if (hasChunkAt(pos.x, pos.z)) {
+        uPtr<Chunk> &chunk = getChunkAt(pos.x, pos.z);
+        int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
+        int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
+        if (!chunk->hasXNEGneighbor()) createMoreTerrainAt(16 * (xFloor - 1), 16 * zFloor);
+        if (!chunk->hasXPOSneighbor()) createMoreTerrainAt(16 * (xFloor + 1), 16 * zFloor);
+        if (!chunk->hasZNEGneighbor()) createMoreTerrainAt(16 * xFloor, 16 * (zFloor - 1));
+        if (!chunk->hasZPOSneighbor()) createMoreTerrainAt(16 * xFloor, 16 * (zFloor + 1));
+    }
+}
+
+void Terrain::createMoreTerrainAt(int x, int z)
+{
+    createChunkAt(x, z);
+    for(int i = x; i < x + 16; ++i) {
+        for(int k = z; k < z + 16; ++k) {
+            setBlockAt(i, 128, k, GRASS);
+        }
+    }
+    getChunkAt(x, z)->create();
+}
+
+
+
+
