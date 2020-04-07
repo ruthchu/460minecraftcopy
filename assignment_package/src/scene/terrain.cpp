@@ -279,7 +279,7 @@ std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mount
     float newGrass = float(grassHeight) / 64.f;
     float newMountain = float(mountainHeight) / 64.f;
 
-    glm::vec2 uv = glm::vec2(newGrass, newMountain);
+    glm::vec2 uv = glm::vec2(newGrass, newMountain);// + glm::vec2(100, 100);
     glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
                                  Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
 //    std::cout << newGrass << ", " << newMountain << std::endl;
