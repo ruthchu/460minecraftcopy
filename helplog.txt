@@ -1,0 +1,3 @@
+4/3/2020 OH: Got a high level overview of how the player physics work from Grace, realized I had to add functionality for a keyReleaseEvent
+
+4/4/2020 9pm est: Discussed raycasting with Rachel and asked a few clarifying questions about player movement, learned that acceleration doesn't increase, rather, a constant acceleration value is applied when a key is pressed.
