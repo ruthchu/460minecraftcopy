@@ -247,7 +247,9 @@ void Terrain::CreateTestScene()
 
 void Terrain::createMoreTerrainAt(int xAt, int zAt)
 {
-    createChunkAt(xAt, zAt);
+    if (!hasChunkAt(xAt, zAt)) {
+        createChunkAt(xAt, zAt);
+    }
     for(int x = xAt; x < xAt + 16; ++x) {
         for(int z = zAt; z < zAt + 16; ++z) {
 
@@ -317,18 +319,16 @@ int Terrain::heightMountain(int x, int z) {
     return y;
 }
 
-
-
 void Terrain::fillColumn(int x, int y, int z, BlockType t) {
     int worldBaseHeight = 0;
     if (DEBUGMODE) {
         worldBaseHeight = 120;
     }
-    for (int i = y; i >= worldBaseHeight; i--) {
+    for (int i = y; i >= y - 3/*worldBaseHeight*/; i--) {
         BlockType bt = t;
-        if (y >= 255 - 55) {
-            bt = SNOW;
-        }
+//        if (y >= 255 - 55) {
+//            bt = SNOW;
+//        }
         if (y <= 128) {
             bt = STONE;
         }
@@ -345,7 +345,7 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 {
     int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
     int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
-    int range = 3;
+    int range = 4;
     int minX = 16 * (xFloor - range);
     int maxX = 16 * (xFloor + range);
     int minZ = 16 * (zFloor - range);
@@ -353,23 +353,9 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 
     for(int x = minX; x < maxX; x += 16) {
         for(int z = minZ; z < maxZ; z += 16) {
-            addNeighborsAt(x, z);
+            createMoreTerrainAt(x, z);
         }
     }
-}
-
-void Terrain::addNeighborsAt(float x, float z)
-{
-    if (!hasChunkAt(x, z)) {
-        createChunkAt(x, z);
-    }
-    uPtr<Chunk> &chunk = getChunkAt(x, z);
-    int xFloor = static_cast<int>(glm::floor(x / 16.f));
-    int zFloor = static_cast<int>(glm::floor(z / 16.f));
-    if (!chunk->hasXNEGneighbor()) createMoreTerrainAt(16 * (xFloor - 1), 16 * zFloor);
-    if (!chunk->hasXPOSneighbor()) createMoreTerrainAt(16 * (xFloor + 1), 16 * zFloor);
-    if (!chunk->hasZNEGneighbor()) createMoreTerrainAt(16 * xFloor, 16 * (zFloor - 1));
-    if (!chunk->hasZPOSneighbor()) createMoreTerrainAt(16 * xFloor, 16 * (zFloor + 1));
 }
 
 std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mountainHeight) {
