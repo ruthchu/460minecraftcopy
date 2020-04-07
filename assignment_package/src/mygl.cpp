@@ -219,6 +219,7 @@ void MyGL::mousePressEvent(QMouseEvent *e) {
     } else if (e->button() == Qt::RightButton) {
         if (m_player.gridMarch(mid, ray * 3.f, m_terrain, &outLen, &hitBlock)) {
             // Determine where to place block based on ray direction
+            std::cout << "hello" << std::endl;
             ray *= outLen * .9f;
             m_terrain.setBlockAt(floor(mid.x + ray.x),
                                  floor(mid.y + ray.y),

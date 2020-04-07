@@ -1,3 +1,12 @@
 4/3/2020 OH: Got a high level overview of how the player physics work from Grace, realized I had to add functionality for a keyReleaseEvent
 
 4/4/2020 9pm est: Discussed raycasting with Rachel and asked a few clarifying questions about player movement, learned that acceleration doesn't increase, rather, a constant acceleration value is applied when a key is pressed.
+
+4/1/2020 OH: How do we tell the GPU how to read the combined VBOs
+Use the method void glVertexAttribPointer(GLuint index,
+ 	GLint size,
+ 	GLenum type,
+ 	GLboolean normalized,
+ 	GLsizei stride,
+ 	const void * pointer);
+The stride represents the how the elements are grouped. If we have pos1nor1col1pos2nor1col2 then the stride is 3. The pointer tells us the byte offset from the first element. So nor1 is the byte size of 1 vec4 away from the start. 
