@@ -145,9 +145,14 @@ void MyGL::paintGL() {
 void MyGL::renderTerrain() {
     int xFloor = static_cast<int>(glm::floor(m_player.mcr_position.x / 16.f));
     int zFloor = static_cast<int>(glm::floor(m_player.mcr_position.z / 16.f));
-    m_terrain.draw(16 * xFloor - 16, 16 * xFloor + 16,
-                   16 * zFloor - 16, 16 * zFloor + 16,
-                   &m_progLambert);
+    int xmin = 16 * (xFloor - 3);
+    int xmax = 16 * (xFloor + 3);
+    int zmin = 16 * (zFloor - 3);
+    int zmax = 16 * (zFloor + 3);
+//    m_terrain.draw(16 * xFloor - 16, 16 * xFloor + 16,
+//                   16 * zFloor - 16, 16 * zFloor + 16,
+//                   &m_progLambert);
+    m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
 }
 
 
