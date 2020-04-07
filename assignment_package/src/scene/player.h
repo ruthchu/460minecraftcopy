@@ -10,7 +10,7 @@ private:
     const Terrain &mcr_terrain;
     float m_phi; // Track camera angle to bound it properly
 
-    void processInputs(InputBundle &inputs);
+    void processInputs(InputBundle &inputs, float dT);
     void computePhysics(float dT, const Terrain &terrain);
 
 public:
