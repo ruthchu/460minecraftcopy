@@ -12,74 +12,75 @@ Player::~Player()
 {}
 
 void Player::tick(float dT, InputBundle &input) {
-    processInputs(input);
+    processInputs(input, dT);
     computePhysics(dT, mcr_terrain);
 }
 
-void Player::processInputs(InputBundle &inputs) {
+void Player::processInputs(InputBundle &inputs, float dT) {
     // Rotate the local axis' based on mouse input
-    float rotationSpeed = 2.f;
-    rotateOnUpGlobal(inputs.mouseX / rotationSpeed);
+    float mod = 1.f / dT;
+    rotateOnUpGlobal(inputs.mouseX / 2 * mod);
     if (m_phi < 90.f && m_phi > -90.f) {
         rotateOnRightLocal
-            (glm::clamp(inputs.mouseY / rotationSpeed, -89.99f - m_phi, 89.99f - m_phi));
+            (glm::clamp(inputs.mouseY / 2 * mod, -89.99f - m_phi, 89.99f - m_phi));
     }
     m_phi = glm::clamp(m_phi + inputs.mouseY, -89.99f, 89.99f);
     inputs.mouseX = 0.f;
     inputs.mouseY = 0.f;
     m_acceleration = {0.f, 0.f, 0.f};
+    float accel = mod * 3.f;
     // Movement in flight mode
     if (m_flightOn) {
         if (inputs.wPressed == true) {
             // Accelerate positively along forward vector
-            m_acceleration += 40.f * m_forward;
+            m_acceleration += accel * 1.1f * m_forward;
         }
         if (inputs.aPressed == true) {
             // Accelerate negatively along right vector
-            m_acceleration += -30.f * m_right;
+            m_acceleration += -accel * m_right;
         }
         if (inputs.sPressed == true) {
             // Accelerate negatively along forward vector
-            m_acceleration += -30.f * m_forward;
+            m_acceleration += -accel * m_forward;
         }
         if (inputs.dPressed == true) {
             // Accelerate positively along right vector
-            m_acceleration += 30.f * m_right;
+            m_acceleration += accel * m_right;
         }
         if (inputs.qPressed == true) {
             // Accelerate negatively along the up vector
-            m_acceleration += -30.f * glm::vec3(0.f, 1.f, 0.f);
+            m_acceleration += -accel * glm::vec3(0.f, 1.f, 0.f);
         }
         if (inputs.ePressed == true) {
             // Accelerate positively along the up vector
-            m_acceleration += 30.f * glm::vec3(0.f, 1.f, 0.f);
+            m_acceleration += accel * glm::vec3(0.f, 1.f, 0.f);
         }
     } else if (!m_flightOn) {
-        m_acceleration.y = -60.f;
+        m_acceleration.y = -accel * 2.f;
         // Movement in non-flight mode
         glm::vec3 flatForward =
                 glm::normalize(glm::vec3(m_forward.x, 0.f, m_forward.z));
         if (inputs.wPressed == true) {
             // Accelerate positively along projected forward vector
-            m_acceleration += 40.f * flatForward;
+            m_acceleration += accel * 1.1f * flatForward;
         }
         if (inputs.sPressed == true) {
             // Accelerate negatively along projected forward vector
-            m_acceleration += -30.f * flatForward;
+            m_acceleration += -accel * flatForward;
         }
         glm::vec3 flatRight =
                 glm::normalize(glm::vec3(m_right.x, 0.f, m_right.z));
         if (inputs.aPressed == true) {
             // Accelerate negatively along projected right vector
-            m_acceleration += -30.f * flatRight;
+            m_acceleration += -accel * flatRight;
         }
         if (inputs.dPressed == true) {
             // Accelerate positively along projected right vector
-            m_acceleration += 30.f * flatRight;
+            m_acceleration += accel * flatRight;
         }
         if (inputs.spacePressed == true) {
-            if (m_velocity.y < -4.f) {
-                m_velocity.y += 35.f;
+            if (m_velocity.y < accel * dT * dT * .8f) {
+                m_velocity.y += 2.f * accel;
             }
             inputs.spacePressed = false;
         }
@@ -89,7 +90,7 @@ void Player::processInputs(InputBundle &inputs) {
 void Player::computePhysics(float dT, const Terrain &terrain) {
     // Update the Player's position based on its acceleration
     // and velocity, and also perform collision detection.
-    m_velocity = m_velocity * .8f + dT * m_acceleration;
+    m_velocity = m_velocity * .5f + dT * m_acceleration;
     glm::vec3 move = m_velocity * dT;
     if (!m_flightOn) {
         float xDist;
@@ -110,9 +111,9 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                     if (gridMarch(origin, moveX, terrain, &xDist, &blockHit)) {
                         if (xDist < std::abs(move.x)) {
                             if (move.x < 0.f) {
-                                move.x = -xDist + .00001f;
+                                move.x = -xDist + .0001f;
                             } else {
-                                move.x = xDist - .00001f;
+                                move.x = xDist - .0001f;
                             }
                         }
                     }
@@ -120,18 +121,18 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                     if (gridMarch(origin, moveY, terrain, &yDist, &blockHit)) {
                         if (yDist < std::abs(move.y)) {
                             if (move.y < 0.f) {
-                                move.y = -yDist + .00001f;
+                                move.y = -yDist + .0001f;
                             } else {
-                                move.y = yDist - .00001f;
+                                move.y = yDist - .0001f;
                             }
                         }
                     }
                     if (gridMarch(origin, moveZ, terrain, &zDist, &blockHit)) {
                         if (zDist < std::abs(move.z)) {
                             if (move.z < 0.f) {
-                                move.z = -zDist + .00001f;
+                                move.z = -zDist + .0001f;
                             } else {
-                                move.z = zDist - .00001f;
+                                move.z = zDist - .0001f;
                             }
                         }
                     }
