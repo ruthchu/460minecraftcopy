@@ -18,10 +18,11 @@ void Player::tick(float dT, InputBundle &input) {
 
 void Player::processInputs(InputBundle &inputs) {
     // Rotate the local axis' based on mouse input
-    rotateOnUpGlobal(inputs.mouseX / 2.f);
+    float rotationSpeed = 2.f;
+    rotateOnUpGlobal(inputs.mouseX / rotationSpeed);
     if (m_phi < 90.f && m_phi > -90.f) {
         rotateOnRightLocal
-            (glm::clamp(inputs.mouseY / 2.f, -89.99f - m_phi, 89.99f - m_phi));
+            (glm::clamp(inputs.mouseY / rotationSpeed, -89.99f - m_phi, 89.99f - m_phi));
     }
     m_phi = glm::clamp(m_phi + inputs.mouseY, -89.99f, 89.99f);
     inputs.mouseX = 0.f;

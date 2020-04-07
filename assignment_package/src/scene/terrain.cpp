@@ -146,6 +146,7 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
         for(int z = minZ; z < maxZ; z += 16) {
             if (hasChunkAt(x, z)) {
                 const uPtr<Chunk> &chunk = getChunkAt(x, z);
+                chunk->create();
                 shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
                 shaderProgram->draw(*chunk);
             }
@@ -200,12 +201,6 @@ void Terrain::CreateTestScene()
         setBlockAt(32, 180, z, STONE);
     }
 
-    for(int x = 0; x < 64; x += 16) {
-        for(int z = 0; z < 64; z += 16) {            
-            const uPtr<Chunk> &chunk = getChunkAt(x, z);
-            chunk->create();
-        }
-    }
 }
 
 void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
@@ -229,7 +224,6 @@ void Terrain::createMoreTerrainAt(int x, int z)
             setBlockAt(i, 128, k, GRASS);
         }
     }
-    getChunkAt(x, z)->create();
 }
 
 
