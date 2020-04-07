@@ -355,25 +355,10 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 
     for(int x = minX; x < maxX; x += 16) {
         for(int z = minZ; z < maxZ; z += 16) {
-            //addNeighborsAt(x, z);
             createMoreTerrainAt(x, z);
         }
     }
 }
-
-//void Terrain::addNeighborsAt(float x, float z)
-//{
-//    if (!hasChunkAt(x, z)) {
-//        createChunkAt(x, z);
-//    }
-//    uPtr<Chunk> &chunk = getChunkAt(x, z);
-//    int xFloor = static_cast<int>(glm::floor(x / 16.f));
-//    int zFloor = static_cast<int>(glm::floor(z / 16.f));
-//    if (!chunk->hasXNEGneighbor()) createMoreTerrainAt(16 * (xFloor - 1), 16 * zFloor);
-//    if (!chunk->hasXPOSneighbor()) createMoreTerrainAt(16 * (xFloor + 1), 16 * zFloor);
-//    if (!chunk->hasZNEGneighbor()) createMoreTerrainAt(16 * xFloor, 16 * (zFloor - 1));
-//    if (!chunk->hasZPOSneighbor()) createMoreTerrainAt(16 * xFloor, 16 * (zFloor + 1));
-//}
 
 std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mountainHeight) {
     float newGrass = float(grassHeight) / 64.f;

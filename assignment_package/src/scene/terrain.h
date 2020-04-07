@@ -92,12 +92,9 @@ public:
     void CreateTestScene();
     // Expands the terrain
     void expandTerrainBasedOnPlayer(glm::vec3 pos);
-
-    // Expands the terrain based on xy
-    void addNeighborsAt(float x, float y);
-
     // Create a grass terrain chunk and its VBO
     void createMoreTerrainAt(int x, int z);
+
     std::pair<int, BlockType> blendMountainGrass(int grassHeight, int mountainHeight);
     int heightGrassland(int x, int z);
     int heightMountain(int x, int z);
