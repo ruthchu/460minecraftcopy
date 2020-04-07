@@ -146,7 +146,7 @@ void MyGL::paintGL() {
 void MyGL::renderTerrain() {
     int xFloor = static_cast<int>(glm::floor(m_player.mcr_position.x / 16.f));
     int zFloor = static_cast<int>(glm::floor(m_player.mcr_position.z / 16.f));
-    int range = 9;
+    int range = 3;
     int xmin = 16 * (xFloor - range);
     int xmax = 16 * (xFloor + range);
     int zmin = 16 * (zFloor - range);

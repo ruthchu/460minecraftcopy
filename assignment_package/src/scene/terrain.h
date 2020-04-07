@@ -94,7 +94,7 @@ public:
     void expandTerrainBasedOnPlayer(glm::vec3 pos);
 
     // Expands the terrain based on xy
-    void expandTerrainAt(float x, float y);
+    void addNeighborsAt(float x, float y);
 
     // Create a grass terrain chunk and its VBO
     void createMoreTerrainAt(int x, int z);

@@ -340,7 +340,7 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 {
     int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
     int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
-    int range = 9;
+    int range = 3;
     int minX = 16 * (xFloor - range);
     int maxX = 16 * (xFloor + range);
     int minZ = 16 * (zFloor - range);
@@ -348,12 +348,12 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 
     for(int x = minX; x < maxX; x += 16) {
         for(int z = minZ; z < maxZ; z += 16) {
-            expandTerrainAt(x, z);
+            addNeighborsAt(x, z);
         }
     }
 }
 
-void Terrain::expandTerrainAt(float x, float z)
+void Terrain::addNeighborsAt(float x, float z)
 {
     if (!hasChunkAt(x, z)) {
         createChunkAt(x, z);
