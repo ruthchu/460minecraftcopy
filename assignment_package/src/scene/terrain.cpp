@@ -345,7 +345,7 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 {
     int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
     int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
-    int range = 4;
+    int range = 5;
     int minX = 16 * (xFloor - range);
     int maxX = 16 * (xFloor + range);
     int minZ = 16 * (zFloor - range);
