@@ -8,7 +8,7 @@ After setting the final height of a block dictated by the biome, I decided to us
 
 CHUNKING: Implemented by Kaiying Guo 
 
-First, I created an standard vector of vertex data comprised of normals, position, and color for every chunk. How I populated the standard vector, was by iterating through all all the blocks in a chunk and comparing each block to its neighboring blocks on all enum directions. If the neighboring block of a face is empty, then the face of the block id drawn via triangulation. The normal is dependent on the face and the color is derivied from the block type which I use a switch statment to implement. I found the positions of the face by offsetting the block position which is a block bottom left. 
+First, I created an standard vector of vertex data comprised of normals, position, and color for every chunk. How I populated the standard vector, was by iterating through all all the blocks in a chunk and comparing each block to its neighboring blocks on all enum directions. If the neighboring block of a face is empty, then the face of the block id drawn via triangulation. The normal is dependent on the face and the color is derivied from the block type which I use a switch statment to implement. I found the positions of the face by offsetting the block position in world which is a block bottom left. 
 
 When I arrive at the edges of the chunk, I compare the edge blocks to blocks of a neighboring chunk if the chunk in question exists. I only check the edges of the chunk in x and z because the y edges should always be there. 
 
