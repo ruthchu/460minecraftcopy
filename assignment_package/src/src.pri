@@ -5,6 +5,7 @@ SOURCES += \
     $$PWD/main.cpp \
     $$PWD/mainwindow.cpp \
     $$PWD/mygl.cpp \
+    $$PWD/scene/lsystem.cpp \
     $$PWD/scene/noise.cpp \
     $$PWD/shaderprogram.cpp \
     $$PWD/drawable.cpp \
@@ -17,11 +18,13 @@ SOURCES += \
     $$PWD/scene/player.cpp \
     $$PWD/scene/camera.cpp \
     $$PWD/playerinfo.cpp \
-    $$PWD/scene/chunk.cpp
+    $$PWD/scene/chunk.cpp \
+    $$PWD/turtle.cpp
 
 HEADERS += \
     $$PWD/mainwindow.h \
     $$PWD/mygl.h \
+    $$PWD/scene/lsystem.h \
     $$PWD/scene/noise.h \
     $$PWD/shaderprogram.h \
     $$PWD/drawable.h \
@@ -36,4 +39,5 @@ HEADERS += \
     $$PWD/scene/player.h \
     $$PWD/scene/camera.h \
     $$PWD/playerinfo.h \
-    $$PWD/scene/chunk.h
+    $$PWD/scene/chunk.h \
+    $$PWD/turtle.h
