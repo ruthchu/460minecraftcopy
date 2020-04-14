@@ -9,6 +9,13 @@
 #include "cube.h"
 #include "noise.h"
 
+#define TERRAIN_RADIUS 2
+#define CHUNK_LENGTH_IN_TERRAIN 4
+#define BLOCK_LENGTH_IN_CHUNK 16
+#define BLOCK_LENGTH_IN_TERRAIN (CHUNK_LENGTH_IN_TERRAIN * BLOCK_LENGTH_IN_CHUNK)
+#define START_PRINT std::cout <<
+#define END_PRINT << std::endl
+
 //using namespace std;
 
 // Helper functions to convert (x, z) to and from hash map key
@@ -92,8 +99,13 @@ public:
     void CreateTestScene();
     // Expands the terrain
     void expandTerrainBasedOnPlayer(glm::vec3 pos);
+    void loadTerrain(int xPos, int yPos);
+
+    glm::ivec2 getTerrainAt(int x, int z);
     // Create a grass terrain chunk and its VBO
     void createMoreTerrainAt(int x, int z);
+    // Deals with terrain zone loading at coordinates defined by bottom-left corner at (x,z) coords
+    void generateTerrainZone(int x, int z);
 
     std::pair<int, BlockType> blendMountainGrass(int grassHeight, int mountainHeight);
     int heightGrassland(int x, int z);

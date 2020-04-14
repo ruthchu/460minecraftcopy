@@ -6,7 +6,6 @@
 #include <QKeyEvent>
 #include <QDateTime>
 
-
 MyGL::MyGL(QWidget *parent)
     : OpenGLContext(parent),
       m_worldAxes(this),
@@ -101,10 +100,30 @@ void MyGL::resizeGL(int w, int h) {
 // all per-frame actions here, such as performing physics updates on all
 // entities in the scene.
 void MyGL::tick() {
+    // check if new terrain zone chunks need to be created and populated
+    glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
+//    glm::ivec2 centerTerrain = m_terrain.getTerrainAt(pPos[0], pPos[1]);
+//    int leftBound = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
+//    int rightBound = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
+//    int botBound = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
+//    int topBound = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
+
+//    START_PRINT "leftbound: " << leftBound END_PRINT;
+//    START_PRINT "rightBound: " << rightBound END_PRINT;
+//    START_PRINT "botBound: " << botBound END_PRINT;
+//    START_PRINT "topBound: " << topBound END_PRINT;
+//    START_PRINT centerTerrain[0] << ", " << centerTerrain[1] END_PRINT;
+
     float dT = (QDateTime::currentMSecsSinceEpoch() - m_currTime) / 1000.f;
     m_player.tick(dT, m_inputs);
     m_currTime = QDateTime::currentMSecsSinceEpoch();
     m_terrain.expandTerrainBasedOnPlayer(m_player.mcr_position);
+//    for (int x = leftBound; x <= rightBound; x+= BLOCK_LENGTH_IN_TERRAIN) {
+//        for (int z = botBound; z <= topBound; z += BLOCK_LENGTH_IN_TERRAIN) {
+//            m_terrain.generateTerrainZone(x, z);
+//        }
+//    }
+
     update(); // Calls paintGL() as part of a larger QOpenGLWidget pipeline
     sendPlayerDataToGUI(); // Updates the info in the secondary window displaying player data
 }
@@ -144,18 +163,22 @@ void MyGL::paintGL() {
 // terrain that surround the player (refer to Terrain::m_generatedTerrain
 // for more info)
 void MyGL::renderTerrain() {
-    int xFloor = static_cast<int>(glm::floor(m_player.mcr_position.x / 16.f));
-    int zFloor = static_cast<int>(glm::floor(m_player.mcr_position.z / 16.f));
-    int range = 4;
-    int xmin = 16 * (xFloor - range);
-    int xmax = 16 * (xFloor + range);
-    int zmin = 16 * (zFloor - range);
-    int zmax = 16 * (zFloor + range);
+    int renderRadius = 1;
+    glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
+    glm::ivec2 centerTerrain = m_terrain.getTerrainAt(pPos[0], pPos[1]);
+
+//    int xFloor = static_cast<int>(glm::floor(m_player.mcr_position.x / 16.f));
+//    int zFloor = static_cast<int>(glm::floor(m_player.mcr_position.z / 16.f));
+//    int range = 4;
+    int xmin = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * renderRadius /*- BLOCK_LENGTH_IN_TERRAIN*/;//16 * (xFloor - range);
+    int xmax = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * renderRadius + BLOCK_LENGTH_IN_TERRAIN; //16 * (xFloor + range);
+    int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius - BLOCK_LENGTH_IN_TERRAIN;//16 * (zFloor - range);
+    int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius /*+ BLOCK_LENGTH_IN_TERRAIN*/;//16 * (zFloor + range);
     m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
 }
 
 
-void MyGL::keyPressEvent(QKeyEvent *e) {    
+void MyGL::keyPressEvent(QKeyEvent *e) {
     // http://doc.qt.io/qt-5/qt.html#Key-enum
     // This could all be much more efficient if a switch
     // statement were used, but I really dislike their
