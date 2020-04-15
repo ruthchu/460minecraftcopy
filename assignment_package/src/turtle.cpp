@@ -1,6 +1,9 @@
 #include "turtle.h"
 
-Turtle::Turtle()
-{
+Turtle::Turtle(glm::vec4 pos, float orient, float length, float depth)
+    : pos(pos), orient(orient), length(length), depth(depth)
+{}
 
-}
+Turtle::Turtle(const Turtle& ref)
+    : pos(ref.pos), orient(ref.orient), length(ref.length), depth(ref.depth)
+{}

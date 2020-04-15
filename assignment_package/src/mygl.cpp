@@ -105,6 +105,7 @@ void MyGL::tick() {
     m_player.tick(dT, m_inputs);
     m_currTime = QDateTime::currentMSecsSinceEpoch();
     m_terrain.expandTerrainBasedOnPlayer(m_player.mcr_position);
+    m_terrain.makeRivers();
     update(); // Calls paintGL() as part of a larger QOpenGLWidget pipeline
     sendPlayerDataToGUI(); // Updates the info in the secondary window displaying player data
 }
@@ -152,6 +153,7 @@ void MyGL::renderTerrain() {
     int zmin = 16 * (zFloor - range);
     int zmax = 16 * (zFloor + range);
     m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
+    //m_terrain.draw(0, 64, 0, 64, &m_progLambert);
 }
 
 

@@ -2,6 +2,7 @@
 #include "cube.h"
 #include <stdexcept>
 #include <iostream>
+#include <glm/glm.hpp>
 
 const static bool DEBUGMODE = true;
 
@@ -384,6 +385,12 @@ std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mount
     }
     return std::make_pair(height, bt);
 }
+
+void Terrain::makeRivers()
+{
+
+}
+
 
 void Terrain::CreateTestSceneDub()
 {
