@@ -12,3 +12,6 @@
 #define mkS std::make_shared
 // Rewrite std::shared_ptr<float> f = std::make_shared<float>(5.f);
 // as sPtr<float> f = mkS<float>(5.f);
+
+#define START_PRINT std::cout <<
+#define END_PRINT << std::endl

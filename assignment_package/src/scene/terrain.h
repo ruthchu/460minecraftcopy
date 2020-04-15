@@ -8,13 +8,11 @@
 #include "shaderprogram.h"
 #include "cube.h"
 #include "noise.h"
-
+#include "BlockTypeData.h"
 #define TERRAIN_RADIUS 2
 #define CHUNK_LENGTH_IN_TERRAIN 4
 #define BLOCK_LENGTH_IN_CHUNK 16
 #define BLOCK_LENGTH_IN_TERRAIN (CHUNK_LENGTH_IN_TERRAIN * BLOCK_LENGTH_IN_CHUNK)
-#define START_PRINT std::cout <<
-#define END_PRINT << std::endl
 
 //using namespace std;
 
@@ -62,6 +60,9 @@ private:
     OpenGLContext* mp_context;
 
     void fillColumn(int x, int y, int z, BlockType t);
+
+    //
+    BlockData chunksWithData;
 public:
     Terrain(OpenGLContext *context);
     ~Terrain();

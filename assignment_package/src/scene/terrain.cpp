@@ -6,7 +6,7 @@
 const static bool DEBUGMODE = true;
 
 Terrain::Terrain(OpenGLContext *context)
-    : m_chunks(), m_generatedTerrain(), mp_context(context)//, m_geomCube(context)
+    : m_chunks(), m_generatedTerrain(), mp_context(context), chunksWithData()//, m_geomCube(context)
 {}
 
 Terrain::~Terrain() {
@@ -152,9 +152,9 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
                 shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
                 shaderProgram->draw(*chunk);
             }
-//            else {
-//                START_PRINT "No chunk at (" << x << ", " << z << ")" END_PRINT;
-//            }
+            //            else {
+            //                START_PRINT "No chunk at (" << x << ", " << z << ")" END_PRINT;
+            //            }
         }
     }
 }
@@ -177,42 +177,42 @@ void Terrain::CreateTestScene()
     // now exists.
     m_generatedTerrain.insert(toKey(0, 0));
 
-//    // Create the basic terrain floor
-//    for(int x = 0; x < 64; ++x) {
-//        for(int z = 0; z < 64; ++z) {
-//            if((x + z) % 2 == 0) {
-//                setBlockAt(x, 128, z, STONE);
-//            }
-//            else {
-//                setBlockAt(x, 128, z, DIRT);
-//            }
-//        }
-//    }
+    //    // Create the basic terrain floor
+    //    for(int x = 0; x < 64; ++x) {
+    //        for(int z = 0; z < 64; ++z) {
+    //            if((x + z) % 2 == 0) {
+    //                setBlockAt(x, 128, z, STONE);
+    //            }
+    //            else {
+    //                setBlockAt(x, 128, z, DIRT);
+    //            }
+    //        }
+    //    }
 
     //grassland test
-//    for(int x = 0; x < 64; ++x) {
-//        for(int z = 0; z < 64; ++z) {
-//            int y = heightGrassland(x, z);
-//            setBlockAt(x, y, z, GRASS);
-//            fillColumn(x, y - 1, z, DIRT);
-//        }
-//    }
+    //    for(int x = 0; x < 64; ++x) {
+    //        for(int z = 0; z < 64; ++z) {
+    //            int y = heightGrassland(x, z);
+    //            setBlockAt(x, y, z, GRASS);
+    //            fillColumn(x, y - 1, z, DIRT);
+    //        }
+    //    }
 
     //mountain test
-//    for(int x = 0; x < 64; ++x) {
-//        for(int z = 0; z < 64; ++z) {
-//            BlockType bt = STONE;
-//            int y = heightMountain(x, z);
-//            if (y > 215) {
-//                bt = SNOW;
-//            }
-//            setBlockAt(x, y, z, bt);
-//            for (int i = 1; i < 10; i++) {
-//                setBlockAt(x, y - i, z, STONE);
+    //    for(int x = 0; x < 64; ++x) {
+    //        for(int z = 0; z < 64; ++z) {
+    //            BlockType bt = STONE;
+    //            int y = heightMountain(x, z);
+    //            if (y > 215) {
+    //                bt = SNOW;
+    //            }
+    //            setBlockAt(x, y, z, bt);
+    //            for (int i = 1; i < 10; i++) {
+    //                setBlockAt(x, y - i, z, STONE);
 
-//            }
-//        }
-//    }
+    //            }
+    //        }
+    //    }
 
     //interpolate test
     for(int x = 0; x < 64; ++x) {
@@ -222,30 +222,30 @@ void Terrain::CreateTestScene()
             std::pair blend = blendMountainGrass(grass, mountain);
             int y = blend.first;
             BlockType bt = blend.second;
-//            for (int i = 1; i < 10; i++) {
-//                if (bt == GRASS) {
-//                    bt = DIRT;
-//                }
-//                if (y > 215) {
-//                    bt = SNOW;
-//                }
-//                setBlockAt(x, y - i, z, bt);
-//            }
+            //            for (int i = 1; i < 10; i++) {
+            //                if (bt == GRASS) {
+            //                    bt = DIRT;
+            //                }
+            //                if (y > 215) {
+            //                    bt = SNOW;
+            //                }
+            //                setBlockAt(x, y - i, z, bt);
+            //            }
             fillColumn(x, y - 1, z, bt);
         }
     }
 
-//    // Add "walls" for collision testing
-//    for(int x = 0; x < 64; ++x) {
-//        setBlockAt(x, 129, 0, GRASS);
-//        setBlockAt(x, 130, 0, GRASS);
-//        setBlockAt(x, 129, 63, GRASS);
-//        setBlockAt(0, 130, x, GRASS);
-//    }
-//    // Add a central column
-//    for(int y = 129; y < 140; ++y) {
-//        setBlockAt(32, y, 32, GRASS);
-//    }
+    //    // Add "walls" for collision testing
+    //    for(int x = 0; x < 64; ++x) {
+    //        setBlockAt(x, 129, 0, GRASS);
+    //        setBlockAt(x, 130, 0, GRASS);
+    //        setBlockAt(x, 129, 63, GRASS);
+    //        setBlockAt(0, 130, x, GRASS);
+    //    }
+    //    // Add a central column
+    //    for(int y = 129; y < 140; ++y) {
+    //        setBlockAt(32, y, 32, GRASS);
+    //    }
 }
 
 void Terrain::createMoreTerrainAt(int xPos, int zPos)
@@ -256,19 +256,19 @@ void Terrain::createMoreTerrainAt(int xPos, int zPos)
     for(int x = xPos; x < xPos + BLOCK_LENGTH_IN_CHUNK; ++x) {
         for(int z = zPos; z < zPos + BLOCK_LENGTH_IN_CHUNK; ++z) {
 
-//            int y = heightGrassland(x, z);
-//            setBlockAt(x, y, z, GRASS);
-//            fillColumn(x, y - 1, z, DIRT);
+            //            int y = heightGrassland(x, z);
+            //            setBlockAt(x, y, z, GRASS);
+            //            fillColumn(x, y - 1, z, DIRT);
 
-//            BlockType bt = STONE;
-//            int y = heightMountain(x, z);
-//            if (y > 215) {
-//                bt = SNOW;
-//            }
-//            setBlockAt(x, y, z, bt);
-//            for (int i = 1; i < 10; i++) {
-//                setBlockAt(x, y - i, z, STONE);
-//            }
+            //            BlockType bt = STONE;
+            //            int y = heightMountain(x, z);
+            //            if (y > 215) {
+            //                bt = SNOW;
+            //            }
+            //            setBlockAt(x, y, z, bt);
+            //            for (int i = 1; i < 10; i++) {
+            //                setBlockAt(x, y - i, z, STONE);
+            //            }
 
             //>>> this is the right part
             int grass = heightGrassland(x, z);
@@ -325,42 +325,42 @@ int Terrain::heightMountain(int x, int z) {
 void Terrain::fillColumn(int x, int y, int z, BlockType t) {
     int worldBaseHeight = 0;
     if (DEBUGMODE) {
-        worldBaseHeight = 100;
+        worldBaseHeight = y - 4;
     }
-    for (int i = y; i >= y - 4/*worldBaseHeight*/; i--) {
+    for (int i = y; i >= worldBaseHeight; i--) {
         BlockType bt = t;
-//        if (y >= 255 - 55) {
-//            bt = SNOW;
-//        }
+        //        if (y >= 255 - 55) {
+        //            bt = SNOW;
+        //        }
         if (y <= 128) {
             bt = STONE;
         }
-       setBlockAt(x, i, z, bt);
+        setBlockAt(x, i, z, bt);
     }
 
-//    for (int z = 15; z < 50; z++) {
-//        setBlockAt(32, 180, z, STONE);
-//    }
+    //    for (int z = 15; z < 50; z++) {
+    //        setBlockAt(32, 180, z, STONE);
+    //    }
 
 }
 
 void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 {
-//    int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
-//    int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
-//    int range = 4;
-//    int minX = 16 * (xFloor - range);
-//    int maxX = 16 * (xFloor + range);
-//    int minZ = 16 * (zFloor - range);
-//    int maxZ = 16 * (zFloor + range);
+    //    int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
+    //    int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
+    //    int range = 4;
+    //    int minX = 16 * (xFloor - range);
+    //    int maxX = 16 * (xFloor + range);
+    //    int minZ = 16 * (zFloor - range);
+    //    int maxZ = 16 * (zFloor + range);
 
-//    for(int x = minX; x < maxX; x += 16) {
-//        for(int z = minZ; z < maxZ; z += 16) {
-//            if (!hasChunkAt(x, z)) {
-//                createMoreTerrainAt(x, z);
-//            }
-//        }
-//    }
+    //    for(int x = minX; x < maxX; x += 16) {
+    //        for(int z = minZ; z < maxZ; z += 16) {
+    //            if (!hasChunkAt(x, z)) {
+    //                createMoreTerrainAt(x, z);
+    //            }
+    //        }
+    //    }
     glm::ivec2 centerTerrain = this->getTerrainAt(pos.x, pos.z);
     int leftBound = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
     int rightBound = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
@@ -458,26 +458,26 @@ glm::ivec2 Terrain::getTerrainAt(int x, int z) {
 void Terrain::generateTerrainZone(int x, int z) {
     int64_t coord = toKey(x, z);
     if (this->m_generatedTerrain.find(coord) == this->m_generatedTerrain.end()) {
-        // terrain zone is not generated
+        // terrain zone has not generated
         // generate chunk data in terrain zone
-//        START_PRINT "Terrain zone does not exist at (" << x << ", " << z << ")" END_PRINT;
+        //        START_PRINT "Terrain zone does not exist at (" << x << ", " << z << ")" END_PRINT;
         for (int i = 0; i <= BLOCK_LENGTH_IN_TERRAIN; i += BLOCK_LENGTH_IN_CHUNK) {
             for (int j = 0; j <= BLOCK_LENGTH_IN_TERRAIN; j += BLOCK_LENGTH_IN_CHUNK) {
                 this->createMoreTerrainAt(x + i, z + j);
             }
         }
         this->m_generatedTerrain.insert(coord);
-    } else {
-        // terrain zone is generated
-//        START_PRINT "Terrain zone exists at (" << x << ", " << z << ")" END_PRINT;
-        // check each chunk to see if it contains vbo data
-//        for (int i = 0; i <= BLOCK_LENGTH_IN_TERRAIN; i += BLOCK_LENGTH_IN_CHUNK) {
-//            for (int j = 0; j <= BLOCK_LENGTH_IN_TERRAIN; j += BLOCK_LENGTH_IN_CHUNK) {
-//                if (!hasChunkAt(x + i, z + j)) {
-
-//                }
-//            }
-//        }
     }
-//    START_PRINT this->m_generatedTerrain.size() END_PRINT;
+
+    // terrain zone is generated
+    // check each chunk to see if it contains vbo data
+    //        for (int i = 0; i <= BLOCK_LENGTH_IN_TERRAIN; i += BLOCK_LENGTH_IN_CHUNK) {
+    //            for (int j = 0; j <= BLOCK_LENGTH_IN_TERRAIN; j += BLOCK_LENGTH_IN_CHUNK) {
+    //                if (!hasChunkAt(x + i, z + j)) {
+
+    //                }
+    //            }
+    //        }
+
+    START_PRINT this->m_generatedTerrain.size() END_PRINT;
 }
