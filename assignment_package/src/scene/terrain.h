@@ -109,9 +109,8 @@ public:
     // Deals with terrain zone loading at coordinates defined by bottom-left corner at (x,z) coords
     void generateTerrainZone(int x, int z);
 
-    std::pair<int, BlockType> blendMountainGrass(int grassHeight, int mountainHeight);
-    int heightGrassland(int x, int z);
-    int heightMountain(int x, int z);
+    static int heightGrassland(int x, int z);
+    static int heightMountain(int x, int z);
 
     void CreateTestSceneDub();
 };

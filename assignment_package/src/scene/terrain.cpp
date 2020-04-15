@@ -214,27 +214,6 @@ void Terrain::CreateTestScene()
     //        }
     //    }
 
-    //interpolate test
-    for(int x = 0; x < 64; ++x) {
-        for(int z = 0; z < 64; ++z) {
-            int grass = heightGrassland(x, z);
-            int mountain = heightMountain(x, z);
-            std::pair blend = blendMountainGrass(grass, mountain);
-            int y = blend.first;
-            BlockType bt = blend.second;
-            //            for (int i = 1; i < 10; i++) {
-            //                if (bt == GRASS) {
-            //                    bt = DIRT;
-            //                }
-            //                if (y > 215) {
-            //                    bt = SNOW;
-            //                }
-            //                setBlockAt(x, y - i, z, bt);
-            //            }
-            fillColumn(x, y - 1, z, bt);
-        }
-    }
-
     //    // Add "walls" for collision testing
     //    for(int x = 0; x < 64; ++x) {
     //        setBlockAt(x, 129, 0, GRASS);
@@ -373,27 +352,6 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
         }
     }
 }
-
-std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mountainHeight) {
-    float newGrass = float(grassHeight) / 64.f;
-    float newMountain = float(mountainHeight) / 64.f;
-
-    glm::vec2 uv = glm::vec2(newGrass, newMountain);// + glm::vec2(100, 100);
-    glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
-                                 Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
-    float freq = 1.0f;
-    float noiseFactor = (Noise::perlinNoise((uv + offset) * freq) + 1) / 2.f;
-
-    noiseFactor = glm::smoothstep(0.25f, 0.75f, noiseFactor);
-
-    int height = glm::mix(mountainHeight, grassHeight, noiseFactor);
-    BlockType bt = GRASS;
-    if (noiseFactor > 0.5) {
-        bt = STONE;
-    }
-    return std::make_pair(height, bt);
-}
-
 void Terrain::CreateTestSceneDub()
 {
     // TODO: DELETE THIS LINE WHEN YOU DELETE m_geomCube!
