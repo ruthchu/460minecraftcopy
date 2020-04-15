@@ -6,6 +6,7 @@
 #include <thread>
 #include "smartpointerhelp.h"
 #include <iostream>
+#include <vector>
 #define BlockData SharedBlockTypeCollection
 
 class SharedBlockTypeCollection {
@@ -16,6 +17,11 @@ public:
     SharedBlockTypeCollection();
 
     void addChunk(Chunk* chunk);
+    void clearChunkData();
+    bool isEmpty();
+
+    // return copy of vector
+    std::vector<Chunk*> getVectorData();
 
     ~SharedBlockTypeCollection();
     SharedBlockTypeCollection(const SharedBlockTypeCollection &collection);

@@ -61,9 +61,10 @@ private:
 
     void fillColumn(int x, int y, int z, BlockType t);
 
-    //
-    BlockData chunksWithData;
 public:
+    // collection of chunks
+    BlockData chunksWithData;
+
     Terrain(OpenGLContext *context);
     ~Terrain();
 

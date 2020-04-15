@@ -6,6 +6,7 @@ SOURCES += \
     $$PWD/mainwindow.cpp \
     $$PWD/mygl.cpp \
     $$PWD/scene/BlockTypeData.cpp \
+    $$PWD/scene/VBOWorkerData.cpp \
     $$PWD/scene/noise.cpp \
     $$PWD/shaderprogram.cpp \
     $$PWD/drawable.cpp \
@@ -24,6 +25,7 @@ HEADERS += \
     $$PWD/mainwindow.h \
     $$PWD/mygl.h \
     $$PWD/scene/BlockTypeData.h \
+    $$PWD/scene/VBOWorkerData.h \
     $$PWD/scene/noise.h \
     $$PWD/shaderprogram.h \
     $$PWD/drawable.h \
