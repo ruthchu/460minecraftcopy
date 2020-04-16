@@ -328,7 +328,7 @@ void Terrain::fillColumn(int x, int y, int z, BlockType t) {
     if (DEBUGMODE) {
         worldBaseHeight = 120;
     }
-    for (int i = y; i >= y - 3/*worldBaseHeight*/; i--) {
+    for (int i = y; i >= y - 2/*worldBaseHeight*/; i--) {
         BlockType bt = t;
 //        if (y >= 255 - 55) {
 //            bt = SNOW;

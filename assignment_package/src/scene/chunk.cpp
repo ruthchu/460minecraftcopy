@@ -52,7 +52,7 @@ void Chunk::create()
                 // World pos = chunk position + block local position
                 glm::vec4 worldPos = glm::vec4(this->X, 0.f, this->Z, 0.f) + glm::vec4(i, j, k, 1.f);
                 // Get block color
-                glm::vec4 col = getColor(t);
+                glm::vec4 uv = getUVs(t);
 
                 // Back face (face with LL vertex at worldPos)
                 BlockType blockBehind = getBlockAt(i, j, std::max(0, k - 1));
@@ -68,19 +68,19 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LL
                     data.push_back(worldPos);
                     data.push_back(glm::vec4(0.f, 0.f, -1.f, 0.f));
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LR
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     data.push_back(glm::vec4(0.f, 0.f, -1.f, 0.f));
-                    data.push_back(col);
+                    data.push_back(uv);
                     //UR
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     data.push_back(glm::vec4(0.f, 0.f, -1.f, 0.f));
-                    data.push_back(col);
+                    data.push_back(uv);
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -100,19 +100,19 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LL
                     data.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LR
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //UR
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -132,19 +132,19 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LL
                     data.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LR
                     data.push_back(worldPos);
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //UR
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -164,19 +164,19 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LL
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LR
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //UR
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -191,19 +191,19 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LL
                     data.push_back(worldPos);
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LR
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //UR
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -218,19 +218,19 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //LR
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     //UR
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(col);
+                    data.push_back(uv);
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -262,7 +262,7 @@ void Chunk::pushIndexForFace(std::vector<GLuint>&idx, int index)
     idx.push_back(index + 3);
 }
 
-glm::vec4 Chunk::getColor(BlockType &type)
+glm::vec4 Chunk::getUVs(BlockType &type)
 {
     if (type == DIRT) {
         return glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f;

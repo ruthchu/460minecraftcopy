@@ -15,7 +15,7 @@
 // block types, but in the scope of this project we'll never get anywhere near that many.
 enum BlockType : unsigned char
 {
-    EMPTY, GRASS, DIRT, STONE, SNOW
+    EMPTY, GRASS, DIRT, STONE, SNOW, LAVA, WATER, ICE
 };
 
 // The six cardinal directions in 3D space
@@ -64,7 +64,7 @@ private:
     int X;
     int Z;
 
-    glm::vec4 getColor(BlockType &type);
+    glm::vec4 getUVs(BlockType &type);
     void pushIndexForFace(std::vector<GLuint>&idx, int index);
     void bufferToDrawableVBOs(std::vector<glm::vec4>&data);
 public:
