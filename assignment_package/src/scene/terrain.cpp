@@ -337,18 +337,10 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
         }
     }
     // generate VBOs for each chunk with data
-//    std::vector<std::thread> threads;
     for (Chunk* c : chunksWithData.getVectorData()) {
         std::thread t(fillVBO, std::ref(*c), std::ref(this->chunksWithVBO));
-//        threads.push_back(std::move(t));
         t.detach();
     }
-
-//    for (auto &t : threads) {
-//        t.join();
-//    }
-
-//    threads.clear();
 
     // push chunk VBOs to GPU
     for (Chunk* c : chunksWithVBO.getVectorData()) {
@@ -428,30 +420,23 @@ glm::ivec2 Terrain::getTerrainAt(int x, int z) {
 
 void Terrain::generateTerrainZone(int x, int z) {
     int64_t coord = toKey(x, z);
-//    std::vector<std::thread> blockDataWorkers;
     if (this->m_generatedTerrain.find(coord) == this->m_generatedTerrain.end()) {
         // generate chunk data in terrain zone
         for (int i = 0; i <= BLOCK_LENGTH_IN_TERRAIN; i += BLOCK_LENGTH_IN_CHUNK) {
             for (int j = 0; j <= BLOCK_LENGTH_IN_TERRAIN; j += BLOCK_LENGTH_IN_CHUNK) {
                 Chunk* cPtr = createChunkAt(x + i, z + j);
-//                blockDataWorkers.push_back(std::thread(fillBlockData, x + i, z + j, cPtr,
-//                                                       std::ref(this->chunksWithData)));
                 std::thread t(fillBlockData, cPtr->X, cPtr->Z, cPtr, &this->chunksWithData);
                 t.detach();
-//                this->createMoreTerrainAt(x + i, z + j);
             }
         }
         this->m_generatedTerrain.insert(coord);
     }
-//    this->chunksWithData.clearChunkData();
-//    START_PRINT this->m_generatedTerrain.size() END_PRINT;
 }
 
 void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData *chunksWithData) {
     // Fill chunk with procedural height and blocktype data
     for(int x = xPos; x < xPos + BLOCK_LENGTH_IN_CHUNK; ++x) {
         for(int z = zPos; z < zPos + BLOCK_LENGTH_IN_CHUNK; ++z) {
-            //>>> this is the right part
             int grass = heightGrassland(x, z);
             int mountain = heightMountain(x, z);
             float perlin = (Noise::perlinNoise(glm::vec2(float(x) / 64, float(z) / 64)) + 1) / 2.f;
