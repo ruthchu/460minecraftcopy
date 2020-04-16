@@ -4,7 +4,7 @@
 #include <math.h>
 
 Lsystem::Lsystem(Terrain &terrain)
-    : currentTurtle(Turtle(glm::vec3(0, 135.f, 0), glm::vec3(0, 0, 1), 10.0f, 12.f)),
+    : currentTurtle(Turtle(glm::vec3(0, 135.f, 0), glm::vec3(1, 0, 1), 10.0f, 12.f)),
       tStack(std::stack<Turtle>()), grammarMap(QHash<QChar, QString>()),
       ruleMap(QHash<QChar, Rule>()), terrain(terrain)
 {}

@@ -152,7 +152,7 @@ void MyGL::renderTerrain() {
     int zmin = 16 * (zFloor - range);
     int zmax = 16 * (zFloor + range);
     m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
-    //m_terrain.draw(0, 64, 0, 64, &m_progLambert);
+//    m_terrain.draw(0, 64, 0, 64, &m_progLambert);
 }
 
 

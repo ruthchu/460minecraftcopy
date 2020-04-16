@@ -58,6 +58,8 @@ private:
 
     OpenGLContext* mp_context;
 
+    bool test;
+
     void fillColumn(int x, int y, int z, BlockType t);
 public:
     Terrain(OpenGLContext *context);

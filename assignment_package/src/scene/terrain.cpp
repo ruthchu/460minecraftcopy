@@ -7,7 +7,7 @@
 const static bool DEBUGMODE = true;
 
 Terrain::Terrain(OpenGLContext *context)
-    : m_chunks(), m_generatedTerrain(), mp_context(context)//, m_geomCube(context)
+    : m_chunks(), m_generatedTerrain(), mp_context(context), test(false)
 {}
 
 Terrain::~Terrain() {
@@ -351,6 +351,7 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 {
     int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
     int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
+
     int range = 5;
     int minX = 16 * (xFloor - range);
     int maxX = 16 * (xFloor + range);
