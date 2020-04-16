@@ -272,8 +272,10 @@ glm::vec4 Chunk::getColor(BlockType &type)
     } else if (type == GRASS) {
         return glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f;
     } else if (type == WATER) {
-        return glm::vec4(10.f, 10.f, 255.f, 255.f) / 255.f;
-    }else {
+        return glm::vec4(10.f, 10.f, 255.f, 50.f) / 255.f;
+    } else if (type == LAVA) {
+        return glm::vec4(255.f, 127.f, 0.f, 50.f) / 255.f;
+    } else {
         return glm::vec4(0.f);
     }
 }

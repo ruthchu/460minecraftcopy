@@ -129,8 +129,4 @@ public:
     void CreateTestSceneDub();
 
     void makeRivers();
-//    float sdCapsule(glm::vec3 p, glm::vec3 a, glm::vec3 b, float r);
-//    float sdSphere(glm::vec3 p, float s);
-//    void carveTerrainAt(glm::vec3 p, float waterLevel);
-
 };
