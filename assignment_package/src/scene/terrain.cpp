@@ -148,7 +148,7 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
         for(int z = minZ; z <= maxZ; z += BLOCK_LENGTH_IN_CHUNK) {
             if (hasChunkAt(x, z)) {
                 const uPtr<Chunk> &chunk = getChunkAt(x, z);
-                chunk->create();
+//                chunk->create();
                 shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
                 shaderProgram->draw(*chunk);
             }
@@ -304,10 +304,9 @@ int Terrain::heightMountain(int x, int z) {
 void Terrain::fillColumn(int x, int y, int z, BlockType t) {
     int worldBaseHeight = 0;
     if (DEBUGMODE) {
-        worldBaseHeight = y - 4;
+        worldBaseHeight = y - 10;
     }
     for (int i = y; i >= worldBaseHeight; i--) {
-        BlockType t = t;
         //        if (y >= 255 - 55) {
         //            t = SNOW;
         //        }
@@ -415,7 +414,7 @@ glm::ivec2 Terrain::getTerrainAt(int x, int z) {
 
 void Terrain::generateTerrainZone(int x, int z) {
     int64_t coord = toKey(x, z);
-    std::vector<std::thread> blockDataWorkers;
+//    std::vector<std::thread> blockDataWorkers;
     if (this->m_generatedTerrain.find(coord) == this->m_generatedTerrain.end()) {
         // terrain zone has not generated
         // generate chunk data in terrain zone
@@ -424,31 +423,28 @@ void Terrain::generateTerrainZone(int x, int z) {
             for (int j = 0; j <= BLOCK_LENGTH_IN_TERRAIN; j += BLOCK_LENGTH_IN_CHUNK) {
 //                blockDataWorkers.push_back(std::thread(&Terrain::createMoreTerrainAt, this, x + i, z + j));
                 Chunk* cPtr = createChunkAt(x + i, z + j);
-                blockDataWorkers.push_back(std::thread(fillBlockData, x + i, z + j, cPtr, this->chunksWithData));
+//                blockDataWorkers.push_back(std::thread(fillBlockData, x + i, z + j, cPtr,
+//                                                       std::ref(this->chunksWithData)));
+                std::thread t(fillBlockData, x + i, z + j, cPtr,
+                                                       std::ref(this->chunksWithData));
+                t.detach();
 //                this->createMoreTerrainAt(x + i, z + j);
             }
         }
         this->m_generatedTerrain.insert(coord);
     }
-
-    for (auto &t : blockDataWorkers) {
-        t.join();
-    }
-    if (this->m_generatedTerrain.find(coord) == this->m_generatedTerrain.end()) {
+    if (this->m_generatedTerrain.find(coord) != this->m_generatedTerrain.end()) {
     // terrain zone is generated
-    // check each chunk to see if it contains vbo data
-    //        for (int i = 0; i <= BLOCK_LENGTH_IN_TERRAIN; i += BLOCK_LENGTH_IN_CHUNK) {
-    //            for (int j = 0; j <= BLOCK_LENGTH_IN_TERRAIN; j += BLOCK_LENGTH_IN_CHUNK) {
-    //                if (!hasChunkAt(x + i, z + j)) {
-
-    //                }
-    //            }
-    //        }
+        std::vector<Chunk*> vec = this->chunksWithData.getVectorData();
+        for (auto c : vec) {
+            c->create();
+        }
+        this->chunksWithData.clearChunkData();
     }
 //    START_PRINT this->m_generatedTerrain.size() END_PRINT;
 }
 
-void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData chunksWithData) {
+void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData &chunksWithData) {
     // Fill chunk with procedural height and blocktype data
     for(int x = xPos; x < xPos + BLOCK_LENGTH_IN_CHUNK; ++x) {
         for(int z = zPos; z < zPos + BLOCK_LENGTH_IN_CHUNK; ++z) {
@@ -473,6 +469,7 @@ void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData chunksWi
         }
     }
     chunksWithData.addChunk(chunk);
+//    START_PRINT std::this_thread::get_id() END_PRINT;
 }
 
 void Terrain::setBlockAtStatic(int x, int y, int z, BlockType t, Chunk* c)
