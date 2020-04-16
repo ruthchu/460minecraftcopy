@@ -21,7 +21,7 @@ public:
     bool isEmpty();
 
     // return copy of vector
-    std::vector<Chunk*> getVectorData();
+    const std::vector<Chunk*>& getVectorData();
 
     ~SharedBlockTypeCollection();
     SharedBlockTypeCollection(const SharedBlockTypeCollection &collection);

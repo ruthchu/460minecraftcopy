@@ -24,6 +24,6 @@ bool SharedBlockTypeCollection::isEmpty() {
     return this->filledChunks.empty();
 }
 
-std::vector<Chunk*> SharedBlockTypeCollection::getVectorData() {
+const std::vector<Chunk*>& SharedBlockTypeCollection::getVectorData() {
     return this->filledChunks;
 }
