@@ -101,29 +101,13 @@ void MyGL::resizeGL(int w, int h) {
 // entities in the scene.
 void MyGL::tick() {
     // check if new terrain zone chunks need to be created and populated
-    glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
-//    glm::ivec2 centerTerrain = m_terrain.getTerrainAt(pPos[0], pPos[1]);
-//    int leftBound = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
-//    int rightBound = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
-//    int botBound = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
-//    int topBound = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
-
-//    START_PRINT "leftbound: " << leftBound END_PRINT;
-//    START_PRINT "rightBound: " << rightBound END_PRINT;
-//    START_PRINT "botBound: " << botBound END_PRINT;
-//    START_PRINT "topBound: " << topBound END_PRINT;
-//    START_PRINT centerTerrain[0] << ", " << centerTerrain[1] END_PRINT;
+//    glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
 
     float dT = (QDateTime::currentMSecsSinceEpoch() - m_currTime) / 1000.f;
     m_player.tick(dT, m_inputs);
     m_currTime = QDateTime::currentMSecsSinceEpoch();
-    m_terrain.expandTerrainBasedOnPlayer(m_player.mcr_position);
-//    for (int x = leftBound; x <= rightBound; x+= BLOCK_LENGTH_IN_TERRAIN) {
-//        for (int z = botBound; z <= topBound; z += BLOCK_LENGTH_IN_TERRAIN) {
-//            m_terrain.generateTerrainZone(x, z);
-//        }
-//    }
 
+    m_terrain.expandTerrainBasedOnPlayer(m_player.mcr_position);
     update(); // Calls paintGL() as part of a larger QOpenGLWidget pipeline
     sendPlayerDataToGUI(); // Updates the info in the secondary window displaying player data
 }
