@@ -72,9 +72,6 @@ void MyGL::initializeGL()
     // using multiple VAOs, we can just bind one once.
     glBindVertexArray(vao);
 
-//    m_terrain.CreateTestScene();
-//    m_terrain.CreateTestSceneDub();
-
     // Move the cursor to the middle of the screen
     moveMouseToCenter();
     m_inputs.prevMouseX = width() / 2;
@@ -107,6 +104,15 @@ void MyGL::tick() {
     m_terrain.expandTerrainBasedOnPlayer(m_player.mcr_position);
     update(); // Calls paintGL() as part of a larger QOpenGLWidget pipeline
     sendPlayerDataToGUI(); // Updates the info in the secondary window displaying player data
+}
+
+void MyGL::createBlockTextures() {
+    std::shared_ptr<Texture> blocks = std::make_shared<Texture>(this);
+    blocks->create(":/tex/minecraft_textures_all.png");
+    m_blockTextures.push_back(blocks);
+
+    mp_blockTexCurrent->load(0);
+    mp_blockTexCurrent->bind(0);
 }
 
 void MyGL::sendPlayerDataToGUI() const {

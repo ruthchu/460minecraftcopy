@@ -51,8 +51,6 @@ void Chunk::create()
                 // Number of color attributes
                 // World pos = chunk position + block local position
                 glm::vec4 worldPos = glm::vec4(this->X, 0.f, this->Z, 0.f) + glm::vec4(i, j, k, 1.f);
-                // Get block color
-                glm::vec4 uv = getUVs(t);
 
                 // Back face (face with LL vertex at worldPos)
                 BlockType blockBehind = getBlockAt(i, j, std::max(0, k - 1));
@@ -65,6 +63,7 @@ void Chunk::create()
                     // Back face positions
                     // Back face normal is -k
                     glm::vec4 norm = glm::vec4(0.f, 0.f, -1.f, 0.f);
+                    glm::vec4 uv = getUVs(t, ZNEG);
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
@@ -97,6 +96,7 @@ void Chunk::create()
                     // Front face positions
                     // Front face normal is +k
                     glm::vec4 norm = glm::vec4(0.f, 0.f, 1.f, 0.f);
+                    glm::vec4 uv = getUVs(t, ZPOS);
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
@@ -129,6 +129,7 @@ void Chunk::create()
                     // Left face positions
                     // Left face normal is -i
                     glm::vec4 norm = glm::vec4(-1.f, 0.f, 0.f, 0.f);
+                    glm::vec4 uv = getUVs(t, XNEG);
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
@@ -161,6 +162,7 @@ void Chunk::create()
                     // Right face positions
                     // Right face normal is +i
                     glm::vec4 norm = glm::vec4(1.f, 0.f, 0.f, 0.f);
+                    glm::vec4 uv = getUVs(t, XPOS);
                     //UL
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
@@ -188,6 +190,7 @@ void Chunk::create()
                     // Bottom face positions
                     // Bottom face normal is -j
                     glm::vec4 norm = glm::vec4(0.f, -1.f, 0.f, 0.f);
+                    glm::vec4 uv = getUVs(t, YNEG);
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
@@ -215,6 +218,7 @@ void Chunk::create()
                     // Top face positions
                     // Top face normal is +j
                     glm::vec4 norm = glm::vec4(0.f, 1.f, 0.f, 0.f);
+                    glm::vec4 uv = getUVs(t, YPOS);
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
@@ -262,16 +266,24 @@ void Chunk::pushIndexForFace(std::vector<GLuint>&idx, int index)
     idx.push_back(index + 3);
 }
 
-glm::vec4 Chunk::getUVs(BlockType &type)
+glm::vec4 Chunk::getUVs(BlockType &type, Direction face)
 {
     if (type == DIRT) {
-        return glm::vec4(121.f, 85.f, 58.f, 255.f) / 255.f;
+        return glm::vec4(2.f, 15.f, 0.f, 0.f) / 16.f;
     } else if (type == STONE) {
-        return glm::vec4(0.5f);
+        return glm::vec4(1.f, 15.f, 0.f, 0.f) / 16.f;
     } else if (type == GRASS) {
-        return glm::vec4(95.f, 159.f, 53.f, 255.f) / 255.f;
-    } else {
-        return glm::vec4(0.f);
+        if (face == YPOS) {
+            return glm::vec4(8.f, 13.f, 0.f, 0.f) / 16.f;
+        } else {
+            return glm::vec4(3.f, 15.f, 0.f, 0.f) / 16.f;
+        }
+    } else if (type == LAVA) {
+        return glm::vec4(13.f, 1.f, 0.f, 0.f) / 16.f;
+    } else if (type == WATER) {
+        return glm::vec4(13.f, 3.f, 0.f, 0.f) / 16.f;
+    } else if (type == ICE) {
+        return glm::vec4(3.f, 11.f, 0.f, 0.f) / 16.f;
     }
 }
 

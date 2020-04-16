@@ -20,7 +20,6 @@ uniform int u_Time;
 in vec4 fs_Pos;
 in vec4 fs_Nor;
 in vec4 fs_LightVec;
-in vec4 fs_Col;
 in vec4 fs_UV;
 
 out vec4 out_Col; // This is the final output color that you will see on your
@@ -74,7 +73,7 @@ vec3 fbm(vec3 p) {
 void main()
 {
     // Material base color (before shading)
-        vec4 diffuseColor = texture(u_Texture, fs_UV);
+        vec4 diffuseColor = texture(u_Texture, vec2(fs_UV.x, fs_UV.y));
         diffuseColor = diffuseColor * (0.5 * vec4(fbm(fs_Pos.xyz), 1) + 0.5);
 
         // Calculate the diffuse term for Lambert shading

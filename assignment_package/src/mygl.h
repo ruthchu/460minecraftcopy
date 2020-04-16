@@ -7,6 +7,7 @@
 #include "scene/camera.h"
 #include "scene/terrain.h"
 #include "scene/player.h"
+#include "texture.h"
 
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
@@ -30,6 +31,12 @@ private:
 
     QTimer m_timer; // Timer linked to tick(). Fires approximately 60 times per second.
     double m_currTime; // Current time used to compute dT for player movement
+
+    std::vector<std::shared_ptr<Texture>> m_blockTextures;
+    Texture* mp_blockTexCurrent;
+
+    // Loads the block textures into memory
+    void createBlockTextures();
 
     void moveMouseToCenter(); // Forces the mouse position to the screen's center. You should call this
                               // from within a mouse move event after reading the mouse movement so that
