@@ -425,8 +425,7 @@ void Terrain::generateTerrainZone(int x, int z) {
                 Chunk* cPtr = createChunkAt(x + i, z + j);
 //                blockDataWorkers.push_back(std::thread(fillBlockData, x + i, z + j, cPtr,
 //                                                       std::ref(this->chunksWithData)));
-                std::thread t(fillBlockData, cPtr->X, cPtr->Z, cPtr,
-                                                       std::ref(this->chunksWithData));
+                std::thread t(fillBlockData, cPtr->X, cPtr->Z, cPtr, &this->chunksWithData);
                 t.detach();
 //                this->createMoreTerrainAt(x + i, z + j);
             }
@@ -444,7 +443,7 @@ void Terrain::generateTerrainZone(int x, int z) {
 //    START_PRINT this->m_generatedTerrain.size() END_PRINT;
 }
 
-void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData &chunksWithData) {
+void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData *chunksWithData) {
     // Fill chunk with procedural height and blocktype data
     for(int x = xPos; x < xPos + BLOCK_LENGTH_IN_CHUNK; ++x) {
         for(int z = zPos; z < zPos + BLOCK_LENGTH_IN_CHUNK; ++z) {
@@ -468,7 +467,7 @@ void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData &chunksW
             fillColumnStatic(x, y - 1, z, t, chunk);
         }
     }
-    chunksWithData.addChunk(chunk);
+    chunksWithData->addChunk(chunk);
 //    START_PRINT std::this_thread::get_id() END_PRINT;
 }
 
