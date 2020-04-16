@@ -325,21 +325,6 @@ void Terrain::fillColumn(int x, int y, int z, BlockType t) {
 
 void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 {
-    //    int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
-    //    int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
-    //    int range = 4;
-    //    int minX = 16 * (xFloor - range);
-    //    int maxX = 16 * (xFloor + range);
-    //    int minZ = 16 * (zFloor - range);
-    //    int maxZ = 16 * (zFloor + range);
-
-    //    for(int x = minX; x < maxX; x += 16) {
-    //        for(int z = minZ; z < maxZ; z += 16) {
-    //            if (!hasChunkAt(x, z)) {
-    //                createMoreTerrainAt(x, z);
-    //            }
-    //        }
-    //    }
     glm::ivec2 centerTerrain = this->getTerrainAt(pos.x, pos.z);
     int leftBound = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
     int rightBound = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
@@ -348,7 +333,18 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 
     for (int x = leftBound; x <= rightBound; x+= BLOCK_LENGTH_IN_TERRAIN) {
         for (int z = botBound; z <= topBound; z += BLOCK_LENGTH_IN_TERRAIN) {
-            this->generateTerrainZone(x, z);
+//            this->generateTerrainZone(x, z);
+            int64_t coord = toKey(x, z);
+            if (this->m_generatedTerrain.find(coord) == this->m_generatedTerrain.end()) {
+                for (int i = 0; i <= BLOCK_LENGTH_IN_TERRAIN; i += BLOCK_LENGTH_IN_CHUNK) {
+                    for (int j = 0; j <= BLOCK_LENGTH_IN_TERRAIN; j += BLOCK_LENGTH_IN_CHUNK) {
+                        this->createMoreTerrainAt(x + i, z + j);
+//                        const uPtr<Chunk> &chunk = getChunkAt(x, z);
+//                        chunk->create();
+                    }
+                }
+                this->m_generatedTerrain.insert(coord);
+            }
         }
     }
 }
@@ -433,7 +429,7 @@ void Terrain::generateTerrainZone(int x, int z) {
                 Chunk* cPtr = createChunkAt(x + i, z + j);
 //                blockDataWorkers.push_back(std::thread(fillBlockData, x + i, z + j, cPtr,
 //                                                       std::ref(this->chunksWithData)));
-                std::thread t(fillBlockData, cPtr->X, cPtr->Z, cPtr, &this->chunksWithData);
+                std::thread t(fillBlockData, x + i, z + j, cPtr, &this->chunksWithData);
                 t.detach();
 //                this->createMoreTerrainAt(x + i, z + j);
             }
