@@ -8,17 +8,22 @@
 #include "shaderprogram.h"
 #include "cube.h"
 #include "noise.h"
+#include "lsystem.h"
 #include "BlockTypeData.h"
 #define TERRAIN_RADIUS 2
 #define CHUNK_LENGTH_IN_TERRAIN 4
 #define BLOCK_LENGTH_IN_CHUNK 16
 #define BLOCK_LENGTH_IN_TERRAIN (CHUNK_LENGTH_IN_TERRAIN * BLOCK_LENGTH_IN_CHUNK)
 
+
 //using namespace std;
 
 // Helper functions to convert (x, z) to and from hash map key
 int64_t toKey(int x, int z);
 glm::ivec2 toCoords(int64_t k);
+
+//Forward class declaration
+class Lsystem;
 
 // The container class for all of the Chunks in the game.
 // Ultimately, while Terrain will always store all Chunks,
@@ -58,6 +63,8 @@ private:
 //    Cube m_geomCube;
 
     OpenGLContext* mp_context;
+
+    bool test;
 
     void fillColumn(int x, int y, int z, BlockType t);
 
@@ -117,4 +124,10 @@ public:
     static void fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c);
 
     void CreateTestSceneDub();
+
+    void makeRivers();
+//    float sdCapsule(glm::vec3 p, glm::vec3 a, glm::vec3 b, float r);
+//    float sdSphere(glm::vec3 p, float s);
+//    void carveTerrainAt(glm::vec3 p, float waterLevel);
+
 };

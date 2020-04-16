@@ -175,6 +175,7 @@ void MyGL::renderTerrain() {
     int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius - BLOCK_LENGTH_IN_TERRAIN;//16 * (zFloor - range);
     int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius /*+ BLOCK_LENGTH_IN_TERRAIN*/;//16 * (zFloor + range);
     m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
+//    m_terrain.draw(0, 64, 0, 64, &m_progLambert);
 }
 
 

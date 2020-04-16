@@ -2,11 +2,12 @@
 #include "cube.h"
 #include <stdexcept>
 #include <iostream>
+#include <glm/glm.hpp>
 
 const static bool DEBUGMODE = true;
 
 Terrain::Terrain(OpenGLContext *context)
-    : m_chunks(), m_generatedTerrain(), mp_context(context), chunksWithData()//, m_geomCube(context)
+    : m_chunks(), m_generatedTerrain(), mp_context(context), test(false)
 {}
 
 Terrain::~Terrain() {
@@ -351,6 +352,13 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
         }
     }
 }
+
+void Terrain::makeRivers()
+{
+    Lsystem lsystem = Lsystem(*this);
+    lsystem.makeRivers();
+}
+
 void Terrain::CreateTestSceneDub()
 {
     // TODO: DELETE THIS LINE WHEN YOU DELETE m_geomCube!
