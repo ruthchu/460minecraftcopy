@@ -425,7 +425,7 @@ void Terrain::generateTerrainZone(int x, int z) {
                 Chunk* cPtr = createChunkAt(x + i, z + j);
 //                blockDataWorkers.push_back(std::thread(fillBlockData, x + i, z + j, cPtr,
 //                                                       std::ref(this->chunksWithData)));
-                std::thread t(fillBlockData, x + i, z + j, cPtr,
+                std::thread t(fillBlockData, cPtr->X, cPtr->Z, cPtr,
                                                        std::ref(this->chunksWithData));
                 t.detach();
 //                this->createMoreTerrainAt(x + i, z + j);

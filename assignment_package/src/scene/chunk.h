@@ -60,14 +60,15 @@ private:
     // a key for this map.
     // These allow us to properly determine
     std::unordered_map<Direction, Chunk*, EnumHash> m_neighbors;
-    // Chunk's lower-left corner X and Z coordinates according to world
-    int X;
-    int Z;
 
     glm::vec4 getColor(BlockType &type);
     void pushIndexForFace(std::vector<GLuint>&idx, int index);
     void bufferToDrawableVBOs(std::vector<glm::vec4>&data);
 public:
+    // Chunk's lower-left corner X and Z coordinates according to world
+    int X;
+    int Z;
+
     Chunk(OpenGLContext* context, int X, int Z);
     Chunk(OpenGLContext* context, int X, int Z, bool test);
     virtual ~Chunk(){};
