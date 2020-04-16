@@ -15,6 +15,7 @@ typedef void (Lsystem::*Rule)(void);
 
 class Lsystem
 {
+private:
     Turtle currentTurtle;
     std::stack<Turtle> tStack;
     QHash<QChar, QString> grammarMap;
@@ -26,12 +27,12 @@ class Lsystem
     void fRule();
     float sdCapsule(glm::vec3 p, glm::vec3 a, glm::vec3 b, float r);
     Terrain &terrain;
-public:
-    Lsystem(Terrain &terrain);
     // recursive grammar subsitution method
     QString strMaker(int iterations, const QString axiom);
     // reads a string and converts to grammar
     void lsystemParser(QString str);
+public:
+    Lsystem(Terrain &terrain);
     void makeRivers();
 };
 

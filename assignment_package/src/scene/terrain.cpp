@@ -388,7 +388,8 @@ std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mount
 
 void Terrain::makeRivers()
 {
-
+    Lsystem lsystem = Lsystem(*this);
+    lsystem.makeRivers();
 }
 
 

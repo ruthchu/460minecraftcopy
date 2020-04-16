@@ -4,7 +4,7 @@
 #include <math.h>
 
 Lsystem::Lsystem(Terrain &terrain)
-    : currentTurtle(Turtle(glm::vec4(512.f / 2, 0, 0, 0), 0.f, 10.0f, 0.f)),
+    : currentTurtle(Turtle(glm::vec4(0, 0, 0, 0), 0.f, 20.0f, 12.f)),
       tStack(std::stack<Turtle>()), grammarMap(QHash<QChar, QString>()),
       ruleMap(QHash<QChar, Rule>()), terrain(terrain)
 {}
@@ -17,7 +17,7 @@ void Lsystem::makeRivers()
     void (Lsystem::*fPtr)(void);
     fPtr = &Lsystem::fRule;
     ruleMap[QChar('F')] = fPtr;
-    QString q = strMaker(4, "FX");
+    QString q = strMaker(1, "FX");
     lsystemParser(q);
 }
 
@@ -25,7 +25,8 @@ void Lsystem::lsystemParser(QString str)
 {
     for (int i = 0; i < str.size(); i++) {
         if (ruleMap.contains(QChar(str[i]))) {
-            this->ruleMap[QChar(str[i])];
+            void (Lsystem::*drawingFunction) (void) = this->ruleMap[QChar(str[i])];
+            (this->*drawingFunction)();
         }
     }
 }
@@ -33,7 +34,7 @@ void Lsystem::lsystemParser(QString str)
 QString Lsystem::strMaker(int iterations, const QString axiom)
 {
     if (iterations == 0) {
-        std::cout << axiom.toUtf8().constData() << std::endl;
+        //std::cout << axiom.toUtf8().constData() << std::endl;
         return QString(axiom);
     } else {
         iterations--;
@@ -42,7 +43,7 @@ QString Lsystem::strMaker(int iterations, const QString axiom)
             // TODO -- use a noise function for add diff probabilities
             newAxiom.append(grammarMap[QChar(axiom[i])]);
         }
-        std::cout << newAxiom.toUtf8().constData() << std::endl;
+        //std::cout << newAxiom.toUtf8().constData() << std::endl;
         return strMaker(iterations, newAxiom);
     }
 }
@@ -79,17 +80,17 @@ void Lsystem::rotateLeft()
 
 void Lsystem::fRule()
 {
+    //std::cout << "frule" << std::endl;
     float capsuelRad = this->currentTurtle.depth;
     float capsuleCenterY = 135.f;
     float waterLevel = 128.f;
     glm::vec4 tPos = this->currentTurtle.pos;
     glm::vec3 a = glm::vec3(tPos.x, capsuleCenterY, tPos.z);
     glm::vec4 newPos = currentTurtle.length *
-            glm::rotate(glm::mat4(1.0f),
-                                   glm::radians(currentTurtle.orient),
-                                   glm::vec3(0.0f, 0.0f, 1.0f))
+            glm::rotate(glm::mat4(1.0f), glm::radians(currentTurtle.orient), glm::vec3(0.0f, 0.0f, 1.0f))
             * glm::normalize(glm::vec4(glm::vec4(tPos.x, capsuleCenterY, tPos.z, tPos.w)));
     glm::vec3 b = glm::vec3(newPos.x, newPos.y, newPos.z);
+
 //    glm::vec3 b = glm::vec3(tPos.x, capsuleCenterY, tPos.z + this->currentTurtle.length);
 
 //    float capsuelRad = 12.f;
@@ -118,6 +119,10 @@ void Lsystem::fRule()
             }
         }
     }
+
+    // update current turtle
+    // TODO -- randomize length, shrink deph
+    currentTurtle = Turtle(newPos, this->currentTurtle.orient, this->currentTurtle.length, this->currentTurtle.depth);
 }
 
 // a and b are endpoints. p is the point u are checking, returns <= 0 if point is inside capsul
