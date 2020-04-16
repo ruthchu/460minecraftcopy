@@ -65,8 +65,8 @@ private:
 
     glm::vec4 getColor(BlockType &type);
     void pushIndexForFace(std::vector<GLuint>&idx, int index);
-    void bufferToDrawableVBOs();
 public:
+    void bufferToDrawableVBOs();
     // Chunk's lower-left corner X and Z coordinates according to world
     int X;
     int Z;

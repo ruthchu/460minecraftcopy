@@ -34,6 +34,7 @@ void Chunk::setBlockAt(unsigned int x, unsigned int y, unsigned int z, BlockType
 
 void Chunk::create()
 {
+    this->idx.clear();
 //    std::vector<GLuint> idx;
 //    std::vector<glm::vec4> data;
     int indexCount = 0;

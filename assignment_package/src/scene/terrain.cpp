@@ -336,6 +336,20 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
             this->generateTerrainZone(x, z);
         }
     }
+    // generate VBOs for each chunk with data
+    std::vector<std::thread> thread;
+    for (Chunk* c : chunksWithData.getVectorData()) {
+        std::thread t(fillVBO, std::ref(*c), std::ref(this->chunksWithVBO));
+        t.detach();
+    }
+
+    // push chunk VBOs to GPU
+    for (Chunk* c : chunksWithVBO.getVectorData()) {
+        c->bufferToDrawableVBOs();
+    }
+
+    chunksWithData.clearChunkData();
+    chunksWithVBO.clearChunkData();
 }
 
 void Terrain::makeRivers()
@@ -422,13 +436,7 @@ void Terrain::generateTerrainZone(int x, int z) {
         }
         this->m_generatedTerrain.insert(coord);
     }
-    if (this->m_generatedTerrain.find(coord) != this->m_generatedTerrain.end()) {
-        std::vector<Chunk*> vec = this->chunksWithData.getVectorData();
-        for (auto c : vec) {
-            c->create();
-        }
-    }
-    this->chunksWithData.clearChunkData();
+//    this->chunksWithData.clearChunkData();
 //    START_PRINT this->m_generatedTerrain.size() END_PRINT;
 }
 
@@ -457,7 +465,6 @@ void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData *chunksW
         }
     }
     chunksWithData->addChunk(chunk);
-//    START_PRINT std::this_thread::get_id() END_PRINT;
 }
 
 void Terrain::setBlockAtStatic(int x, int y, int z, BlockType t, Chunk* c)
@@ -484,4 +491,9 @@ void Terrain::fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c) {
         setBlockAtStatic(x, i, z, t, c);
     }
 
+}
+
+void Terrain::fillVBO(Chunk &c, VBOCollection &chunksWithVBO) {
+    c.create();
+    chunksWithVBO.addChunk(&c);
 }

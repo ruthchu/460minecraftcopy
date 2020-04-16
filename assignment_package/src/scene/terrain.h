@@ -10,6 +10,7 @@
 #include "noise.h"
 #include "lsystem.h"
 #include "BlockTypeData.h"
+#include "VBOWorkerData.h"
 #define TERRAIN_RADIUS 2
 #define CHUNK_LENGTH_IN_TERRAIN 4
 #define BLOCK_LENGTH_IN_CHUNK 16
@@ -71,6 +72,7 @@ private:
 public:
     // collection of chunks
     BlockData chunksWithData;
+    VBOCollection chunksWithVBO;
 
     Terrain(OpenGLContext *context);
     ~Terrain();
@@ -122,6 +124,7 @@ public:
     static void fillBlockData(int xPos, int zPos, Chunk* c, BlockData *chunksWithData);
     static void setBlockAtStatic(int x, int y, int z, BlockType t, Chunk* c);
     static void fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c);
+    static void fillVBO(Chunk &c, VBOCollection &chunksWithVBO);
 
     void CreateTestSceneDub();
 

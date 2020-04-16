@@ -3,27 +3,30 @@
 
 #include "chunk.h"
 #include <mutex>
+#define VBOCollection SharedVBODataCollection
+
+struct VBOData {
+    std::vector<GLuint> idx;
+    std::vector<float> vertexData;
+    Chunk* c;
+    VBOData(Chunk* chunk) {
+        c = chunk;
+    }
+};
 
 class SharedVBODataCollection {
 public:
-    struct VBOData {
-        std::vector<float> vertexData;
-        std::vector<GLuint> idx;
-        Chunk* chunk;
-        VBOData(Chunk* chunk);
-    };
-
-    std::vector<VBOData> VBOchunks;
+    std::vector<Chunk*> VBOchunks;
     std::mutex mu;
 
     SharedVBODataCollection();
 
-    void addChunk(VBOData data);
+    void addChunk(Chunk* data);
     void clearChunkData();
     bool isEmpty();
 
     // return copy of vector
-    std::vector<VBOData> getVectorData();
+    std::vector<Chunk*> getVectorData();
 
     ~SharedVBODataCollection();
     SharedVBODataCollection(const SharedVBODataCollection &collection);
