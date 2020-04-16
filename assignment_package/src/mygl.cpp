@@ -105,7 +105,6 @@ void MyGL::tick() {
     m_player.tick(dT, m_inputs);
     m_currTime = QDateTime::currentMSecsSinceEpoch();
     m_terrain.expandTerrainBasedOnPlayer(m_player.mcr_position);
-    m_terrain.makeRivers();
     update(); // Calls paintGL() as part of a larger QOpenGLWidget pipeline
     sendPlayerDataToGUI(); // Updates the info in the secondary window displaying player data
 }

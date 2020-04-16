@@ -6,12 +6,12 @@
 class Turtle
 {
 public:
-    glm::vec4 pos;
-    float orient;
+    glm::vec3 pos;
+    glm::vec3 orient;
     float length;
     // radius of the capsule
     float depth;
-    Turtle(glm::vec4 pos, float orient, float length, float depth);
+    Turtle(glm::vec3 pos, glm::vec3 orient, float length, float depth);
     Turtle(const Turtle& ref);
 };
 
