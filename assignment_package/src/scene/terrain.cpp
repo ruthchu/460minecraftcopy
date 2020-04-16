@@ -337,11 +337,18 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
         }
     }
     // generate VBOs for each chunk with data
-    std::vector<std::thread> thread;
+//    std::vector<std::thread> threads;
     for (Chunk* c : chunksWithData.getVectorData()) {
         std::thread t(fillVBO, std::ref(*c), std::ref(this->chunksWithVBO));
+//        threads.push_back(std::move(t));
         t.detach();
     }
+
+//    for (auto &t : threads) {
+//        t.join();
+//    }
+
+//    threads.clear();
 
     // push chunk VBOs to GPU
     for (Chunk* c : chunksWithVBO.getVectorData()) {
