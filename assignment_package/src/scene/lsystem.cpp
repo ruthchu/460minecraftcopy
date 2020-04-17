@@ -9,10 +9,10 @@
 #include <time.h>
 
 
-Lsystem::Lsystem(Terrain &terrain, glm::ivec2 zonePosition)
+Lsystem::Lsystem(Terrain &terrain, glm::ivec2 position)
     : currentTurtle(Turtle(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.f, 0.f)),
       tStack(std::stack<Turtle>()), grammarMap(QHash<QChar, QString>()),
-      ruleMap(QHash<QChar, Rule>()), terrain(terrain), zonePosition(zonePosition)
+      ruleMap(QHash<QChar, Rule>()), terrain(terrain), inputPosition(position)
 {}
 
 void Lsystem::setRiverStart()
@@ -21,7 +21,7 @@ void Lsystem::setRiverStart()
     int result = rand() % 4;
     float riverY = 130.f;
     float offset = 2.f;
-    glm::vec2 LLcorner = this->terrain.getTerrainAt(zonePosition[0], zonePosition[1]);
+    glm::vec2 LLcorner = this->terrain.getTerrainAt(inputPosition[0], inputPosition[1]);
     // Randomly select a corner of the terrain zone
     if (result == 0) {
         currentTurtle.pos = glm::vec3(LLcorner.x + offset, riverY, LLcorner.y + offset);
@@ -152,7 +152,7 @@ void Lsystem::rotateRight()
 
     srand((unsigned) time(0));
     float ran = (rand() / RAND_MAX) * 2 - 1;
-    float angle = -12.f + (ran * 4);
+    float angle = -15.f + (ran * 4);
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec4 newOrient = rotation * glm::vec4(this->currentTurtle.orient, 1.f);
     this->currentTurtle.orient = glm::vec3(newOrient.x, newOrient.y, newOrient.z);
@@ -162,7 +162,7 @@ void Lsystem::rotateLeft()
 {
     srand((unsigned) time(0));
     float ran = (rand() / RAND_MAX) * 2 - 1;
-    float angle = 12.f + (ran * 4);
+    float angle = 15.f + (ran * 4);
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec4 newOrient = rotation * glm::vec4(this->currentTurtle.orient, 1.f);
     this->currentTurtle.orient = glm::vec3(newOrient.x, newOrient.y, newOrient.z);
@@ -190,11 +190,9 @@ void Lsystem::fRule()
     glm::vec3 a = this->currentTurtle.pos;
     glm::vec3 b = this->currentTurtle.pos + this->currentTurtle.length * glm::normalize(this->currentTurtle.orient);
 
-//    float capsuelRad = 12.f;
-//    float capsuleCenterY = 135.f;
-//    float waterLevel = 128.f;
-//    glm::vec3 a = glm::vec3(0, capsuleCenterY, 0);
-//    glm::vec3 b = glm::vec3(40, capsuleCenterY, 40);
+    // If drawing the segment will leave the terrain zone, do not draw it
+    if (!isInZone(b)) return;
+
     float xmin = std::min(a.x - capsuelRad, b.x - capsuelRad);
     float xmax = std::max(a.x + capsuelRad, b.x + capsuelRad);
     float zmin = std::min(a.z - capsuelRad, b.z - capsuelRad);
@@ -238,6 +236,12 @@ float Lsystem::sdCapsule(glm::vec3 p, glm::vec3 a, glm::vec3 b, float r)
   return glm::length( pa - ba*h ) - r;
 }
 
+bool Lsystem::isInZone(glm::vec3 p) {
+    // X and Z coordinates of the LL corner of the terrain
+    glm::vec2 LLcorner = this->terrain.getTerrainAt(inputPosition[0], inputPosition[1]);
+    return (p.x > LLcorner[0]) && (p.x < LLcorner[0] + BLOCK_LENGTH_IN_TERRAIN) &&
+            (p.z > LLcorner[1]) && (p.z < LLcorner[1] + BLOCK_LENGTH_IN_TERRAIN);
+}
 
 
 
