@@ -203,6 +203,8 @@ void MyGL::keyReleaseEvent(QKeyEvent *e) {
         m_inputs.qPressed = false;
     } else if (e->key() == Qt::Key_E) {
         m_inputs.ePressed = false;
+    } else if (e->key() == Qt::Key_Space) {
+        m_inputs.spacePressed = false;
     }
 }
 
