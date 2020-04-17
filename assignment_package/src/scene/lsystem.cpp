@@ -2,6 +2,7 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <math.h>
+#include <algorithm>
 
 Lsystem::Lsystem(Terrain &terrain)
     : currentTurtle(Turtle(glm::vec3(0, 135.f, 0), glm::vec3(1, 0, 1), 10.0f, 12.f)),
@@ -42,8 +43,18 @@ void Lsystem::makeRivers()
 
 void Lsystem::lsystemParser(QString str)
 {
+    // Used to keep track of branching
+    QChar first = QChar('H');
+    QChar sec = QChar('H');
+    QChar third = QChar('H');
     for (int i = 0; i < str.size(); i++) {
+        first = sec;
+        sec = third;
+        third = QChar(str[i]);
         if (ruleMap.contains(QChar(str[i]))) {
+            currentTurtle.isNewBranch = // pop, rot, F creates new branch
+                    ((first == QChar(']')) && (sec == QChar('+')) && (third == QChar('F'))) ||
+                    ((first == QChar(']')) && (sec == QChar('-')) && (third == QChar('F')));
             void (Lsystem::*drawingFunction) (void) = this->ruleMap[QChar(str[i])];
             (this->*drawingFunction)();
         }
@@ -109,6 +120,11 @@ void Lsystem::fRule()
 //    std::cout << "Current Turtle Length: "<< this->currentTurtle.length << std::endl;
 //    std::cout << " " << std::endl;
 
+    if (currentTurtle.isNewBranch) {
+        this->currentTurtle.depth = std::max(this->currentTurtle.depth - 1, 1.f);
+        currentTurtle.isNewBranch = false;
+    }
+
     float capsuelRad = this->currentTurtle.depth;
     float capsuleCenterY = this->currentTurtle.pos.y;
     float waterLevel = 128.f;
@@ -149,7 +165,7 @@ void Lsystem::fRule()
     }
 
     // update current turtle
-    // TODO -- randomize length, shrink deph
+    // TODO -- randomize length
     this->currentTurtle = Turtle(b, this->currentTurtle.orient, this->currentTurtle.length, this->currentTurtle.depth);
 }
 

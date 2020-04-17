@@ -11,6 +11,7 @@ public:
     float length;
     // radius of the capsule
     float depth;
+    bool isNewBranch;
     Turtle(glm::vec3 pos, glm::vec3 orient, float length, float depth);
     Turtle(const Turtle& ref);
 };
