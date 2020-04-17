@@ -4,14 +4,9 @@
 #include <iostream>
 
 Chunk::Chunk(OpenGLContext* context, int X, int Z)
-<<<<<<< HEAD
-    : Drawable(context), X(X), Z(Z), m_blocks(),
-      m_neighbors{{XPOS, nullptr}, {XNEG, nullptr}, {ZPOS, nullptr}, {ZNEG, nullptr}},
-      mp_texture(nullptr)
-=======
     : idx(std::vector<GLuint>()), data(std::vector<glm::vec4>()), Drawable(context), X(X), Z(Z), m_blocks(),
-      m_neighbors{{XPOS, nullptr}, {XNEG, nullptr}, {ZPOS, nullptr}, {ZNEG, nullptr}}
->>>>>>> master
+      m_neighbors{{XPOS, nullptr}, {XNEG, nullptr}, {ZPOS, nullptr}, {ZNEG, nullptr}},
+mp_texture(nullptr)
 {
     std::fill_n(m_blocks.begin(), 65536, EMPTY);
 }
