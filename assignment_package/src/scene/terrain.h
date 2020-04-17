@@ -128,5 +128,5 @@ public:
 
     void CreateTestSceneDub();
 
-    void makeRivers();
+    void makeRivers(glm::ivec2 zonePosition);
 };

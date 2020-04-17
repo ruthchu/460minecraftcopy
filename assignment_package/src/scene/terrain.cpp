@@ -353,9 +353,9 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
     chunksWithVBO.clearChunkData();
 }
 
-void Terrain::makeRivers()
+void Terrain::makeRivers(glm::ivec2 zonePosition)
 {
-    Lsystem lsystem = Lsystem(*this);
+    Lsystem lsystem = Lsystem(*this, zonePosition);
     lsystem.makeRivers();
 }
 
@@ -431,7 +431,7 @@ void Terrain::generateTerrainZone(int x, int z) {
                 t.detach();
             }
         }
-        makeRivers();
+        makeRivers(glm::ivec2(x, z));
         this->m_generatedTerrain.insert(coord);
     }
 }

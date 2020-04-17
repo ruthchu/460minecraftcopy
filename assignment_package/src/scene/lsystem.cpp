@@ -4,15 +4,58 @@
 #include <math.h>
 #include <algorithm>
 #include "noise.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-Lsystem::Lsystem(Terrain &terrain)
-    : currentTurtle(Turtle(glm::vec3(0, 130.f, 0), glm::vec3(1, 0, 1), 10.0f, 12.f)),
+
+Lsystem::Lsystem(Terrain &terrain, glm::ivec2 zonePosition)
+    : currentTurtle(Turtle(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.f, 0.f)),
       tStack(std::stack<Turtle>()), grammarMap(QHash<QChar, QString>()),
-      ruleMap(QHash<QChar, Rule>()), terrain(terrain)
+      ruleMap(QHash<QChar, Rule>()), terrain(terrain), zonePosition(zonePosition)
 {}
+
+void Lsystem::setRiverStart()
+{
+    srand((unsigned) time(0));
+    int result = rand() % 4;
+    float riverY = 130.f;
+    float offset = 2.f;
+    glm::vec2 LLcorner = this->terrain.getTerrainAt(zonePosition[0], zonePosition[1]);
+    // Randomly select a corner of the terrain zone
+    if (result == 0) {
+        currentTurtle.pos = glm::vec3(LLcorner.x + offset, riverY, LLcorner.y + offset);
+        currentTurtle.orient = glm::vec3(1, 0, 1);
+    } else if (result == 1) {
+        glm::vec2 ULcorner = LLcorner + glm::vec2(0.f, BLOCK_LENGTH_IN_TERRAIN);
+        currentTurtle.pos = glm::vec3(ULcorner.x + offset, riverY, ULcorner.y - offset);
+        currentTurtle.orient = glm::vec3(1, 0, -1);
+    } else if (result == 2) {
+        glm::vec2 LRcorner = LLcorner + glm::vec2(BLOCK_LENGTH_IN_TERRAIN, 0.f);
+        currentTurtle.pos = glm::vec3(LRcorner.x - offset, riverY, LRcorner.y + offset);
+        currentTurtle.orient = glm::vec3(-1, 0, 1);
+    } else {
+        glm::vec2 URcorner = LLcorner + glm::vec2(BLOCK_LENGTH_IN_TERRAIN, BLOCK_LENGTH_IN_TERRAIN);
+        currentTurtle.pos = glm::vec3(URcorner.x - offset, riverY, URcorner.y - offset);
+        currentTurtle.orient = glm::vec3(-1, 0, 1);
+    }
+    // set segement length
+    currentTurtle.length = 8.0f;
+    // set diameter of river
+    currentTurtle.depth = 8.f;
+}
 
 void Lsystem::makeRivers()
 {
+    // randomly decide whether or not create river with 0.6 chance
+    srand((unsigned) time(0));
+    float result = rand() / RAND_MAX;
+    if (result < 0.33) {
+        return;
+    }
+
+    setRiverStart();
+
     grammarMap[QChar('X')] = QString("F+[+++F-F+X-FFX]--FF++F+FX");
     grammarMap[QChar('F')] = QString("F-B");
     grammarMap[QChar('B')] = QString("XX");
@@ -37,7 +80,18 @@ void Lsystem::makeRivers()
     rotLeft = &Lsystem::rotateLeft;
     ruleMap[QChar('+')] = rotLeft;
 
-    QString q = strMaker(1, "FX");
+    srand((unsigned) time(0));
+    float prob = rand() / RAND_MAX;
+    float iter = 0;
+    if (prob < 0.2) {
+        iter = 1;
+    } else if (prob < 0.70) {
+        iter = 2;
+    } else {
+        iter = 3;
+    }
+
+    QString q = strMaker(iter, "FX");
     std::cout << q.toUtf8().constData() << std::endl;
     lsystemParser(q);
 }
@@ -95,9 +149,10 @@ void Lsystem::popState()
 
 void Lsystem::rotateRight()
 {
-    float b = Noise::random1(glm::vec2(currentTurtle.pos.x, currentTurtle.pos.z)); // (0,1]
-    float ran = floor(b * 2) * 2 - 1; // map (-1, 1]
-    float angle = -12.f + (ran * b * 4);
+
+    srand((unsigned) time(0));
+    float ran = (rand() / RAND_MAX) * 2 - 1;
+    float angle = -12.f + (ran * 4);
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec4 newOrient = rotation * glm::vec4(this->currentTurtle.orient, 1.f);
     this->currentTurtle.orient = glm::vec3(newOrient.x, newOrient.y, newOrient.z);
@@ -105,9 +160,9 @@ void Lsystem::rotateRight()
 
 void Lsystem::rotateLeft()
 {
-    float b = Noise::random1(glm::vec2(currentTurtle.pos.x, currentTurtle.pos.z)); // (0,1]
-    float ran = floor(b * 2) * 2 - 1; // map (-1, 1]
-    float angle = 12.f + (ran * b * 4);
+    srand((unsigned) time(0));
+    float ran = (rand() / RAND_MAX) * 2 - 1;
+    float angle = 12.f + (ran * 4);
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec4 newOrient = rotation * glm::vec4(this->currentTurtle.orient, 1.f);
     this->currentTurtle.orient = glm::vec3(newOrient.x, newOrient.y, newOrient.z);
@@ -124,7 +179,7 @@ void Lsystem::fRule()
 //    std::cout << " " << std::endl;
 
     if (currentTurtle.isNewBranch) {
-        this->currentTurtle.depth = std::max(this->currentTurtle.depth - 1, 3.f);
+        this->currentTurtle.depth = std::max(this->currentTurtle.depth - 1, 2.f);
         currentTurtle.isNewBranch = false;
     }
 
@@ -168,9 +223,9 @@ void Lsystem::fRule()
     }
 
     // update current turtle
-    float noise = Noise::perlinNoise(glm::vec2(this->currentTurtle.pos.x, this->currentTurtle.pos.z));
-    float lengthAmp = glm::floor(noise * 2) * 2 * noise; // maps (0,2]
-    this->currentTurtle.length =  lengthAmp * currentTurtle.length + currentTurtle.length;
+    srand((unsigned) time(0));
+    float ran = (rand() / RAND_MAX) * 2 - 1;
+    this->currentTurtle.length = currentTurtle.length + ran * currentTurtle.length;
     this->currentTurtle = Turtle(b, this->currentTurtle.orient, this->currentTurtle.length, this->currentTurtle.depth);
 }
 

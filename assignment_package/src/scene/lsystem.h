@@ -31,8 +31,10 @@ private:
     QString strMaker(int iterations, const QString axiom);
     // reads a string and converts to grammar
     void lsystemParser(QString str);
+    glm::ivec2 zonePosition;
+    void setRiverStart();
 public:
-    Lsystem(Terrain &terrain);
+    Lsystem(Terrain &terrain, glm::ivec2 zonePosition);
     void makeRivers();
 };
 
