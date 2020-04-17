@@ -509,9 +509,6 @@ void Chunk::bufferToDrawableVBOs()
     mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
     // Buffer data to GPU
     mp_context->glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec4), this->data.data(), GL_STATIC_DRAW);
-
-    idx.clear();
-    data.clear();
 }
 
 void Chunk::bufferTransparentDrawableVBOs()
@@ -530,6 +527,13 @@ void Chunk::bufferTransparentDrawableVBOs()
     mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
     // Buffer data to GPU
     mp_context->glBufferData(GL_ARRAY_BUFFER, tData.size() * sizeof(glm::vec4), this->tData.data(), GL_STATIC_DRAW);
+}
+
+void Chunk::clearIdxBuffers() {
+    idx.clear();
+    data.clear();
+    tIdx.clear();
+    tData.clear();
 }
 
 bool Chunk::hasXPOSneighbor() { return m_neighbors.at(XPOS) != nullptr; }

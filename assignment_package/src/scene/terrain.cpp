@@ -154,11 +154,6 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
                 shaderProgram->draw(*chunk);
                 chunk->bufferTransparentDrawableVBOs();
                 shaderProgram->draw(*chunk);
-//                if(chunk->m_count != -1) {
-//                chunk->create();
-//                    shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
-//                    shaderProgram->draw(*chunk);
-//                }
             }
         }
     }
@@ -196,7 +191,7 @@ void Terrain::createMoreTerrainAt(int xPos, int zPos)
             if (perlin > 0.5) {
                 t = STONE; //stone
             } else {
-                t = WATER;// GRASS
+                t = GRASS;// GRASS
             }
             int y = glm::mix(grass, mountain, perlin);
             setBlockAt(x, y, z, t);
@@ -276,11 +271,7 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
     chunksWithData.clearChunkData();
     chunksWithData.mu.unlock();
 
-    // push chunk VBOs to GPU
     chunksWithVBO.mu.lock();
-    for (Chunk* c : chunksWithVBO.getVectorData()) {
-        c->bufferToDrawableVBOs();
-    }
     chunksWithVBO.clearChunkData();
     chunksWithVBO.mu.unlock();
 
@@ -378,7 +369,7 @@ void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData *chunksW
             if (perlin > 0.5) {
                 t = STONE; //stone
             } else {
-                t = WATER; //GRASS
+                t = GRASS; //GRASS
             }
             int y = glm::mix(grass, mountain, perlin);
             setBlockAtStatic(x, y, z, t, chunk);

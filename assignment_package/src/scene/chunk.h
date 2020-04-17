@@ -77,6 +77,8 @@ public:
     void bufferToDrawableVBOs();
     // Set up buffer for transparent blocks
     void bufferTransparentDrawableVBOs();
+    // Clear buffers
+    void clearIdxBuffers();
     // Chunk's lower-left corner X and Z coordinates according to world
     int X;
     int Z;
