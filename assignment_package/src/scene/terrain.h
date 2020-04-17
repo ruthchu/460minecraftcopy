@@ -126,7 +126,5 @@ public:
     static void fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c);
     static void fillVBO(Chunk &c, VBOCollection &chunksWithVBO);
 
-    void CreateTestSceneDub();
-
     void makeRivers(glm::ivec2 zonePosition);
 };

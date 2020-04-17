@@ -42,18 +42,19 @@ void Lsystem::setRiverStart()
         currentTurtle.orient = glm::vec3(-1, 0, 1);
     }
     // set segement length
-    currentTurtle.length = 8.0f;
+    currentTurtle.length = 10.0f;
     // set diameter of river
-    currentTurtle.depth = 8.f;
+    currentTurtle.depth = 4.f;
 }
 
 void Lsystem::makeRivers()
 {
     // randomly decide whether or not create river with 0.6 chance
-    float result = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
-    if (result < 0.33) {
-        return;
-    }
+//    float result = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
+//    if (result < 0.33) {
+//        return;
+//    }
+    return;
 
     setRiverStart();
 
@@ -84,15 +85,15 @@ void Lsystem::makeRivers()
     srand((unsigned) time(0));
     float prob = rand() / RAND_MAX;
     float iter = 0;
-    if (prob < 0.2) {
+//    if (prob < 0.2) {
         iter = 1;
-    } else if (prob < 0.70) {
-        iter = 2;
-    } else {
-        iter = 3;
-    }
+//    } else if (prob < 0.70) {
+//        iter = 2;
+//    } else {
+//        iter = 3;
+//    }
 
-    QString q = strMaker(iter, "FX");
+    QString q = strMaker(2, "FX");
     //std::cout << q.toUtf8().constData() << std::endl;
     lsystemParser(q);
 }
@@ -153,7 +154,7 @@ void Lsystem::rotateRight()
 
     srand((unsigned) time(0));
     float ran = (rand() / RAND_MAX) * 2 - 1;
-    float angle = -15.f + (ran * 4);
+    float angle = -20.f + (ran * 4);
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec4 newOrient = rotation * glm::vec4(this->currentTurtle.orient, 1.f);
     this->currentTurtle.orient = glm::vec3(newOrient.x, newOrient.y, newOrient.z);
@@ -163,7 +164,7 @@ void Lsystem::rotateLeft()
 {
     srand((unsigned) time(0));
     float ran = (rand() / RAND_MAX) * 2 - 1;
-    float angle = 15.f + (ran * 4);
+    float angle = 20.f + (ran * 4);
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec4 newOrient = rotation * glm::vec4(this->currentTurtle.orient, 1.f);
     this->currentTurtle.orient = glm::vec3(newOrient.x, newOrient.y, newOrient.z);
@@ -222,9 +223,9 @@ void Lsystem::fRule()
     }
 
     // update current turtle
-    srand((unsigned) time(0));
-    float ran = (rand() / RAND_MAX) * 2 - 1;
-    this->currentTurtle.length = currentTurtle.length + ran * currentTurtle.length;
+//    srand((unsigned) time(0));
+//    float ran = (rand() / RAND_MAX) * 2 - 1;
+//    this->currentTurtle.length = currentTurtle.length + ran * currentTurtle.length;
     this->currentTurtle = Turtle(b, this->currentTurtle.orient, this->currentTurtle.length, this->currentTurtle.depth);
 }
 
