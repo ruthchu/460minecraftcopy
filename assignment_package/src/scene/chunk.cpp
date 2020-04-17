@@ -254,7 +254,7 @@ void Chunk::create()
                         pushIndexForFace(idx, indexCount);
                         indexCount += 4;
                     }
-                } /*else if (t == WATER || t == ICE) { // Transparent blocks
+                } else if (t == WATER || t == ICE) { // Transparent blocks
                     // Back face (face with LL vertex at worldPos)
                     BlockType blockBehind = getBlockAt(i, j, std::max(0, k - 1));
                     if (k == 0) {
@@ -448,7 +448,7 @@ void Chunk::create()
                         pushIndexForFace(tIdx, tIndexCount);
                         tIndexCount += 4;
                     }
-                }*/
+                }
             }
         }
     }
@@ -505,7 +505,7 @@ void Chunk::bufferToDrawableVBOs()
     // Buffer data to GPU
     mp_context->glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec4), this->data.data(), GL_STATIC_DRAW);
 }
-/*
+
 void Chunk::bufferTransparentDrawableVBOs()
 {
     m_count = this->tIdx.size();
@@ -523,7 +523,7 @@ void Chunk::bufferTransparentDrawableVBOs()
     // Buffer data to GPU
     mp_context->glBufferData(GL_ARRAY_BUFFER, tData.size() * sizeof(glm::vec4), this->tData.data(), GL_STATIC_DRAW);
 }
-*/
+
 bool Chunk::hasXPOSneighbor() { return m_neighbors.at(XPOS) != nullptr; }
 bool Chunk::hasXNEGneighbor() { return m_neighbors.at(XNEG) != nullptr; }
 bool Chunk::hasZPOSneighbor() { return m_neighbors.at(ZPOS) != nullptr; }

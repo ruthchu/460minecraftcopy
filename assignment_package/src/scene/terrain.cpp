@@ -150,6 +150,9 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
             if (hasChunkAt(x, z)) {
                 const uPtr<Chunk> &chunk = getChunkAt(x, z);
                 shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
+                chunk->bufferToDrawableVBOs();
+                shaderProgram->draw(*chunk);
+                chunk->bufferTransparentDrawableVBOs();
                 shaderProgram->draw(*chunk);
             }
         }
@@ -186,9 +189,9 @@ void Terrain::createMoreTerrainAt(int xPos, int zPos)
             perlin = glm::smoothstep(0.25f, 0.75f, perlin);
             BlockType t;
             if (perlin > 0.5) {
-                t = STONE;
+                t = STONE; //stone
             } else {
-                t = GRASS;
+                t = WATER;// GRASS
             }
             int y = glm::mix(grass, mountain, perlin);
             setBlockAt(x, y, z, t);
@@ -238,7 +241,7 @@ void Terrain::fillColumn(int x, int y, int z, BlockType t) {
     }
     for (int i = y; i >= worldBaseHeight; i--) {
         if (y <= 128) {
-            t = STONE;
+            t = STONE; //stone
         }
         setBlockAt(x, i, z, t);
     }
@@ -266,7 +269,7 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
     // push chunk VBOs to GPU
     for (Chunk* c : chunksWithVBO.getVectorData()) {
         c->bufferToDrawableVBOs();
-        //c->bufferTransparentDrawableVBOs();
+        c->bufferTransparentDrawableVBOs();
     }
 
     chunksWithData.clearChunkData();
@@ -281,9 +284,6 @@ void Terrain::makeRivers()
 
 void Terrain::CreateTestSceneDub()
 {
-    // TODO: DELETE THIS LINE WHEN YOU DELETE m_geomCube!
-    //m_geomCube.create();
-
     // Create the Chunks that will
     // store the blocks for our
     // initial world space
@@ -301,7 +301,7 @@ void Terrain::CreateTestSceneDub()
     for(int x = 0; x < 64; ++x) {
         for(int z = 0; z < 64; ++z) {
             if((x + z) % 2 == 0) {
-                setBlockAt(x, 128, z, STONE);
+                setBlockAt(x, 128, z, STONE); //stone
             }
             else {
                 setBlockAt(x, 128, z, DIRT);
@@ -323,7 +323,7 @@ void Terrain::CreateTestSceneDub()
     }
 
     for (int z = 15; z < 50; z++) {
-        setBlockAt(32, 180, z, STONE);
+        setBlockAt(32, 180, z, STONE);// stone
     }
 
     for(int x = 0; x < 64; x += 16) {
@@ -365,9 +365,9 @@ void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData *chunksW
             perlin = glm::smoothstep(0.25f, 0.75f, perlin);
             BlockType t;
             if (perlin > 0.5) {
-                t = STONE;
+                t = STONE; //stone
             } else {
-                t = GRASS;
+                t = WATER; //GRASS
             }
             int y = glm::mix(grass, mountain, perlin);
             setBlockAtStatic(x, y, z, t, chunk);
@@ -397,7 +397,7 @@ void Terrain::fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c) {
     }
     for (int i = y; i >= worldBaseHeight; i--) {
         if (y <= 128) {
-            t = STONE;
+            t = STONE; //stone
         }
         setBlockAtStatic(x, i, z, t, c);
     }
