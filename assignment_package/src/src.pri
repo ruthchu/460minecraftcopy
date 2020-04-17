@@ -2,9 +2,11 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 SOURCES += \
+    $$PWD/framebuffer.cpp \
     $$PWD/main.cpp \
     $$PWD/mainwindow.cpp \
     $$PWD/mygl.cpp \
+    $$PWD/postprocessshader.cpp \
     $$PWD/scene/BlockTypeData.cpp \
     $$PWD/scene/VBOWorkerData.cpp \
     $$PWD/scene/lsystem.cpp \
@@ -25,8 +27,10 @@ SOURCES += \
     $$PWD/turtle.cpp \
 
 HEADERS += \
+    $$PWD/framebuffer.h \
     $$PWD/mainwindow.h \
     $$PWD/mygl.h \
+    $$PWD/postprocessshader.h \
     $$PWD/scene/BlockTypeData.h \
     $$PWD/scene/VBOWorkerData.h \
     $$PWD/scene/lsystem.h \

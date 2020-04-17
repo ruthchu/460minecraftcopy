@@ -10,9 +10,11 @@ private:
     const Terrain &mcr_terrain;
     float m_phi; // Track camera angle to bound it properly
 
+    // player acceleration added for use across machines
+    float accel;
+
     void processInputs(InputBundle &inputs, float dT);
     void computePhysics(float dT, const Terrain &terrain);
-
 public:
     // Readonly public reference to our camera
     // for easy access from MyGL

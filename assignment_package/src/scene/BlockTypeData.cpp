@@ -11,14 +11,18 @@ SharedBlockTypeCollection::SharedBlockTypeCollection(const SharedBlockTypeCollec
 {}
 
 void SharedBlockTypeCollection::addChunk(Chunk* chunk) {
-    std::lock_guard<std::mutex> lock(this->mu);
+    //std::lock_guard<std::mutex> lock(this->mu);
 //    START_PRINT std::this_thread::get_id() END_PRINT;
+    mu.lock();
     this->filledChunks.push_back(chunk);
+    mu.unlock();
 //    START_PRINT filledChunks.size() END_PRINT;
 }
 
 void SharedBlockTypeCollection::clearChunkData() {
+    //mu.lock();
     this->filledChunks.clear();
+    //mu.unlock();
 }
 
 bool SharedBlockTypeCollection::isEmpty() {

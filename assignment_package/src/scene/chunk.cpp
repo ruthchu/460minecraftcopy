@@ -37,6 +37,9 @@ void Chunk::create()
     this->idx.clear();
     this->tIdx.clear();
 
+    this->data.clear();
+    this->tData.clear();
+
     int indexCount = 0;
     int tIndexCount = 0;
 
@@ -485,6 +488,8 @@ glm::vec4 Chunk::getUVs(BlockType &type, Direction face)
         return glm::vec4(3.f, 11.f, 0.f, 0.f) / 16.f;
     } else if (type == SNOW) {
         return glm::vec4(2.f, 11.f, 0.f, 0.f) / 16.f;
+    } else {
+        return glm::vec4(0.f);
     }
 }
 
@@ -504,6 +509,9 @@ void Chunk::bufferToDrawableVBOs()
     mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
     // Buffer data to GPU
     mp_context->glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec4), this->data.data(), GL_STATIC_DRAW);
+
+    idx.clear();
+    data.clear();
 }
 
 void Chunk::bufferTransparentDrawableVBOs()

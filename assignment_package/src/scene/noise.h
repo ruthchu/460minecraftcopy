@@ -7,6 +7,7 @@ private:
     static float bilerpNoise(glm::vec2 uv);
     static float mySmoothStep(float a, float b, float t);
 public:
+    // (0, 1]
     static float random1(float p);
     static float random1(glm::vec2 p);
     static glm::vec2 random2(glm::vec2 p);

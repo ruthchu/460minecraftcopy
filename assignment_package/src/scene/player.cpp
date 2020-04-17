@@ -5,13 +5,14 @@
 Player::Player(glm::vec3 pos, const Terrain &terrain)
     : Entity(pos), m_velocity(0,0,0), m_acceleration(0,0,0),
       m_camera(pos + glm::vec3(0, 1.5f, 0)), mcr_terrain(terrain), m_phi(0.f),
-      mcr_camera(m_camera), m_flightOn(true)
+      mcr_camera(m_camera), m_flightOn(true), accel(0.f)
 {}
 
 Player::~Player()
 {}
 
 void Player::tick(float dT, InputBundle &input) {
+    this->accel = 3.f / dT;
     processInputs(input, dT);
     computePhysics(dT, mcr_terrain);
 }
@@ -28,7 +29,7 @@ void Player::processInputs(InputBundle &inputs, float dT) {
     inputs.mouseX = 0.f;
     inputs.mouseY = 0.f;
     m_acceleration = {0.f, 0.f, 0.f};
-    float accel = mod * 3.f;
+    //this->accel = mod * 3.f;
     // Movement in flight mode
     if (m_flightOn) {
         if (inputs.wPressed == true) {
@@ -79,10 +80,7 @@ void Player::processInputs(InputBundle &inputs, float dT) {
             m_acceleration += accel * flatRight;
         }
         if (inputs.spacePressed == true) {
-            if (m_velocity.y < accel * dT * dT * .8f) {
-                m_velocity.y += 3.f * accel;
-            }
-            inputs.spacePressed = false;
+            m_velocity.y += 2.f * accel;
         }
     }
 }
@@ -109,30 +107,48 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                     glm::vec3 origin = {m_position.x + x, m_position.y + y,
                                         m_position.z + z};
                     if (gridMarch(origin, moveX, terrain, &xDist, &blockHit)) {
-                        if (xDist < std::abs(move.x)) {
-                            if (move.x < 0.f) {
-                                move.x = -xDist + .0001f;
-                            } else {
-                                move.x = xDist - .0001f;
+                        BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
+                        if (type == WATER || type == LAVA) {
+                            move.x = move.x * 0.66;
+                        } else {
+                            if (xDist < std::abs(move.x)) {
+                                if (move.x < 0.f) {
+                                    move.x = -xDist + .0001f;
+                                } else {
+                                    move.x = xDist - .0001f;
+                                }
                             }
                         }
+                    }
+                    if (gridMarch(origin, moveY, terrain, &yDist, &blockHit)) {
+                        BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
+                        if (type == WATER || type == LAVA) {
+                            move.y = move.y * 0.66;
+                        } else {
+                            if (yDist < std::abs(move.y)) {
+                                if (move.y < 0.f) {
+                                    move.y = -yDist + .0001f;
+                                } else {
+                                    move.y = yDist - .0001f;
+                                }
+                            }
+                        }
+                    } else {
+                        // player is moving into the air
+                        move.y -= 2.f * this->accel;
                     }
 
-                    if (gridMarch(origin, moveY, terrain, &yDist, &blockHit)) {
-                        if (yDist < std::abs(move.y)) {
-                            if (move.y < 0.f) {
-                                move.y = -yDist + .0001f;
-                            } else {
-                                move.y = yDist - .0001f;
-                            }
-                        }
-                    }
                     if (gridMarch(origin, moveZ, terrain, &zDist, &blockHit)) {
-                        if (zDist < std::abs(move.z)) {
-                            if (move.z < 0.f) {
-                                move.z = -zDist + .0001f;
-                            } else {
-                                move.z = zDist - .0001f;
+                        BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
+                        if (type == WATER || type == LAVA) {
+                            move.z = move.z * 0.66;
+                        } else {
+                            if (zDist < std::abs(move.z)) {
+                                if (move.z < 0.f) {
+                                    move.z = -zDist + .0001f;
+                                } else {
+                                    move.z = zDist - .0001f;
+                                }
                             }
                         }
                     }
@@ -143,6 +159,7 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
     moveAlongVector(move);
 }
 
+// Returns true if raycasting hits something
 bool Player::gridMarch(glm::vec3 rayOrigin, glm::vec3 rayDirection,
         const Terrain &terrain, float *out_dist, glm::ivec3 *out_blockHit) {
     float maxLen = glm::length(rayDirection); // Farthest we search
