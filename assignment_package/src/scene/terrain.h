@@ -11,6 +11,7 @@
 #include "lsystem.h"
 #include "BlockTypeData.h"
 #include "VBOWorkerData.h"
+#include <thread>
 #define TERRAIN_RADIUS 1
 #define CHUNK_LENGTH_IN_TERRAIN 4
 #define BLOCK_LENGTH_IN_CHUNK 16
@@ -122,7 +123,6 @@ public:
     static int heightMountain(int x, int z);
 
     static void fillTerrainZone(std::vector<Chunk*> terrainChunks, BlockData *chunksWithData);
-    static void fillBlockData(int xPos, int zPos, Chunk* c);
     static void fillBlockData(int xPos, int zPos, Chunk* c, BlockData *chunksWithData);
     static void setBlockAtStatic(int x, int y, int z, BlockType t, Chunk* c);
     static void fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c);
