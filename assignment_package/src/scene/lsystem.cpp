@@ -35,8 +35,8 @@ void Lsystem::makeRivers()
     rotLeft = &Lsystem::rotateLeft;
     ruleMap[QChar('+')] = rotLeft;
 
-    QString q = strMaker(1, "FX");
-    std::cout << q.toUtf8().constData() << std::endl;
+    QString q = strMaker(2, "FX");
+//    std::cout << q.toUtf8().constData() << std::endl;
     lsystemParser(q);
 }
 
@@ -115,11 +115,6 @@ void Lsystem::fRule()
 
     glm::vec3 a = this->currentTurtle.pos;
     glm::vec3 b = this->currentTurtle.pos + this->currentTurtle.length * glm::normalize(this->currentTurtle.orient);
-
-//    std::cout << "New Pos: "<< newPos.x << " " <<  newPos.y << " " << newPos.z << std::endl;
-//    std::cout << " " << std::endl;
-
-//    glm::vec3 b = glm::vec3(tPos.x, capsuleCenterY, tPos.z + this->currentTurtle.length);
 
 //    float capsuelRad = 12.f;
 //    float capsuleCenterY = 135.f;
