@@ -2,11 +2,12 @@
 #include "cube.h"
 #include <stdexcept>
 #include <iostream>
+#include <glm/glm.hpp>
 
 const static bool DEBUGMODE = true;
 
 Terrain::Terrain(OpenGLContext *context)
-    : m_chunks(), m_generatedTerrain(), mp_context(context)//, m_geomCube(context)
+    : m_chunks(), m_generatedTerrain(), mp_context(context), test(false)
 {}
 
 Terrain::~Terrain() {
@@ -144,14 +145,17 @@ Chunk* Terrain::createChunkAt(int x, int z) {
 // it draws each Chunk with the given ShaderProgram, remembering to set the
 // model matrix to the proper X and Z translation!
 void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shaderProgram) {
-    for(int x = minX; x < maxX; x += 16) {
-        for(int z = minZ; z < maxZ; z += 16) {
+    for(int x = minX; x <= maxX; x += BLOCK_LENGTH_IN_CHUNK) {
+        for(int z = minZ; z <= maxZ; z += BLOCK_LENGTH_IN_CHUNK) {
             if (hasChunkAt(x, z)) {
                 const uPtr<Chunk> &chunk = getChunkAt(x, z);
-                chunk->create();
+//                chunk->create();
                 shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
                 shaderProgram->draw(*chunk);
             }
+            //            else {
+            //                START_PRINT "No chunk at (" << x << ", " << z << ")" END_PRINT;
+            //            }
         }
     }
 }
@@ -174,120 +178,95 @@ void Terrain::CreateTestScene()
     // now exists.
     m_generatedTerrain.insert(toKey(0, 0));
 
-//    // Create the basic terrain floor
-//    for(int x = 0; x < 64; ++x) {
-//        for(int z = 0; z < 64; ++z) {
-//            if((x + z) % 2 == 0) {
-//                setBlockAt(x, 128, z, STONE);
-//            }
-//            else {
-//                setBlockAt(x, 128, z, DIRT);
-//            }
-//        }
-//    }
+    //    // Create the basic terrain floor
+    //    for(int x = 0; x < 64; ++x) {
+    //        for(int z = 0; z < 64; ++z) {
+    //            if((x + z) % 2 == 0) {
+    //                setBlockAt(x, 128, z, STONE);
+    //            }
+    //            else {
+    //                setBlockAt(x, 128, z, DIRT);
+    //            }
+    //        }
+    //    }
 
     //grassland test
-//    for(int x = 0; x < 64; ++x) {
-//        for(int z = 0; z < 64; ++z) {
-//            int y = heightGrassland(x, z);
-//            setBlockAt(x, y, z, GRASS);
-//            fillColumn(x, y - 1, z, DIRT);
-//        }
-//    }
+    //    for(int x = 0; x < 64; ++x) {
+    //        for(int z = 0; z < 64; ++z) {
+    //            int y = heightGrassland(x, z);
+    //            setBlockAt(x, y, z, GRASS);
+    //            fillColumn(x, y - 1, z, DIRT);
+    //        }
+    //    }
 
     //mountain test
-//    for(int x = 0; x < 64; ++x) {
-//        for(int z = 0; z < 64; ++z) {
-//            BlockType bt = STONE;
-//            int y = heightMountain(x, z);
-//            if (y > 215) {
-//                bt = SNOW;
-//            }
-//            setBlockAt(x, y, z, bt);
-//            for (int i = 1; i < 10; i++) {
-//                setBlockAt(x, y - i, z, STONE);
+    //    for(int x = 0; x < 64; ++x) {
+    //        for(int z = 0; z < 64; ++z) {
+    //            BlockType t = STONE;
+    //            int y = heightMountain(x, z);
+    //            if (y > 215) {
+    //                t = SNOW;
+    //            }
+    //            setBlockAt(x, y, z, t);
+    //            for (int i = 1; i < 10; i++) {
+    //                setBlockAt(x, y - i, z, STONE);
 
-//            }
-//        }
-//    }
+    //            }
+    //        }
+    //    }
 
-    //interpolate test
-    for(int x = 0; x < 64; ++x) {
-        for(int z = 0; z < 64; ++z) {
-            int grass = heightGrassland(x, z);
-            int mountain = heightMountain(x, z);
-            std::pair blend = blendMountainGrass(grass, mountain);
-            int y = blend.first;
-            BlockType bt = blend.second;
-//            for (int i = 1; i < 10; i++) {
-//                if (bt == GRASS) {
-//                    bt = DIRT;
-//                }
-//                if (y > 215) {
-//                    bt = SNOW;
-//                }
-//                setBlockAt(x, y - i, z, bt);
-//            }
-            fillColumn(x, y - 1, z, bt);
-        }
-    }
-
-//    // Add "walls" for collision testing
-//    for(int x = 0; x < 64; ++x) {
-//        setBlockAt(x, 129, 0, GRASS);
-//        setBlockAt(x, 130, 0, GRASS);
-//        setBlockAt(x, 129, 63, GRASS);
-//        setBlockAt(0, 130, x, GRASS);
-//    }
-//    // Add a central column
-//    for(int y = 129; y < 140; ++y) {
-//        setBlockAt(32, y, 32, GRASS);
-//    }
+    //    // Add "walls" for collision testing
+    //    for(int x = 0; x < 64; ++x) {
+    //        setBlockAt(x, 129, 0, GRASS);
+    //        setBlockAt(x, 130, 0, GRASS);
+    //        setBlockAt(x, 129, 63, GRASS);
+    //        setBlockAt(0, 130, x, GRASS);
+    //    }
+    //    // Add a central column
+    //    for(int y = 129; y < 140; ++y) {
+    //        setBlockAt(32, y, 32, GRASS);
+    //    }
 }
 
-void Terrain::createMoreTerrainAt(int xAt, int zAt)
+void Terrain::createMoreTerrainAt(int xPos, int zPos)
 {
-    createChunkAt(xAt, zAt);
-    for(int x = xAt; x < xAt + 16; ++x) {
-        for(int z = zAt; z < zAt + 16; ++z) {
+    createChunkAt(xPos, zPos);
 
-//            int y = heightGrassland(x, z);
-//            setBlockAt(x, y, z, GRASS);
-//            fillColumn(x, y - 1, z, DIRT);
+    // Fill chunk with procedural height and blocktype data
+    for(int x = xPos; x < xPos + BLOCK_LENGTH_IN_CHUNK; ++x) {
+        for(int z = zPos; z < zPos + BLOCK_LENGTH_IN_CHUNK; ++z) {
 
-//            BlockType bt = STONE;
-//            int y = heightMountain(x, z);
-//            if (y > 215) {
-//                bt = SNOW;
-//            }
-//            setBlockAt(x, y, z, bt);
-//            for (int i = 1; i < 10; i++) {
-//                setBlockAt(x, y - i, z, STONE);
-//            }
+            //            int y = heightGrassland(x, z);
+            //            setBlockAt(x, y, z, GRASS);
+            //            fillColumn(x, y - 1, z, DIRT);
+
+            //            BlockType t = STONE;
+            //            int y = heightMountain(x, z);
+            //            if (y > 215) {
+            //                t = SNOW;
+            //            }
+            //            setBlockAt(x, y, z, t);
+            //            for (int i = 1; i < 10; i++) {
+            //                setBlockAt(x, y - i, z, STONE);
+            //            }
 
             //>>> this is the right part
             int grass = heightGrassland(x, z);
             int mountain = heightMountain(x, z);
             float perlin = (Noise::perlinNoise(glm::vec2(float(x) / 64, float(z) / 64)) + 1) / 2.f;
-            perlin = glm::smoothstep(0.0f, 1.f, perlin);
-            float cutoff = 0.5f;
-            float diff = perlin - cutoff;
-            float skew;
-            BlockType bt;
-            if (perlin > cutoff) {
-                bt = STONE;
-                skew = glm::mix(0.6f, 1.f, perlin);
+            perlin = glm::smoothstep(0.25f, 0.75f, perlin);
+            BlockType t;
+            if (perlin > 0.5) {
+                t = STONE;
             } else {
-                bt = GRASS;
-                skew = glm::mix(0.0f, 0.3f, perlin);
+                t = GRASS;
             }
-            float weight = perlin + diff * skew;
-            int y = mountain * weight + grass * (1 - weight);
-            setBlockAt(x, y, z, bt);
-            if (bt == GRASS) {
-                bt = DIRT;
+            int y = glm::mix(grass, mountain, perlin);
+            setBlockAt(x, y, z, t);
+            if (t == GRASS) {
+                t = DIRT;
             }
-            fillColumn(x, y - 1, z, bt);
+            fillColumn(x, y - 1, z, t);
         }
     }
 }
@@ -310,7 +289,7 @@ int Terrain::heightMountain(int x, int z) {
     int heightRange = 255 - baseHeight;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
-    float freq = 1.5f;
+    float freq = 2.5f;
     glm::vec2 uv = glm::vec2(xNew, zNew);
     glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
                                  Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
@@ -326,62 +305,49 @@ int Terrain::heightMountain(int x, int z) {
 void Terrain::fillColumn(int x, int y, int z, BlockType t) {
     int worldBaseHeight = 0;
     if (DEBUGMODE) {
-        worldBaseHeight = 120;
+        worldBaseHeight = y - 10;
     }
-    for (int i = y; i >= y - 2/*worldBaseHeight*/; i--) {
-        BlockType bt = t;
-//        if (y >= 255 - 55) {
-//            bt = SNOW;
-//        }
+    for (int i = y; i >= worldBaseHeight; i--) {
         if (y <= 128) {
-            bt = STONE;
+            t = STONE;
         }
-       setBlockAt(x, i, z, bt);
+        setBlockAt(x, i, z, t);
     }
-
-//    for (int z = 15; z < 50; z++) {
-//        setBlockAt(32, 180, z, STONE);
-//    }
-
 }
 
 void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 {
-    int xFloor = static_cast<int>(glm::floor(pos.x / 16.f));
-    int zFloor = static_cast<int>(glm::floor(pos.z / 16.f));
-    int range = 5;
-    int minX = 16 * (xFloor - range);
-    int maxX = 16 * (xFloor + range);
-    int minZ = 16 * (zFloor - range);
-    int maxZ = 16 * (zFloor + range);
+    glm::ivec2 centerTerrain = this->getTerrainAt(pos.x, pos.z);
+    int leftBound = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
+    int rightBound = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
+    int botBound = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
+    int topBound = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * TERRAIN_RADIUS;
 
-    for(int x = minX; x < maxX; x += 16) {
-        for(int z = minZ; z < maxZ; z += 16) {
-            if (!hasChunkAt(x, z)) {
-                createMoreTerrainAt(x, z);
-            }
+    for (int x = leftBound; x <= rightBound; x+= BLOCK_LENGTH_IN_TERRAIN) {
+        for (int z = botBound; z <= topBound; z += BLOCK_LENGTH_IN_TERRAIN) {
+            this->generateTerrainZone(x, z);
         }
     }
+    // generate VBOs for each chunk with data
+    std::vector<std::thread> thread;
+    for (Chunk* c : chunksWithData.getVectorData()) {
+        std::thread t(fillVBO, std::ref(*c), std::ref(this->chunksWithVBO));
+        t.detach();
+    }
+
+    // push chunk VBOs to GPU
+    for (Chunk* c : chunksWithVBO.getVectorData()) {
+        c->bufferToDrawableVBOs();
+    }
+
+    chunksWithData.clearChunkData();
+    chunksWithVBO.clearChunkData();
 }
 
-std::pair<int, BlockType> Terrain::blendMountainGrass(int grassHeight, int mountainHeight) {
-    float newGrass = float(grassHeight) / 64.f;
-    float newMountain = float(mountainHeight) / 64.f;
-
-    glm::vec2 uv = glm::vec2(newGrass, newMountain);// + glm::vec2(100, 100);
-    glm::vec2 offset = glm::vec2(Noise::perlinNoise(uv),
-                                 Noise::perlinNoise(uv + glm::vec2(5.2 + 1.3)));
-    float freq = 1.0f;
-    float noiseFactor = (Noise::perlinNoise((uv + offset) * freq) + 1) / 2.f;
-
-    noiseFactor = glm::smoothstep(0.25f, 0.75f, noiseFactor);
-
-    int height = glm::mix(mountainHeight, grassHeight, noiseFactor);
-    BlockType bt = GRASS;
-    if (noiseFactor > 0.5) {
-        bt = STONE;
-    }
-    return std::make_pair(height, bt);
+void Terrain::makeRivers()
+{
+    Lsystem lsystem = Lsystem(*this);
+    lsystem.makeRivers();
 }
 
 void Terrain::CreateTestSceneDub()
@@ -439,7 +405,87 @@ void Terrain::CreateTestSceneDub()
     }
 }
 
+glm::ivec2 Terrain::getTerrainAt(int x, int z) {
+    int xFloor = glm::floor(x / 64.f) * BLOCK_LENGTH_IN_TERRAIN;
+    int zFloor = glm::floor(z / 64.f) * BLOCK_LENGTH_IN_TERRAIN;
+    return glm::vec2(xFloor, zFloor);
+}
 
+void Terrain::generateTerrainZone(int x, int z) {
+    int64_t coord = toKey(x, z);
+//    std::vector<std::thread> blockDataWorkers;
+    if (this->m_generatedTerrain.find(coord) == this->m_generatedTerrain.end()) {
+        // generate chunk data in terrain zone
+        for (int i = 0; i <= BLOCK_LENGTH_IN_TERRAIN; i += BLOCK_LENGTH_IN_CHUNK) {
+            for (int j = 0; j <= BLOCK_LENGTH_IN_TERRAIN; j += BLOCK_LENGTH_IN_CHUNK) {
+                Chunk* cPtr = createChunkAt(x + i, z + j);
+//                blockDataWorkers.push_back(std::thread(fillBlockData, x + i, z + j, cPtr,
+//                                                       std::ref(this->chunksWithData)));
+                std::thread t(fillBlockData, cPtr->X, cPtr->Z, cPtr, &this->chunksWithData);
+                t.detach();
+//                this->createMoreTerrainAt(x + i, z + j);
+            }
+        }
+        this->m_generatedTerrain.insert(coord);
+    }
+//    this->chunksWithData.clearChunkData();
+//    START_PRINT this->m_generatedTerrain.size() END_PRINT;
+}
 
+void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData *chunksWithData) {
+    // Fill chunk with procedural height and blocktype data
+    for(int x = xPos; x < xPos + BLOCK_LENGTH_IN_CHUNK; ++x) {
+        for(int z = zPos; z < zPos + BLOCK_LENGTH_IN_CHUNK; ++z) {
+            //>>> this is the right part
+            int grass = heightGrassland(x, z);
+            int mountain = heightMountain(x, z);
+            float perlin = (Noise::perlinNoise(glm::vec2(float(x) / 64, float(z) / 64)) + 1) / 2.f;
+            perlin = glm::smoothstep(0.25f, 0.75f, perlin);
+            BlockType t;
+            if (perlin > 0.5) {
+                t = STONE;
+            } else {
+                t = GRASS;
+            }
+            int y = glm::mix(grass, mountain, perlin);
+            setBlockAtStatic(x, y, z, t, chunk);
 
+            if (t == GRASS) {
+                t = DIRT;
+            }
+            fillColumnStatic(x, y - 1, z, t, chunk);
+        }
+    }
+    chunksWithData->addChunk(chunk);
+}
 
+void Terrain::setBlockAtStatic(int x, int y, int z, BlockType t, Chunk* c)
+{
+    glm::vec2 chunkOrigin = glm::vec2(floor(x / 16.f) * 16, floor(z / 16.f) * 16);
+    c->setBlockAt(static_cast<unsigned int>(x - chunkOrigin.x),
+                  static_cast<unsigned int>(y),
+                  static_cast<unsigned int>(z - chunkOrigin.y),
+                  t);
+}
+
+void Terrain::fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c) {
+    int worldBaseHeight = 0;
+    if (DEBUGMODE) {
+        worldBaseHeight = y - 4;
+    }
+    for (int i = y; i >= worldBaseHeight; i--) {
+        //        if (y >= 255 - 55) {
+        //            t = SNOW;
+        //        }
+        if (y <= 128) {
+            t = STONE;
+        }
+        setBlockAtStatic(x, i, z, t, c);
+    }
+
+}
+
+void Terrain::fillVBO(Chunk &c, VBOCollection &chunksWithVBO) {
+    c.create();
+    chunksWithVBO.addChunk(&c);
+}

@@ -4,9 +4,14 @@
 #include <iostream>
 
 Chunk::Chunk(OpenGLContext* context, int X, int Z)
+<<<<<<< HEAD
     : Drawable(context), X(X), Z(Z), m_blocks(),
       m_neighbors{{XPOS, nullptr}, {XNEG, nullptr}, {ZPOS, nullptr}, {ZNEG, nullptr}},
       mp_texture(nullptr)
+=======
+    : idx(std::vector<GLuint>()), data(std::vector<glm::vec4>()), Drawable(context), X(X), Z(Z), m_blocks(),
+      m_neighbors{{XPOS, nullptr}, {XNEG, nullptr}, {ZPOS, nullptr}, {ZNEG, nullptr}}
+>>>>>>> master
 {
     std::fill_n(m_blocks.begin(), 65536, EMPTY);
 }
@@ -35,8 +40,9 @@ void Chunk::setBlockAt(unsigned int x, unsigned int y, unsigned int z, BlockType
 
 void Chunk::create()
 {
-    std::vector<GLuint> idx;
-    std::vector<glm::vec4> data;
+    this->idx.clear();
+//    std::vector<GLuint> idx;
+//    std::vector<glm::vec4> data;
     int indexCount = 0;
 
     // Iterate over all blocks in chunk
@@ -250,17 +256,6 @@ void Chunk::create()
         }
     }
 
-    m_count = idx.size();
-
-    // Generate index buffer
-    generateIdx();
-    // Bind index buffer
-    mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufIdx);
-    // Buffer index data
-    mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof (GLuint), idx.data(), GL_STATIC_DRAW);
-
-    bufferToDrawableVBOs(data);
-
     mp_texture = std::unique_ptr<Texture>(new Texture(this->mp_context));
         mp_texture->create();
         mp_texture->load(0);
@@ -299,14 +294,22 @@ glm::vec4 Chunk::getUVs(BlockType &type, Direction face)
     }
 }
 
-void Chunk::bufferToDrawableVBOs(std::vector<glm::vec4>&data)
+void Chunk::bufferToDrawableVBOs()
 {
+    m_count = this->idx.size();
+
+    // Generate index buffer
+    generateIdx();
+    // Bind index buffer
+    mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufIdx);
+    // Buffer index data
+    mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof (GLuint), this->idx.data(), GL_STATIC_DRAW);
     // Generate data buffer
     generateAll();
     // Bind data buffer
     mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
     // Buffer data to GPU
-    mp_context->glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec4), data.data(), GL_STATIC_DRAW);
+    mp_context->glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec4), this->data.data(), GL_STATIC_DRAW);
 }
 
 bool Chunk::hasXPOSneighbor() { return m_neighbors.at(XPOS) != nullptr; }

@@ -8,12 +8,23 @@
 #include "shaderprogram.h"
 #include "cube.h"
 #include "noise.h"
+#include "lsystem.h"
+#include "BlockTypeData.h"
+#include "VBOWorkerData.h"
+#define TERRAIN_RADIUS 2
+#define CHUNK_LENGTH_IN_TERRAIN 4
+#define BLOCK_LENGTH_IN_CHUNK 16
+#define BLOCK_LENGTH_IN_TERRAIN (CHUNK_LENGTH_IN_TERRAIN * BLOCK_LENGTH_IN_CHUNK)
+
 
 //using namespace std;
 
 // Helper functions to convert (x, z) to and from hash map key
 int64_t toKey(int x, int z);
 glm::ivec2 toCoords(int64_t k);
+
+//Forward class declaration
+class Lsystem;
 
 // The container class for all of the Chunks in the game.
 // Ultimately, while Terrain will always store all Chunks,
@@ -54,8 +65,15 @@ private:
 
     OpenGLContext* mp_context;
 
+    bool test;
+
     void fillColumn(int x, int y, int z, BlockType t);
+
 public:
+    // collection of chunks
+    BlockData chunksWithData;
+    VBOCollection chunksWithVBO;
+
     Terrain(OpenGLContext *context);
     ~Terrain();
 
@@ -92,12 +110,27 @@ public:
     void CreateTestScene();
     // Expands the terrain
     void expandTerrainBasedOnPlayer(glm::vec3 pos);
+    void loadTerrain(int xPos, int yPos);
+
+    glm::ivec2 getTerrainAt(int x, int z);
     // Create a grass terrain chunk and its VBO
     void createMoreTerrainAt(int x, int z);
+    // Deals with terrain zone loading at coordinates defined by bottom-left corner at (x,z) coords
+    void generateTerrainZone(int x, int z);
 
-    std::pair<int, BlockType> blendMountainGrass(int grassHeight, int mountainHeight);
-    int heightGrassland(int x, int z);
-    int heightMountain(int x, int z);
+    static int heightGrassland(int x, int z);
+    static int heightMountain(int x, int z);
+
+    static void fillBlockData(int xPos, int zPos, Chunk* c, BlockData *chunksWithData);
+    static void setBlockAtStatic(int x, int y, int z, BlockType t, Chunk* c);
+    static void fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c);
+    static void fillVBO(Chunk &c, VBOCollection &chunksWithVBO);
 
     void CreateTestSceneDub();
+
+    void makeRivers();
+//    float sdCapsule(glm::vec3 p, glm::vec3 a, glm::vec3 b, float r);
+//    float sdSphere(glm::vec3 p, float s);
+//    void carveTerrainAt(glm::vec3 p, float waterLevel);
+
 };

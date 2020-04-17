@@ -54,6 +54,8 @@ const static std::unordered_map<Direction, Direction, EnumHash> oppositeDirectio
 class Chunk : public Drawable
 {
 private:
+    std::vector<GLuint> idx;
+    std::vector<glm::vec4> data;
     // All of the blocks contained within this Chunk
     std::array<BlockType, 65536> m_blocks;
     // This Chunk's four neighbors to the north, south, east, and west
@@ -61,17 +63,18 @@ private:
     // a key for this map.
     // These allow us to properly determine
     std::unordered_map<Direction, Chunk*, EnumHash> m_neighbors;
-    // Chunk's lower-left corner X and Z coordinates according to world
-    int X;
-    int Z;
 
     // Texture for chunks
     uPtr<Texture> mp_texture;
 
     glm::vec4 getUVs(BlockType &type, Direction face);
     void pushIndexForFace(std::vector<GLuint>&idx, int index);
-    void bufferToDrawableVBOs(std::vector<glm::vec4>&data);
 public:
+    void bufferToDrawableVBOs();
+    // Chunk's lower-left corner X and Z coordinates according to world
+    int X;
+    int Z;
+
     Chunk(OpenGLContext* context, int X, int Z);
     Chunk(OpenGLContext* context, int X, int Z, bool test);
     virtual ~Chunk(){};
