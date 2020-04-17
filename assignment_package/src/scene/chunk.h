@@ -5,6 +5,7 @@
 #include <array>
 #include <unordered_map>
 #include <cstddef>
+#include "texture.h"
 
 
 //using namespace std;
@@ -15,7 +16,7 @@
 // block types, but in the scope of this project we'll never get anywhere near that many.
 enum BlockType : unsigned char
 {
-    EMPTY, GRASS, DIRT, STONE, SNOW, WATER, LAVA
+    EMPTY, GRASS, DIRT, STONE, SNOW, LAVA, WATER, ICE
 };
 
 // The six cardinal directions in 3D space
@@ -53,8 +54,13 @@ const static std::unordered_map<Direction, Direction, EnumHash> oppositeDirectio
 class Chunk : public Drawable
 {
 private:
+    // Solid block data
     std::vector<GLuint> idx;
     std::vector<glm::vec4> data;
+
+    // Transparent block data
+    std::vector<GLuint> tIdx;
+    std::vector<glm::vec4> tData;
 
     // All of the blocks contained within this Chunk
     std::array<BlockType, 65536> m_blocks;
@@ -64,10 +70,15 @@ private:
     // These allow us to properly determine
     std::unordered_map<Direction, Chunk*, EnumHash> m_neighbors;
 
-    glm::vec4 getColor(BlockType &type);
+    glm::vec4 getUVs(BlockType &type, Direction face);
     void pushIndexForFace(std::vector<GLuint>&idx, int index);
 public:
+    // Set up buffer for solid blocks
     void bufferToDrawableVBOs();
+    // Set up buffer for transparent blocks
+    void bufferTransparentDrawableVBOs();
+    // Clear buffers
+    void clearIdxBuffers();
     // Chunk's lower-left corner X and Z coordinates according to world
     int X;
     int Z;

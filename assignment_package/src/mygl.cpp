@@ -9,9 +9,9 @@
 MyGL::MyGL(QWidget *parent)
     : OpenGLContext(parent),
       m_worldAxes(this),
-      m_progLambert(this), m_progFlat(this),
+      m_progLambert(this), m_progFlat(this), m_texture(this),
       m_terrain(this), m_player(glm::vec3(48.f, 170.f, 48.f), m_terrain),
-      m_currTime(QDateTime::currentMSecsSinceEpoch())
+      m_currTime(QDateTime::currentMSecsSinceEpoch()), m_timeSinceStart(0)
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -45,6 +45,11 @@ void MyGL::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LINE_SMOOTH);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+    // Settings to allow proper rendering of transparent blocks
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // Set the color with which the screen is filled at the start of each render call.
     glClearColor(0.37f, 0.74f, 1.0f, 1);
 
@@ -67,12 +72,13 @@ void MyGL::initializeGL()
     // and UV coordinates
     m_progLambert.setGeometryColor(glm::vec4(0,1,0,1));
 
+    // Create and load the appropriate texture
+    m_texture.create();
+    m_texture.load(0);
+
     // We have to have a VAO bound in OpenGL 3.2 Core. But if we're not
     // using multiple VAOs, we can just bind one once.
     glBindVertexArray(vao);
-
-//    m_terrain.CreateTestScene();
-//    m_terrain.CreateTestSceneDub();
 
     // Move the cursor to the middle of the screen
     moveMouseToCenter();
@@ -100,12 +106,14 @@ void MyGL::resizeGL(int w, int h) {
 // all per-frame actions here, such as performing physics updates on all
 // entities in the scene.
 void MyGL::tick() {
-    // check if new terrain zone chunks need to be created and populated
-//    glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
-
+    // Calculate dT and pass relevant time values to tick and shader
     float dT = (QDateTime::currentMSecsSinceEpoch() - m_currTime) / 1000.f;
+    m_progLambert.setTime(m_timeSinceStart);
     m_player.tick(dT, m_inputs);
+
+    // Update time values
     m_currTime = QDateTime::currentMSecsSinceEpoch();
+    m_timeSinceStart++;
 
     m_terrain.expandTerrainBasedOnPlayer(m_player.mcr_position);
     update(); // Calls paintGL() as part of a larger QOpenGLWidget pipeline
@@ -151,15 +159,14 @@ void MyGL::renderTerrain() {
     glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
     glm::ivec2 centerTerrain = m_terrain.getTerrainAt(pPos[0], pPos[1]);
 
-//    int xFloor = static_cast<int>(glm::floor(m_player.mcr_position.x / 16.f));
-//    int zFloor = static_cast<int>(glm::floor(m_player.mcr_position.z / 16.f));
-//    int range = 4;
+    // Bind the texture
+    m_texture.bind(0);
+
     int xmin = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * renderRadius /*- BLOCK_LENGTH_IN_TERRAIN*/;//16 * (xFloor - range);
     int xmax = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * renderRadius + BLOCK_LENGTH_IN_TERRAIN; //16 * (xFloor + range);
     int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius - BLOCK_LENGTH_IN_TERRAIN;//16 * (zFloor - range);
     int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius /*+ BLOCK_LENGTH_IN_TERRAIN*/;//16 * (zFloor + range);
     m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
-//    m_terrain.draw(0, 64, 0, 64, &m_progLambert);
 }
 
 
@@ -235,7 +242,8 @@ void MyGL::mousePressEvent(QMouseEvent *e) {
                                   hitBlock.z + .5f};
             // Find where the ray collides with the block
             glm::vec3 rayHit = m_player.mcr_camera.mcr_position + ray * outLen;
-            // Find the difference between the two points
+            // Find the difference between the two points and set the block
+            // adjacent to the face that has the largest distance from the center
             glm::vec3 diff = rayHit - blockMid;
             glm::ivec3 mod = glm::ivec3(0);
             if (abs(diff.x) > abs(diff.y) && abs(diff.x) > abs(diff.z)) {

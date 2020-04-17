@@ -7,6 +7,7 @@
 #include "scene/camera.h"
 #include "scene/terrain.h"
 #include "scene/player.h"
+#include "texture.h"
 
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
@@ -20,6 +21,7 @@ private:
     WorldAxes m_worldAxes; // A wireframe representation of the world axes. It is hard-coded to sit centered at (32, 128, 32).
     ShaderProgram m_progLambert;// A shader program that uses lambertian reflection
     ShaderProgram m_progFlat;// A shader program that uses "flat" reflection (no shadowing at all)
+    Texture m_texture; // A texture to be used in the lambert shader
 
     GLuint vao; // A handle for our vertex array object. This will store the VBOs created in our geometry classes.
                 // Don't worry too much about this. Just know it is necessary in order to render geometry.
@@ -30,6 +32,7 @@ private:
 
     QTimer m_timer; // Timer linked to tick(). Fires approximately 60 times per second.
     double m_currTime; // Current time used to compute dT for player movement
+    int m_timeSinceStart; // Time passed to UVs to warp LAVA and WATER UV coords
 
     void moveMouseToCenter(); // Forces the mouse position to the screen's center. You should call this
                               // from within a mouse move event after reading the mouse movement so that

@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>tex/minecraft_normals_all.png</file>
+        <file>tex/minecraft_textures_all.png</file>
+        <file>tex/minecraft_textures_all_grey_grass.png</file>
+    </qresource>
+</RCC>
