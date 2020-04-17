@@ -20,9 +20,9 @@ void SharedBlockTypeCollection::addChunk(Chunk* chunk) {
 }
 
 void SharedBlockTypeCollection::clearChunkData() {
-    mu.lock();
+    //mu.lock();
     this->filledChunks.clear();
-    mu.unlock();
+    //mu.unlock();
 }
 
 bool SharedBlockTypeCollection::isEmpty() {

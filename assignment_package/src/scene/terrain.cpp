@@ -346,6 +346,7 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
         std::thread t(fillVBO, std::ref(*c), std::ref(this->chunksWithVBO));
         t.detach();
     }
+    chunksWithData.clearChunkData();
     chunksWithData.mu.unlock();
 
     // push chunk VBOs to GPU
@@ -353,10 +354,9 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
     for (Chunk* c : chunksWithVBO.getVectorData()) {
         c->bufferToDrawableVBOs();
     }
+    chunksWithVBO.clearChunkData();
     chunksWithVBO.mu.unlock();
 
-    chunksWithData.clearChunkData();
-    chunksWithVBO.clearChunkData();
 }
 
 void Terrain::makeRivers(glm::ivec2 zonePosition)
@@ -430,8 +430,8 @@ void Terrain::generateTerrainZone(int x, int z) {
     int64_t coord = toKey(x, z);
     if (this->m_generatedTerrain.find(coord) == this->m_generatedTerrain.end()) {
         // generate chunk data in terrain zone
-        for (int i = 0; i <= BLOCK_LENGTH_IN_TERRAIN; i += BLOCK_LENGTH_IN_CHUNK) {
-            for (int j = 0; j <= BLOCK_LENGTH_IN_TERRAIN; j += BLOCK_LENGTH_IN_CHUNK) {
+        for (int i = 0; i <= BLOCK_LENGTH_IN_TERRAIN - BLOCK_LENGTH_IN_CHUNK; i += BLOCK_LENGTH_IN_CHUNK) {
+            for (int j = 0; j <= BLOCK_LENGTH_IN_TERRAIN - BLOCK_LENGTH_IN_CHUNK; j += BLOCK_LENGTH_IN_CHUNK) {
                 Chunk* cPtr = createChunkAt(x + i, z + j);
                 std::thread t(fillBlockData, cPtr->X, cPtr->Z, cPtr, &this->chunksWithData);
                 t.detach();

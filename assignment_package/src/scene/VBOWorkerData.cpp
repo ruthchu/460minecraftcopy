@@ -18,9 +18,9 @@ void SharedVBODataCollection::addChunk(Chunk* data) {
 }
 
 void SharedVBODataCollection::clearChunkData() {
-    mu.lock();
+    //mu.lock();
     this->VBOchunks.clear();
-    mu.unlock();
+    //mu.unlock();
 }
 
 bool SharedVBODataCollection::isEmpty() {
