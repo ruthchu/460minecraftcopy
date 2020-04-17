@@ -149,22 +149,15 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
         for(int z = minZ; z <= maxZ; z += BLOCK_LENGTH_IN_CHUNK) {
             if (hasChunkAt(x, z)) {
                 const uPtr<Chunk> &chunk = getChunkAt(x, z);
-//                chunk->create();
                 shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
                 shaderProgram->draw(*chunk);
             }
-            //            else {
-            //                START_PRINT "No chunk at (" << x << ", " << z << ")" END_PRINT;
-            //            }
         }
     }
 }
 
 void Terrain::CreateTestScene()
 {
-    // TODO: DELETE THIS LINE WHEN YOU DELETE m_geomCube!
-    //m_geomCube.create();
-
     // Create the Chunks that will
     // store the blocks for our
     // initial world space
@@ -177,55 +170,6 @@ void Terrain::CreateTestScene()
     // the "generated terrain zone" at (0,0)
     // now exists.
     m_generatedTerrain.insert(toKey(0, 0));
-
-    //    // Create the basic terrain floor
-    //    for(int x = 0; x < 64; ++x) {
-    //        for(int z = 0; z < 64; ++z) {
-    //            if((x + z) % 2 == 0) {
-    //                setBlockAt(x, 128, z, STONE);
-    //            }
-    //            else {
-    //                setBlockAt(x, 128, z, DIRT);
-    //            }
-    //        }
-    //    }
-
-    //grassland test
-    //    for(int x = 0; x < 64; ++x) {
-    //        for(int z = 0; z < 64; ++z) {
-    //            int y = heightGrassland(x, z);
-    //            setBlockAt(x, y, z, GRASS);
-    //            fillColumn(x, y - 1, z, DIRT);
-    //        }
-    //    }
-
-    //mountain test
-    //    for(int x = 0; x < 64; ++x) {
-    //        for(int z = 0; z < 64; ++z) {
-    //            BlockType t = STONE;
-    //            int y = heightMountain(x, z);
-    //            if (y > 215) {
-    //                t = SNOW;
-    //            }
-    //            setBlockAt(x, y, z, t);
-    //            for (int i = 1; i < 10; i++) {
-    //                setBlockAt(x, y - i, z, STONE);
-
-    //            }
-    //        }
-    //    }
-
-    //    // Add "walls" for collision testing
-    //    for(int x = 0; x < 64; ++x) {
-    //        setBlockAt(x, 129, 0, GRASS);
-    //        setBlockAt(x, 130, 0, GRASS);
-    //        setBlockAt(x, 129, 63, GRASS);
-    //        setBlockAt(0, 130, x, GRASS);
-    //    }
-    //    // Add a central column
-    //    for(int y = 129; y < 140; ++y) {
-    //        setBlockAt(32, y, 32, GRASS);
-    //    }
 }
 
 void Terrain::createMoreTerrainAt(int xPos, int zPos)
@@ -236,21 +180,6 @@ void Terrain::createMoreTerrainAt(int xPos, int zPos)
     for(int x = xPos; x < xPos + BLOCK_LENGTH_IN_CHUNK; ++x) {
         for(int z = zPos; z < zPos + BLOCK_LENGTH_IN_CHUNK; ++z) {
 
-            //            int y = heightGrassland(x, z);
-            //            setBlockAt(x, y, z, GRASS);
-            //            fillColumn(x, y - 1, z, DIRT);
-
-            //            BlockType t = STONE;
-            //            int y = heightMountain(x, z);
-            //            if (y > 215) {
-            //                t = SNOW;
-            //            }
-            //            setBlockAt(x, y, z, t);
-            //            for (int i = 1; i < 10; i++) {
-            //                setBlockAt(x, y - i, z, STONE);
-            //            }
-
-            //>>> this is the right part
             int grass = heightGrassland(x, z);
             int mountain = heightMountain(x, z);
             float perlin = (Noise::perlinNoise(glm::vec2(float(x) / 64, float(z) / 64)) + 1) / 2.f;
@@ -337,6 +266,7 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
     // push chunk VBOs to GPU
     for (Chunk* c : chunksWithVBO.getVectorData()) {
         c->bufferToDrawableVBOs();
+        //c->bufferTransparentDrawableVBOs();
     }
 
     chunksWithData.clearChunkData();
@@ -466,9 +396,6 @@ void Terrain::fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c) {
         worldBaseHeight = y - 4;
     }
     for (int i = y; i >= worldBaseHeight; i--) {
-        //        if (y >= 255 - 55) {
-        //            t = SNOW;
-        //        }
         if (y <= 128) {
             t = STONE;
         }
