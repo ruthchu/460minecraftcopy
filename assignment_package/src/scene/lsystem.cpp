@@ -134,18 +134,19 @@ void Lsystem::fRule()
     for (int x = xmin; x <= xmax; x++) {
         for (int z = zmin; z <= zmax; z++) {
             for (int y = capsuleCenterY - capsuelRad; y <= capsuleCenterY; y++) {
+                // If no chunk at location, do not check
                 if (!this->terrain.hasChunkAt(x, z)) continue;
-                glm::vec3 p = glm::vec3(x, y, z);
-                // Check if a block is inside the capsule
-                if (sdCapsule(p, a, b, capsuelRad) <= 0.f) {
-                    // Carve terrain
-                    if (!this->terrain.hasChunkAt(p.x, p.z)) return;
-                    if (p.y <= waterLevel) {
-                        this->terrain.setBlockAt(p.x, p.y, p.z, WATER);
-                        //std::cout << "adding water" << std::endl;
-                    }
-                    for (int y = waterLevel + 1; y < 256; y++) {
-                        this->terrain.setBlockAt(p.x, y, p.z, EMPTY);
+                // Check if block is inside the capsule
+                if (sdCapsule(glm::vec3(x, y, z), a, b, capsuelRad) <= 0.f) {
+                    // If y <= waterlevel, put water block
+                    if (y <= waterLevel) {
+                        this->terrain.setBlockAt(x, y, z, WATER);
+                    } else if (y < capsuleCenterY) { // If y > waterlevel but < capsuleCenterY put empty
+                        this->terrain.setBlockAt(x, y, z, EMPTY);
+                    } else if (y == capsuleCenterY) { // If y == capsuleCenterY, carve out everything on top
+                        for (int y = capsuleCenterY; y < 256; y++) {
+                            this->terrain.setBlockAt(x, y, z, EMPTY);
+                        }
                     }
                 }
             }
