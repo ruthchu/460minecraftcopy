@@ -106,15 +106,6 @@ void MyGL::tick() {
     sendPlayerDataToGUI(); // Updates the info in the secondary window displaying player data
 }
 
-void MyGL::createBlockTextures() {
-    std::shared_ptr<Texture> blocks = std::make_shared<Texture>(this);
-    blocks->create(":/tex/minecraft_textures_all.png");
-    m_blockTextures.push_back(blocks);
-
-    mp_blockTexCurrent->load(0);
-    mp_blockTexCurrent->bind(0);
-}
-
 void MyGL::sendPlayerDataToGUI() const {
     emit sig_sendPlayerPos(m_player.posAsQString());
     emit sig_sendPlayerVel(m_player.velAsQString());

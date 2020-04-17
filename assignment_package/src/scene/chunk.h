@@ -5,6 +5,7 @@
 #include <array>
 #include <unordered_map>
 #include <cstddef>
+#include "texture.h"
 
 
 //using namespace std;
@@ -63,6 +64,9 @@ private:
     // Chunk's lower-left corner X and Z coordinates according to world
     int X;
     int Z;
+
+    // Texture for chunks
+    uPtr<Texture> mp_texture;
 
     glm::vec4 getUVs(BlockType &type, Direction face);
     void pushIndexForFace(std::vector<GLuint>&idx, int index);

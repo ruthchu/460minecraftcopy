@@ -10,7 +10,7 @@ public:
     Texture(OpenGLContext* context);
     ~Texture();
 
-    void create(const char *texturePath);
+    void create();
     void load(int texSlot);
     void bind(int texSlot);
 

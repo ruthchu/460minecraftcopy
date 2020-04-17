@@ -9,9 +9,10 @@ Texture::Texture(OpenGLContext *context)
 Texture::~Texture()
 {}
 
-void Texture::create(const char *texturePath)
+void Texture::create()
 {
     context->printGLErrorLog();
+    QString texturePath = ":/tex/minecraft_textures_all.png";
 
     QImage img(texturePath);
     img.convertToFormat(QImage::Format_ARGB32);
@@ -32,14 +33,14 @@ void Texture::load(int texSlot = 0)
     // These parameters need to be set for EVERY texture you create
     // They don't always have to be set to the values given here, but they do need
     // to be set
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    context->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    context->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    context->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    context->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     context->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
                           m_textureImage->width(), m_textureImage->height(),
-                          0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, m_textureImage->bits());
+                          0, GL_BGRA, GL_UNSIGNED_BYTE, m_textureImage->bits());
     context->printGLErrorLog();
 }
 

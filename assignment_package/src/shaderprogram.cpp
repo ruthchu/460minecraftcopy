@@ -134,6 +134,13 @@ void ShaderProgram::setGeometryColor(glm::vec4 color)
     }
 }
 
+void ShaderProgram::setTextureSampler(int textureSlot) {
+    useMe();
+    if (unifSampler2D != -1) {
+        context->glUniform1i(unifSampler2D, textureSlot);
+    }
+}
+
 void ShaderProgram::setTime(int t) {
     useMe();
 

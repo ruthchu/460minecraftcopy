@@ -74,6 +74,7 @@ void main()
 {
     // Material base color (before shading)
         vec4 diffuseColor = texture(u_Texture, vec2(fs_UV.x, fs_UV.y));
+        //vec4 diffuseColor = texture(u_Texture, vec2(0.5, 0.5));
         diffuseColor = diffuseColor * (0.5 * vec4(fbm(fs_Pos.xyz), 1) + 0.5);
 
         // Calculate the diffuse term for Lambert shading

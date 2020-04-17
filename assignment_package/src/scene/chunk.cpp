@@ -5,7 +5,8 @@
 
 Chunk::Chunk(OpenGLContext* context, int X, int Z)
     : Drawable(context), X(X), Z(Z), m_blocks(),
-      m_neighbors{{XPOS, nullptr}, {XNEG, nullptr}, {ZPOS, nullptr}, {ZNEG, nullptr}}
+      m_neighbors{{XPOS, nullptr}, {XNEG, nullptr}, {ZPOS, nullptr}, {ZNEG, nullptr}},
+      mp_texture(nullptr)
 {
     std::fill_n(m_blocks.begin(), 65536, EMPTY);
 }
@@ -67,7 +68,7 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(0.f, 1.f / 16.f, 0.f, 0.f));
                     //LL
                     data.push_back(worldPos);
                     data.push_back(glm::vec4(0.f, 0.f, -1.f, 0.f));
@@ -75,11 +76,12 @@ void Chunk::create()
                     //LR
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     data.push_back(glm::vec4(0.f, 0.f, -1.f, 0.f));
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 0.f, 0.f, 0.f));
                     //UR
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     data.push_back(glm::vec4(0.f, 0.f, -1.f, 0.f));
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 1.f / 16.f,
+                                                  0.f, 0.f));
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -100,7 +102,7 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(0.f, 1.f / 16.f, 0.f, 0.f));
                     //LL
                     data.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
@@ -108,11 +110,12 @@ void Chunk::create()
                     //LR
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 0.f, 0.f, 0.f));
                     //UR
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 1.f / 16.f,
+                                                  0.f, 0.f));
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -133,7 +136,7 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(0.f, 1.f / 16.f, 0.f, 0.f));
                     //LL
                     data.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
@@ -141,11 +144,12 @@ void Chunk::create()
                     //LR
                     data.push_back(worldPos);
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 0.f, 0.f, 0.f));
                     //UR
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 1.f / 16.f,
+                                                  0.f, 0.f));
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -166,7 +170,7 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(0.f, 1.f / 16.f, 0.f, 0.f));
                     //LL
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     data.push_back(norm);
@@ -174,11 +178,12 @@ void Chunk::create()
                     //LR
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 0.f, 0.f, 0.f));
                     //UR
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 1.f / 16.f,
+                                                  0.f, 0.f));
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -194,7 +199,7 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(0.f, 1.f / 16.f, 0.f, 0.f));
                     //LL
                     data.push_back(worldPos);
                     data.push_back(norm);
@@ -202,11 +207,12 @@ void Chunk::create()
                     //LR
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 0.f, 0.f, 0.f));
                     //UR
                     data.push_back(worldPos + glm::vec4(1.f, 0.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 1.f / 16.f,
+                                                  0.f, 0.f));
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -222,7 +228,7 @@ void Chunk::create()
                     //UL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(0.f, 1.f / 16.f, 0.f, 0.f));
                     //LL
                     data.push_back(worldPos + glm::vec4(0.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
@@ -230,11 +236,12 @@ void Chunk::create()
                     //LR
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 0.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 0.f, 0.f, 0.f));
                     //UR
                     data.push_back(worldPos + glm::vec4(1.f, 1.f, 1.f, 0.f));
                     data.push_back(norm);
-                    data.push_back(uv);
+                    data.push_back(uv + glm::vec4(1.f / 16.f, 1.f / 16.f,
+                                                  0.f, 0.f));
                     // Add indices
                     pushIndexForFace(idx, indexCount);
                     indexCount += 4;
@@ -253,6 +260,11 @@ void Chunk::create()
     mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof (GLuint), idx.data(), GL_STATIC_DRAW);
 
     bufferToDrawableVBOs(data);
+
+    mp_texture = std::unique_ptr<Texture>(new Texture(this->mp_context));
+        mp_texture->create();
+        mp_texture->load(0);
+        mp_texture->bind(0);
 }
 
 

@@ -39,6 +39,8 @@ public:
     void setViewProjMatrix(const glm::mat4 &vp);
     // Pass the given color to this shader on the GPU
     void setGeometryColor(glm::vec4 color);
+    // Pass a texture to this shader on the GPU
+    void setTextureSampler(int textureSlot);
     // Pass a time variable to this shader on the GPU
     void setTime(int t);
     // Draw the given object to our screen using this ShaderProgram's shaders
