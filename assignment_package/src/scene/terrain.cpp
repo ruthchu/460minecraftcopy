@@ -431,7 +431,7 @@ void Terrain::generateTerrainZone(int x, int z) {
                 t.detach();
             }
         }
-//        std::thread t(fillTerrainZone, terrainChunks, &this->chunksWithData);
+//        std::thread t(fillTerrainZone, terrainChunks, &(this->chunksWithData));
 //        t.detach();
 //        makeRivers();
         this->m_generatedTerrain.insert(coord);
