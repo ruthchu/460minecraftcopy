@@ -2,6 +2,7 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 SOURCES += \
+    $$PWD/framebuffer.cpp \
     $$PWD/main.cpp \
     $$PWD/mainwindow.cpp \
     $$PWD/mygl.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
     $$PWD/turtle.cpp
 
 HEADERS += \
+    $$PWD/framebuffer.h \
     $$PWD/mainwindow.h \
     $$PWD/mygl.h \
     $$PWD/scene/BlockTypeData.h \

@@ -55,6 +55,7 @@ class Chunk : public Drawable
 private:
     std::vector<GLuint> idx;
     std::vector<glm::vec4> data;
+
     // All of the blocks contained within this Chunk
     std::array<BlockType, 65536> m_blocks;
     // This Chunk's four neighbors to the north, south, east, and west
