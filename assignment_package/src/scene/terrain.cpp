@@ -336,6 +336,8 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
             this->generateTerrainZone(x, z);
         }
     }
+
+
     // generate VBOs for each chunk with data
     std::vector<std::thread> thread;
     for (Chunk* c : chunksWithData.getVectorData()) {
@@ -434,6 +436,7 @@ void Terrain::generateTerrainZone(int x, int z) {
 //                this->createMoreTerrainAt(x + i, z + j);
             }
         }
+        makeRivers();
         this->m_generatedTerrain.insert(coord);
     }
 //    this->chunksWithData.clearChunkData();
