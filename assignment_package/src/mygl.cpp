@@ -266,7 +266,7 @@ void MyGL::mousePressEvent(QMouseEvent *e) {
                 }
             }
             m_terrain.setBlockAt(hitBlock.x + mod.x, hitBlock.y + mod.y,
-                                 hitBlock.z + mod.z, DIRT);
+                                 hitBlock.z + mod.z, LAVA);
         }
     }
 }

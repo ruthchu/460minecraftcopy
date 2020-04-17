@@ -5,31 +5,28 @@
 Player::Player(glm::vec3 pos, const Terrain &terrain)
     : Entity(pos), m_velocity(0,0,0), m_acceleration(0,0,0),
       m_camera(pos + glm::vec3(0, 1.5f, 0)), mcr_terrain(terrain), m_phi(0.f),
-      mcr_camera(m_camera), m_flightOn(true), accel(0.f)
+      mcr_camera(m_camera), m_flightOn(true), accel(10.f)
 {}
 
 Player::~Player()
 {}
 
 void Player::tick(float dT, InputBundle &input) {
-    this->accel = 3.f / dT;
-    processInputs(input, dT);
+    processInputs(input);
     computePhysics(dT, mcr_terrain);
 }
 
-void Player::processInputs(InputBundle &inputs, float dT) {
+void Player::processInputs(InputBundle &inputs) {
     // Rotate the local axis' based on mouse input
-    float mod = 1.f / dT;
-    rotateOnUpGlobal(inputs.mouseX / 40.f * mod);
+    rotateOnUpGlobal(inputs.mouseX / 5.f);
     if (m_phi < 90.f && m_phi > -90.f) {
         rotateOnRightLocal
-            (glm::clamp(inputs.mouseY / 40.f * mod, -89.99f - m_phi, 89.99f - m_phi));
+            (glm::clamp(inputs.mouseY / 5.f, -89.99f - m_phi, 89.99f - m_phi));
     }
     m_phi = glm::clamp(m_phi + inputs.mouseY, -89.99f, 89.99f);
     inputs.mouseX = 0.f;
     inputs.mouseY = 0.f;
     m_acceleration = {0.f, 0.f, 0.f};
-    //this->accel = mod * 3.f;
     // Movement in flight mode
     if (m_flightOn) {
         if (inputs.wPressed == true) {
@@ -133,11 +130,7 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                                 }
                             }
                         }
-                    } else {
-                        // player is moving into the air
-                        move.y -= 2.f * this->accel;
                     }
-
                     if (gridMarch(origin, moveZ, terrain, &zDist, &blockHit)) {
                         BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
                         if (type == WATER || type == LAVA) {

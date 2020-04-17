@@ -13,7 +13,7 @@ private:
     // player acceleration added for use across machines
     float accel;
 
-    void processInputs(InputBundle &inputs, float dT);
+    void processInputs(InputBundle &inputs);
     void computePhysics(float dT, const Terrain &terrain);
 public:
     // Readonly public reference to our camera
