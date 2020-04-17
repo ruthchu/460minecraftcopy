@@ -35,6 +35,7 @@ void Chunk::setBlockAt(unsigned int x, unsigned int y, unsigned int z, BlockType
 void Chunk::create()
 {
     this->idx.clear();
+    this->data.clear();
 //    std::vector<GLuint> idx;
 //    std::vector<glm::vec4> data;
     int indexCount = 0;
@@ -296,6 +297,9 @@ void Chunk::bufferToDrawableVBOs()
     mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
     // Buffer data to GPU
     mp_context->glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec4), this->data.data(), GL_STATIC_DRAW);
+
+    idx.clear();
+    data.clear();
 }
 
 bool Chunk::hasXPOSneighbor() { return m_neighbors.at(XPOS) != nullptr; }

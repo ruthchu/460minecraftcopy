@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-
 Lsystem::Lsystem(Terrain &terrain, glm::ivec2 position)
     : currentTurtle(Turtle(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.f, 0.f)),
       tStack(std::stack<Turtle>()), grammarMap(QHash<QChar, QString>()),
@@ -18,9 +17,12 @@ Lsystem::Lsystem(Terrain &terrain, glm::ivec2 position)
 void Lsystem::setRiverStart()
 {
     srand((unsigned) time(0));
-    int result = rand() % 4;
+    //int result = rand() % 4;
+    int result = 0;
     float riverY = 130.f;
     float offset = 2.f;
+    //float result = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
+
     glm::vec2 LLcorner = this->terrain.getTerrainAt(inputPosition[0], inputPosition[1]);
     // Randomly select a corner of the terrain zone
     if (result == 0) {
@@ -48,8 +50,7 @@ void Lsystem::setRiverStart()
 void Lsystem::makeRivers()
 {
     // randomly decide whether or not create river with 0.6 chance
-    srand((unsigned) time(0));
-    float result = rand() / RAND_MAX;
+    float result = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
     if (result < 0.33) {
         return;
     }
@@ -92,7 +93,7 @@ void Lsystem::makeRivers()
     }
 
     QString q = strMaker(iter, "FX");
-    std::cout << q.toUtf8().constData() << std::endl;
+    //std::cout << q.toUtf8().constData() << std::endl;
     lsystemParser(q);
 }
 

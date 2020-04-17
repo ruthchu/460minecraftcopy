@@ -149,9 +149,11 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
         for(int z = minZ; z <= maxZ; z += BLOCK_LENGTH_IN_CHUNK) {
             if (hasChunkAt(x, z)) {
                 const uPtr<Chunk> &chunk = getChunkAt(x, z);
+                if(chunk->m_count != -1) {
 //                chunk->create();
-                shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
-                shaderProgram->draw(*chunk);
+                    shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
+                    shaderProgram->draw(*chunk);
+                }
             }
             //            else {
             //                START_PRINT "No chunk at (" << x << ", " << z << ")" END_PRINT;
@@ -339,15 +341,19 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
 
 
     // generate VBOs for each chunk with data
+    chunksWithData.mu.lock();
     for (Chunk* c : chunksWithData.getVectorData()) {
         std::thread t(fillVBO, std::ref(*c), std::ref(this->chunksWithVBO));
         t.detach();
     }
+    chunksWithData.mu.unlock();
 
     // push chunk VBOs to GPU
+    chunksWithVBO.mu.lock();
     for (Chunk* c : chunksWithVBO.getVectorData()) {
         c->bufferToDrawableVBOs();
     }
+    chunksWithVBO.mu.unlock();
 
     chunksWithData.clearChunkData();
     chunksWithVBO.clearChunkData();

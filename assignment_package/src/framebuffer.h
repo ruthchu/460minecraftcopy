@@ -33,8 +33,10 @@ public:
     void create();
     // Deallocate all GPU-side data
     void destroy();
+    // calls gl bind frame texture
     void bindFrameBuffer();
     // Associate our output texture with the indicated texture slot
+
     void bindToTextureSlot(unsigned int slot);
     unsigned int getTextureSlot() const;
 };

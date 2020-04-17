@@ -11,12 +11,16 @@ SharedVBODataCollection::SharedVBODataCollection(const SharedVBODataCollection &
 {}
 
 void SharedVBODataCollection::addChunk(Chunk* data) {
-    std::lock_guard<std::mutex> lock(this->mu);
+    //std::lock_guard<std::mutex> lock(this->mu);
+    mu.lock();
     this->VBOchunks.push_back(data);
+    mu.unlock();
 }
 
 void SharedVBODataCollection::clearChunkData() {
+    mu.lock();
     this->VBOchunks.clear();
+    mu.unlock();
 }
 
 bool SharedVBODataCollection::isEmpty() {

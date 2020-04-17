@@ -50,4 +50,6 @@ public:
     bool bindNor();
     bool bindCol();
     bool bindAll();
+
+    friend class Terrain;
 };
