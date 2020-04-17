@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <math.h>
 #include <algorithm>
+#include "noise.h"
 
 Lsystem::Lsystem(Terrain &terrain)
     : currentTurtle(Turtle(glm::vec3(0, 135.f, 0), glm::vec3(1, 0, 1), 10.0f, 12.f)),
@@ -94,8 +95,8 @@ void Lsystem::popState()
 
 void Lsystem::rotateRight()
 {
-    // TODO -- use a noise function for random rotation
-    float angle = -10.f;
+    float b = Noise::random1(glm::vec2(currentTurtle.pos.x, currentTurtle.pos.z));
+    float angle = -15.f + (b * -10.f);
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec4 newOrient = rotation * glm::vec4(this->currentTurtle.orient, 1.f);
     this->currentTurtle.orient = glm::vec3(newOrient.x, newOrient.y, newOrient.z);
@@ -103,8 +104,8 @@ void Lsystem::rotateRight()
 
 void Lsystem::rotateLeft()
 {
-    // TODO -- use a noise function for random rotation
-    float angle = 10.f;
+    float b = Noise::random1(glm::vec2(currentTurtle.pos.x, currentTurtle.pos.z));
+    float angle = 15.f + (b * 10.f);
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec4 newOrient = rotation * glm::vec4(this->currentTurtle.orient, 1.f);
     this->currentTurtle.orient = glm::vec3(newOrient.x, newOrient.y, newOrient.z);
@@ -165,7 +166,9 @@ void Lsystem::fRule()
     }
 
     // update current turtle
-    // TODO -- randomize length
+    float noise = Noise::perlinNoise(glm::vec2(this->currentTurtle.pos.x, this->currentTurtle.pos.z));
+    float lengthAmp = glm::floor(noise * 2) * 2 * noise;
+    this->currentTurtle.length =  lengthAmp * currentTurtle.length + currentTurtle.length;
     this->currentTurtle = Turtle(b, this->currentTurtle.orient, this->currentTurtle.length, this->currentTurtle.depth);
 }
 
