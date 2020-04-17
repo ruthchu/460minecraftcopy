@@ -32,6 +32,7 @@ private:
 
     QTimer m_timer; // Timer linked to tick(). Fires approximately 60 times per second.
     double m_currTime; // Current time used to compute dT for player movement
+    int m_timeSinceStart; // Time passed to UVs to warp LAVA and WATER UV coords
 
     void moveMouseToCenter(); // Forces the mouse position to the screen's center. You should call this
                               // from within a mouse move event after reading the mouse movement so that

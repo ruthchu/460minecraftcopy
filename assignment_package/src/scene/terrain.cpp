@@ -266,12 +266,6 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
         t.detach();
     }
 
-    // push chunk VBOs to GPU
-    for (Chunk* c : chunksWithVBO.getVectorData()) {
-        c->bufferToDrawableVBOs();
-        c->bufferTransparentDrawableVBOs();
-    }
-
     chunksWithData.clearChunkData();
     chunksWithVBO.clearChunkData();
 }

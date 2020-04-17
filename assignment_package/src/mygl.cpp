@@ -11,7 +11,7 @@ MyGL::MyGL(QWidget *parent)
       m_worldAxes(this),
       m_progLambert(this), m_progFlat(this), m_texture(this),
       m_terrain(this), m_player(glm::vec3(48.f, 170.f, 48.f), m_terrain),
-      m_currTime(QDateTime::currentMSecsSinceEpoch())
+      m_currTime(QDateTime::currentMSecsSinceEpoch()), m_timeSinceStart(0)
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -106,10 +106,14 @@ void MyGL::resizeGL(int w, int h) {
 // all per-frame actions here, such as performing physics updates on all
 // entities in the scene.
 void MyGL::tick() {
-    // check if new terrain zone chunks need to be created and populated
+    // Calculate dT and pass relevant time values to tick and shader
     float dT = (QDateTime::currentMSecsSinceEpoch() - m_currTime) / 1000.f;
+    m_progLambert.setTime(m_timeSinceStart);
     m_player.tick(dT, m_inputs);
+
+    // Update time values
     m_currTime = QDateTime::currentMSecsSinceEpoch();
+    m_timeSinceStart++;
 
     m_terrain.expandTerrainBasedOnPlayer(m_player.mcr_position);
     update(); // Calls paintGL() as part of a larger QOpenGLWidget pipeline

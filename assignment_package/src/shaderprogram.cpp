@@ -69,6 +69,9 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
     unifModelInvTr = context->glGetUniformLocation(prog, "u_ModelInvTr");
     unifViewProj   = context->glGetUniformLocation(prog, "u_ViewProj");
     unifColor      = context->glGetUniformLocation(prog, "u_Color");
+
+    unifSampler2D  = context->glGetUniformLocation(prog, "u_Texture");
+    unifTime       = context->glGetUniformLocation(prog, "u_Time");
 }
 
 void ShaderProgram::useMe()

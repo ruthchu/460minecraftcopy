@@ -13,7 +13,7 @@
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
 uniform sampler2D u_Texture; // The texture to be read from by this shader
-uniform int u_Time;
+uniform int u_Time; // A time value that changes once every tick
 
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
@@ -73,7 +73,15 @@ vec3 fbm(vec3 p) {
 void main()
 {
     // Material base color (before shading)
-        vec4 diffuseColor = texture(u_Texture, vec2(fs_UV.x, fs_UV.y));
+        vec4 diffuseColor;
+        if (fs_UV.x >= 13.0 / 16.0) {
+            // If this block has UV coords that fall in the range of LAVA or WATER
+            // offset the UVs as a function of time
+            diffuseColor = texture(u_Texture, vec2(fs_UV.x + mod(u_Time / 1000.0, 2.0 / 16.0), fs_UV.y));
+        } else {
+            // Draw with static UV coords
+            diffuseColor = texture(u_Texture, vec2(fs_UV.x, fs_UV.y));
+        }
 
         // Calculate the diffuse term for Lambert shading
         float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
