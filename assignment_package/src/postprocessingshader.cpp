@@ -64,9 +64,9 @@ void PostProcessingShader::create(const char *vertfile, const char *fragfile)
     attrPos = context->glGetAttribLocation(prog, "vs_Pos");
     attrUV  = context->glGetAttribLocation(prog, "vs_UV");
 
-//    unifTime = context->glGetUniformLocation(prog, "u_Time");
+    unifTime = context->glGetUniformLocation(prog, "u_Time");
     unifSampler2D = context->glGetUniformLocation(prog, "u_sampler1");
-//    unifDimensions = context->glGetUniformLocation(prog, "u_Dimensions");
+    unifDimensions = context->glGetUniformLocation(prog, "u_Dimensions");
 }
 
 void PostProcessingShader::draw(Drawable &d, int textureSlot)

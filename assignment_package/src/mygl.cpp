@@ -111,10 +111,13 @@ void MyGL::resizeGL(int w, int h) {
     m_progLambert.setViewProjMatrix(viewproj);
     m_progFlat.setViewProjMatrix(viewproj);
 
-    printGLErrorLog();
+    m_progNoOp.setDimensions(glm::ivec2(w, h));
+    m_progTint.setDimensions(glm::ivec2(w, h));
 
     // resize frame buffer
     framebuffer.resize(w, h, this->devicePixelRatio());
+
+    printGLErrorLog();
 }
 
 
@@ -126,6 +129,7 @@ void MyGL::tick() {
     // Calculate dT and pass relevant time values to tick and shader
     float dT = (QDateTime::currentMSecsSinceEpoch() - m_currTime) / 1000.f;
     m_progLambert.setTime(m_timeSinceStart);
+
     m_player.tick(dT, m_inputs);
 
     // Update time values
@@ -213,8 +217,13 @@ void MyGL::performTerrainPostprocessRenderPass()
 }
 
 bool MyGL::playerIsInWater() {
-    return false;
-//    return m_terrain.getBlockAt(m_player.mcr_position.x, m_player.mcr_position.y, m_player.mcr_position.z) == WATER;
+    if (m_terrain.hasChunkAt(m_player.mcr_camera.mcr_position.x, m_player.mcr_camera.mcr_position.z)) {
+        return m_terrain.getBlockAt(m_player.mcr_camera.mcr_position.x,
+                                    m_player.mcr_camera.mcr_position.y,
+                                    m_player.mcr_camera.mcr_position.z) == WATER;
+    } else {
+        return false;
+    }
 }
 
 void MyGL::keyPressEvent(QKeyEvent *e) {
