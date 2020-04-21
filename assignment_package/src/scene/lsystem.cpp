@@ -44,7 +44,7 @@ void Lsystem::setRiverStart()
     // set segement length
     currentTurtle.length = 10.0f;
     // set diameter of river
-    currentTurtle.depth = 4.f;
+    currentTurtle.depth = 8.f;
 }
 
 void Lsystem::makeRivers()
@@ -54,7 +54,7 @@ void Lsystem::makeRivers()
 //    if (result < 0.33) {
 //        return;
 //    }
-    return;
+//    return;
 
     setRiverStart();
 
@@ -86,14 +86,14 @@ void Lsystem::makeRivers()
     float prob = rand() / RAND_MAX;
     float iter = 0;
 //    if (prob < 0.2) {
-        iter = 1;
+//        iter = 1;
 //    } else if (prob < 0.70) {
-//        iter = 2;
+        iter = 2;
 //    } else {
 //        iter = 3;
 //    }
 
-    QString q = strMaker(2, "FX");
+    QString q = strMaker(iter, "FX");
     //std::cout << q.toUtf8().constData() << std::endl;
     lsystemParser(q);
 }

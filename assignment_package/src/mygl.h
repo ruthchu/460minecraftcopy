@@ -8,6 +8,9 @@
 #include "scene/terrain.h"
 #include "scene/player.h"
 #include "texture.h"
+#include "framebuffer.h"
+#include "postprocessingshader.h"
+#include "scene/quad.h"
 
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
@@ -31,8 +34,15 @@ private:
     InputBundle m_inputs; // A collection of variables to be updated in keyPressEvent, mouseMoveEvent, mousePressEvent, etc.
 
     QTimer m_timer; // Timer linked to tick(). Fires approximately 60 times per second.
+
     double m_currTime; // Current time used to compute dT for player movement
     int m_timeSinceStart; // Time passed to UVs to warp LAVA and WATER UV coords
+
+    FrameBuffer framebuffer; // Frame buffer for post processing
+    PostProcessingShader m_progTint; // A post processing shader program that handels water and lava tinting
+    PostProcessingShader m_progNoOp; // A post processing shader program that handels water and lava tinting
+
+    Quad quad;
 
     void moveMouseToCenter(); // Forces the mouse position to the screen's center. You should call this
                               // from within a mouse move event after reading the mouse movement so that
@@ -40,6 +50,9 @@ private:
 
     void sendPlayerDataToGUI() const;
 
+    void performTerrainPostprocessRenderPass();
+
+    bool playerIsInWater();
 
 public:
     explicit MyGL(QWidget *parent = nullptr);
@@ -59,6 +72,7 @@ public:
     // Called from paintGL().
     // Calls Terrain::draw().
     void renderTerrain();
+
 
 protected:
     // Automatically invoked when the user

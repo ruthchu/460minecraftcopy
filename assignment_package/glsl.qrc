@@ -4,5 +4,8 @@
         <file>glsl/lambert.vert.glsl</file>
         <file>glsl/flat.frag.glsl</file>
         <file>glsl/flat.vert.glsl</file>
+        <file>glsl/noOp.frag.glsl</file>
+        <file>glsl/screentint.frag.glsl</file>
+        <file>glsl/passthrough.vert.glsl</file>
     </qresource>
 </RCC>

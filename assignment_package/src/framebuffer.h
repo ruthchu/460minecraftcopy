@@ -15,16 +15,16 @@
 class FrameBuffer {
 private:
     OpenGLContext *mp_context;
-    GLuint m_frameBuffer;
-    GLuint m_outputTexture;
-    GLuint m_depthRenderBuffer;
-
     unsigned int m_width, m_height, m_devicePixelRatio;
     bool m_created;
 
     unsigned int m_textureSlot;
 
 public:
+    GLuint m_frameBuffer;
+    GLuint m_outputTexture;
+    GLuint m_depthRenderBuffer;
+
     FrameBuffer(OpenGLContext *context, unsigned int width, unsigned int height, unsigned int devicePixelRatio);
     // Make sure to call resize from MyGL::resizeGL to keep your frame buffer up to date with
     // your screen dimensions
@@ -39,4 +39,5 @@ public:
 
     void bindToTextureSlot(unsigned int slot);
     unsigned int getTextureSlot() const;
+
 };

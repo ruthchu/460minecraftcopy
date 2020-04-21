@@ -11,6 +11,7 @@
 #include "lsystem.h"
 #include "BlockTypeData.h"
 #include "VBOWorkerData.h"
+#include "postprocessingshader.h"
 #define TERRAIN_RADIUS 2
 #define CHUNK_LENGTH_IN_TERRAIN 4
 #define BLOCK_LENGTH_IN_CHUNK 16

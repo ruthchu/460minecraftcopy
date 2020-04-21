@@ -500,7 +500,8 @@ void Chunk::bufferToDrawableVBOs()
     // Generate index buffer
     generateIdx();
     // Bind index buffer
-    mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufIdx);
+    bindIdx();
+//    mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufIdx);
     // Buffer index data
     mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof (GLuint), this->idx.data(), GL_STATIC_DRAW);
     // Generate data buffer
@@ -518,7 +519,8 @@ void Chunk::bufferTransparentDrawableVBOs()
     // Generate index buffer
     generateIdx();
     // Bind index buffer
-    mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufIdx);
+    bindIdx();
+//    mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufIdx);
     // Buffer index data
     mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof (GLuint), this->tIdx.data(), GL_STATIC_DRAW);
     // Generate data buffer

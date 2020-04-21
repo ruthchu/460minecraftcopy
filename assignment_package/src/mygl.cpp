@@ -11,7 +11,9 @@ MyGL::MyGL(QWidget *parent)
       m_worldAxes(this),
       m_progLambert(this), m_progFlat(this), m_texture(this),
       m_terrain(this), m_player(glm::vec3(48.f, 170.f, 48.f), m_terrain),
-      m_currTime(QDateTime::currentMSecsSinceEpoch()), m_timeSinceStart(0)
+      m_currTime(QDateTime::currentMSecsSinceEpoch()), m_timeSinceStart(0),
+      framebuffer(FrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
+      m_progTint(this), m_progNoOp(this), quad(Quad(this))
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -26,6 +28,7 @@ MyGL::MyGL(QWidget *parent)
 MyGL::~MyGL() {
     makeCurrent();
     glDeleteVertexArrays(1, &vao);
+    framebuffer.destroy();
 }
 
 
@@ -58,6 +61,9 @@ void MyGL::initializeGL()
     // Create a Vertex Attribute Object
     glGenVertexArrays(1, &vao);
 
+    // Create render buffers
+    framebuffer.create();
+
     //Create the instance of the world axes
     m_worldAxes.create();
 
@@ -65,6 +71,11 @@ void MyGL::initializeGL()
     m_progLambert.create(":/glsl/lambert.vert.glsl", ":/glsl/lambert.frag.glsl");
     // Create and set up the flat lighting shader
     m_progFlat.create(":/glsl/flat.vert.glsl", ":/glsl/flat.frag.glsl");
+
+    // Create post processing shader for tinting in water
+    m_progTint.create(":/glsl/passthrough.vert.glsl", ":/glsl/screentint.frag.glsl");
+    // Create post processing shader for no operation
+    m_progNoOp.create(":/glsl/passthrough.vert.glsl", ":/glsl/noOp.frag.glsl");
 
     // Set a color with which to draw geometry.
     // This will ultimately not be used when you change
@@ -84,6 +95,9 @@ void MyGL::initializeGL()
     moveMouseToCenter();
     m_inputs.prevMouseX = width() / 2;
     m_inputs.prevMouseY = height() / 2;
+
+    // create quad for post processing
+    quad.create();
 }
 
 void MyGL::resizeGL(int w, int h) {
@@ -98,6 +112,9 @@ void MyGL::resizeGL(int w, int h) {
     m_progFlat.setViewProjMatrix(viewproj);
 
     printGLErrorLog();
+
+    // resize frame buffer
+    framebuffer.resize(w, h, this->devicePixelRatio());
 }
 
 
@@ -116,6 +133,7 @@ void MyGL::tick() {
     m_timeSinceStart++;
 
     m_terrain.expandTerrainBasedOnPlayer(m_player.mcr_position);
+
     update(); // Calls paintGL() as part of a larger QOpenGLWidget pipeline
     sendPlayerDataToGUI(); // Updates the info in the secondary window displaying player data
 }
@@ -136,13 +154,12 @@ void MyGL::sendPlayerDataToGUI() const {
 // MyGL's constructor links update() to a timer that fires 60 times per second,
 // so paintGL() called at a rate of 60 frames per second.
 void MyGL::paintGL() {
-    // Clear the screen so that we only see newly drawn images
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
     m_progLambert.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 
     renderTerrain();
+    performTerrainPostprocessRenderPass();
 
     glDisable(GL_DEPTH_TEST);
     m_progFlat.setModelMatrix(glm::mat4());
@@ -155,6 +172,13 @@ void MyGL::paintGL() {
 // terrain that surround the player (refer to Terrain::m_generatedTerrain
 // for more info)
 void MyGL::renderTerrain() {
+    // Render to our framebuffer rather than the viewport
+    framebuffer.bindFrameBuffer();
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    glViewport(0,0,this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
+    // Clear the screen so that we only see newly drawn images
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     int renderRadius = 1;
     glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
     glm::ivec2 centerTerrain = m_terrain.getTerrainAt(pPos[0], pPos[1]);
@@ -169,6 +193,29 @@ void MyGL::renderTerrain() {
     m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
 }
 
+void MyGL::performTerrainPostprocessRenderPass()
+{
+    // Render to our framebuffer rather than the viewport
+    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    glViewport(0,0,this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
+    // Clear the screen so that we only see newly drawn images
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // bind the texture to slot number 1
+    framebuffer.bindToTextureSlot(1);
+
+    quad.bufferVBOdata();
+    if (playerIsInWater()) {
+        m_progTint.draw(quad, 1);
+    } else {
+        m_progNoOp.draw(quad, 1);
+    }
+}
+
+bool MyGL::playerIsInWater() {
+    return false;
+//    return m_terrain.getBlockAt(m_player.mcr_position.x, m_player.mcr_position.y, m_player.mcr_position.z) == WATER;
+}
 
 void MyGL::keyPressEvent(QKeyEvent *e) {
     // http://doc.qt.io/qt-5/qt.html#Key-enum

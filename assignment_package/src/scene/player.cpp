@@ -89,9 +89,9 @@ void Player::processInputs(InputBundle &inputs, float dT) {
 void Player::computePhysics(float dT, const Terrain &terrain) {
     // Update the Player's position based on its acceleration
     // and velocity, and also perform collision detection.
-//    m_velocity = m_velocity * .5f + dT * m_acceleration;
-    m_velocity = m_velocity * 0.9f;
-    m_velocity += dT * m_acceleration;
+    m_velocity = m_velocity * .5f + dT * m_acceleration;
+//    m_velocity = m_velocity * 0.9f;
+//    m_velocity += dT * m_acceleration;
     glm::vec3 move = m_velocity * dT;
     if (!m_flightOn) {
         float xDist;
