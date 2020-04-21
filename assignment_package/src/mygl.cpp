@@ -193,7 +193,7 @@ void MyGL::keyPressEvent(QKeyEvent *e) {
     } else if (e->key() == Qt::Key_E) {
         m_inputs.ePressed = true;
     } else if (e->key() == Qt::Key_Space) {
-        m_inputs.spacePressed = true;
+        m_player.m_spacePressed = true;
     }
 }
 
@@ -211,7 +211,7 @@ void MyGL::keyReleaseEvent(QKeyEvent *e) {
     } else if (e->key() == Qt::Key_E) {
         m_inputs.ePressed = false;
     } else if (e->key() == Qt::Key_Space) {
-        m_inputs.spacePressed = false;
+        m_player.m_spacePressed = false;
     }
 }
 

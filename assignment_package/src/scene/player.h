@@ -20,6 +20,7 @@ public:
     // for easy access from MyGL
     const Camera& mcr_camera;
     bool m_flightOn; // Boolean to toggle flight mode
+    bool m_spacePressed; // Boolean to track spacebar press
 
     Player(glm::vec3 pos, const Terrain &terrain);
     virtual ~Player() override;
