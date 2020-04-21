@@ -5,7 +5,7 @@
 Player::Player(glm::vec3 pos, const Terrain &terrain)
     : Entity(pos), m_velocity(0,0,0), m_acceleration(0,0,0),
       m_camera(pos + glm::vec3(0, 1.5f, 0)), mcr_terrain(terrain), m_phi(0.f),
-      mcr_camera(m_camera), m_flightOn(true), accel(0.f)
+      accel(0.f), mcr_camera(m_camera), m_flightOn(true)
 {}
 
 Player::~Player()
@@ -133,11 +133,7 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                                 }
                             }
                         }
-                    } else {
-                        // player is moving into the air
-                        move.y -= 2.f * this->accel;
                     }
-
                     if (gridMarch(origin, moveZ, terrain, &zDist, &blockHit)) {
                         BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
                         if (type == WATER || type == LAVA) {
