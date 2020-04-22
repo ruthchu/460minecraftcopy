@@ -6,11 +6,12 @@ SOURCES += \
     $$PWD/main.cpp \
     $$PWD/mainwindow.cpp \
     $$PWD/mygl.cpp \
-    $$PWD/postprocessshader.cpp \
+    $$PWD/postprocessingshader.cpp \
     $$PWD/scene/BlockTypeData.cpp \
     $$PWD/scene/VBOWorkerData.cpp \
     $$PWD/scene/lsystem.cpp \
     $$PWD/scene/noise.cpp \
+    $$PWD/scene/quad.cpp \
     $$PWD/shaderprogram.cpp \
     $$PWD/drawable.cpp \
     $$PWD/cameracontrolshelp.cpp \
@@ -30,11 +31,12 @@ HEADERS += \
     $$PWD/framebuffer.h \
     $$PWD/mainwindow.h \
     $$PWD/mygl.h \
-    $$PWD/postprocessshader.h \
+    $$PWD/postprocessingshader.h \
     $$PWD/scene/BlockTypeData.h \
     $$PWD/scene/VBOWorkerData.h \
     $$PWD/scene/lsystem.h \
     $$PWD/scene/noise.h \
+    $$PWD/scene/quad.h \
     $$PWD/shaderprogram.h \
     $$PWD/drawable.h \
     $$PWD/cameracontrolshelp.h \

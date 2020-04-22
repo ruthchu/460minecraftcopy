@@ -13,13 +13,14 @@ private:
     // player acceleration added for use across machines
     float accel;
 
-    void processInputs(InputBundle &inputs);
+    void processInputs(InputBundle &inputs, float dT);
     void computePhysics(float dT, const Terrain &terrain);
 public:
     // Readonly public reference to our camera
     // for easy access from MyGL
     const Camera& mcr_camera;
     bool m_flightOn; // Boolean to toggle flight mode
+    bool m_spacePressed; // Boolean to track spacebar press
 
     Player(glm::vec3 pos, const Terrain &terrain);
     virtual ~Player() override;

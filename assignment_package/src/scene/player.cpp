@@ -5,23 +5,25 @@
 Player::Player(glm::vec3 pos, const Terrain &terrain)
     : Entity(pos), m_velocity(0,0,0), m_acceleration(0,0,0),
       m_camera(pos + glm::vec3(0, 1.5f, 0)), mcr_terrain(terrain), m_phi(0.f),
-      mcr_camera(m_camera), m_flightOn(true), accel(10.f)
+      accel(0.f), mcr_camera(m_camera), m_flightOn(true), m_spacePressed(false)
 {}
 
 Player::~Player()
 {}
 
 void Player::tick(float dT, InputBundle &input) {
-    processInputs(input);
+    this->accel = 1.7f / dT;
+    processInputs(input, dT);
     computePhysics(dT, mcr_terrain);
 }
 
-void Player::processInputs(InputBundle &inputs) {
+void Player::processInputs(InputBundle &inputs, float dT) {
     // Rotate the local axis' based on mouse input
-    rotateOnUpGlobal(inputs.mouseX / 5.f);
+    float mod = 0.2f / dT;
+    rotateOnUpGlobal(inputs.mouseX / 40.f * mod);
     if (m_phi < 90.f && m_phi > -90.f) {
         rotateOnRightLocal
-            (glm::clamp(inputs.mouseY / 5.f, -89.99f - m_phi, 89.99f - m_phi));
+            (glm::clamp(inputs.mouseY / 40.f * mod, -89.99f - m_phi, 89.99f - m_phi));
     }
     m_phi = glm::clamp(m_phi + inputs.mouseY, -89.99f, 89.99f);
     inputs.mouseX = 0.f;
@@ -55,6 +57,7 @@ void Player::processInputs(InputBundle &inputs) {
         }
     } else if (!m_flightOn) {
         m_acceleration.y = -accel * 2.f;
+//        m_acceleration.y -= .5;
         // Movement in non-flight mode
         glm::vec3 flatForward =
                 glm::normalize(glm::vec3(m_forward.x, 0.f, m_forward.z));
@@ -76,9 +79,6 @@ void Player::processInputs(InputBundle &inputs) {
             // Accelerate positively along projected right vector
             m_acceleration += accel * flatRight;
         }
-        if (inputs.spacePressed == true) {
-            m_velocity.y += 2.f * accel;
-        }
     }
 }
 
@@ -86,6 +86,8 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
     // Update the Player's position based on its acceleration
     // and velocity, and also perform collision detection.
     m_velocity = m_velocity * .5f + dT * m_acceleration;
+//    m_velocity = m_velocity * 0.9f;
+//    m_velocity += dT * m_acceleration;
     glm::vec3 move = m_velocity * dT;
     if (!m_flightOn) {
         float xDist;
@@ -103,6 +105,7 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                 for (float z = -.5f; z <= .5f; z += 1.f) {
                     glm::vec3 origin = {m_position.x + x, m_position.y + y,
                                         m_position.z + z};
+                    // Checks collisions on the x-component of the move vector
                     if (gridMarch(origin, moveX, terrain, &xDist, &blockHit)) {
                         BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
                         if (type == WATER || type == LAVA) {
@@ -117,10 +120,14 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                             }
                         }
                     }
-                    if (gridMarch(origin, moveY, terrain, &yDist, &blockHit)) {
+                    // Checks collisions on the y-component of the move vector
+                    if (move.y < 0 && gridMarch(origin, moveY, terrain, &yDist, &blockHit)) {
                         BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
                         if (type == WATER || type == LAVA) {
                             move.y = move.y * 0.66;
+                            if (m_spacePressed) {
+                                move.y = -move.y;
+                            }
                         } else {
                             if (yDist < std::abs(move.y)) {
                                 if (move.y < 0.f) {
@@ -131,6 +138,7 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                             }
                         }
                     }
+                    // Checks collisions on the z-component of the move vector
                     if (gridMarch(origin, moveZ, terrain, &zDist, &blockHit)) {
                         BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
                         if (type == WATER || type == LAVA) {
