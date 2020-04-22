@@ -72,6 +72,8 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
 
     unifSampler2D  = context->glGetUniformLocation(prog, "u_Texture");
     unifTime       = context->glGetUniformLocation(prog, "u_Time");
+
+    uniEnviorment   = context->glGetUniformLocation(prog, "u_enviorment");
 }
 
 void ShaderProgram::useMe()
@@ -125,6 +127,11 @@ void ShaderProgram::setViewProjMatrix(const glm::mat4 &vp)
                     // Pointer to the first element of the matrix
                        &vp[0][0]);
     }
+}
+
+void ShaderProgram::setEnviorment(int i) {
+    useMe();
+    context->glUniform1i(uniEnviorment, i);
 }
 
 void ShaderProgram::setGeometryColor(glm::vec4 color)
