@@ -12,14 +12,14 @@ Player::~Player()
 {}
 
 void Player::tick(float dT, InputBundle &input) {
-    this->accel = 3.f / dT;
+    this->accel = 1.7f / dT;
     processInputs(input, dT);
     computePhysics(dT, mcr_terrain);
 }
 
 void Player::processInputs(InputBundle &inputs, float dT) {
     // Rotate the local axis' based on mouse input
-    float mod = 1.f / dT;
+    float mod = 0.2f / dT;
     rotateOnUpGlobal(inputs.mouseX / 40.f * mod);
     if (m_phi < 90.f && m_phi > -90.f) {
         rotateOnRightLocal
@@ -57,6 +57,7 @@ void Player::processInputs(InputBundle &inputs, float dT) {
         }
     } else if (!m_flightOn) {
         m_acceleration.y = -accel * 2.f;
+//        m_acceleration.y -= .5;
         // Movement in non-flight mode
         glm::vec3 flatForward =
                 glm::normalize(glm::vec3(m_forward.x, 0.f, m_forward.z));
@@ -85,6 +86,8 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
     // Update the Player's position based on its acceleration
     // and velocity, and also perform collision detection.
     m_velocity = m_velocity * .5f + dT * m_acceleration;
+//    m_velocity = m_velocity * 0.9f;
+//    m_velocity += dT * m_acceleration;
     glm::vec3 move = m_velocity * dT;
     if (!m_flightOn) {
         float xDist;

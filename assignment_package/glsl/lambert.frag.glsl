@@ -15,6 +15,8 @@ uniform vec4 u_Color; // The color with which to render this instance of geometr
 uniform sampler2D u_Texture; // The texture to be read from by this shader
 uniform int u_Time; // A time value that changes once every tick
 
+uniform int u_enviorment;
+
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
 in vec4 fs_Pos;
@@ -95,5 +97,13 @@ void main()
                                                             //lit by our point light are not completely black.
 
         // Compute final shaded color
-        out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
+        vec4 finCol = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
+
+        // Check enviroment
+       if (u_enviorment == 1) {
+           finCol.g = clamp(finCol.g * 1.5f, 0.f, 1.f);
+           finCol.b = clamp(finCol.b * 2.2f, 0.7f, 1.f);
+       }
+
+       out_Col = finCol;
 }
