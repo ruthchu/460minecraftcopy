@@ -213,7 +213,7 @@ void Terrain::createMoreTerrainAt(int xPos, int zPos)
 
 int Terrain::heightGrassland(int x, int z) {
     int baseHeight = 128;
-    int heightRange = baseHeight / 8;
+    int heightRange = 10;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
     float filterIdx = 0.50f;
@@ -226,7 +226,7 @@ int Terrain::heightGrassland(int x, int z) {
 
 int Terrain::heightMountain(int x, int z) {
     int baseHeight = 140;
-    int heightRange = 255 - baseHeight;
+    int heightRange = 20;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
     float freq = 2.5f;
