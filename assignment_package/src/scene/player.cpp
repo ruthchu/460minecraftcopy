@@ -23,7 +23,7 @@ void Player::processInputs(InputBundle &inputs, float dT) {
     rotateOnUpGlobal(inputs.mouseX / 40.f * mod);
     if (m_phi < 90.f && m_phi > -90.f) {
         rotateOnRightLocal
-            (glm::clamp(inputs.mouseY / 40.f * mod, -(-89.99f - m_phi), 89.99f - m_phi));
+            (glm::clamp(inputs.mouseY / 40.f * mod, -89.99f - m_phi, 89.99f - m_phi));
     }
     m_phi = glm::clamp(m_phi + inputs.mouseY, -89.99f, 89.99f);
     inputs.mouseX = 0.f;
