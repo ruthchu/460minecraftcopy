@@ -52,7 +52,7 @@ private:
 
     void performTerrainPostprocessRenderPass();
 
-    bool playerIsInWater();
+    int playerIsInLiquid();
 
 public:
     explicit MyGL(QWidget *parent = nullptr);

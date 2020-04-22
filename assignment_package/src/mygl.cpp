@@ -195,11 +195,7 @@ void MyGL::renderTerrain() {
     int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius - BLOCK_LENGTH_IN_TERRAIN;//16 * (zFloor - range);
     int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius /*+ BLOCK_LENGTH_IN_TERRAIN*/;//16 * (zFloor + range);
 
-    if (playerIsInWater()) {
-        m_progLambert.setEnviorment(1);
-    } else {
-        m_progLambert.setEnviorment(0);
-    }
+    m_progLambert.setEnviorment(playerIsInLiquid());
 
     m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
 }
@@ -223,13 +219,16 @@ void MyGL::performTerrainPostprocessRenderPass()
 //    }
 }
 
-bool MyGL::playerIsInWater() {
+int MyGL::playerIsInLiquid() {
     if (m_terrain.hasChunkAt(m_player.mcr_camera.mcr_position.x, m_player.mcr_camera.mcr_position.z)) {
-        return m_terrain.getBlockAt(m_player.mcr_camera.mcr_position.x,
-                                    m_player.mcr_camera.mcr_position.y,
-                                    m_player.mcr_camera.mcr_position.z) == WATER;
+        BlockType b = m_terrain.getBlockAt(m_player.mcr_camera.mcr_position.x, m_player.mcr_camera.mcr_position.y, m_player.mcr_camera.mcr_position.z);
+        if (b == WATER) {
+            return 1;
+        } else if (b == LAVA) {
+            return 2;
+        }
     } else {
-        return false;
+        return 0;
     }
 }
 
