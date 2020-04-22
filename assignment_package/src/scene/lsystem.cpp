@@ -11,28 +11,27 @@
 Lsystem::Lsystem(Terrain &terrain, glm::ivec2 position)
     : currentTurtle(Turtle(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.f, 0.f)),
       tStack(std::stack<Turtle>()), grammarMap(QHash<QChar, QString>()),
-      ruleMap(QHash<QChar, Rule>()), terrain(terrain), inputPosition(position)
+      ruleMap(QHash<QChar, Rule>()), terrain(terrain), inputPosition(position),
+      riverType(WATER)
 {}
 
 void Lsystem::setRiverStart()
 {
     srand((unsigned) time(0));
-    //int result = rand() % 4;
-    int result = 0;
-    float riverY = 130.f;
+    float riverY = 129.f;
     float offset = 2.f;
-    //float result = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
+    float result = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
 
     glm::vec2 LLcorner = this->terrain.getTerrainAt(inputPosition[0], inputPosition[1]);
     // Randomly select a corner of the terrain zone
-    if (result == 0) {
+    if (result > 0.75f) {
         currentTurtle.pos = glm::vec3(LLcorner.x + offset, riverY, LLcorner.y + offset);
         currentTurtle.orient = glm::vec3(1, 0, 1);
-    } else if (result == 1) {
+    } else if (result > 0.5f) {
         glm::vec2 ULcorner = LLcorner + glm::vec2(0.f, BLOCK_LENGTH_IN_TERRAIN);
         currentTurtle.pos = glm::vec3(ULcorner.x + offset, riverY, ULcorner.y - offset);
         currentTurtle.orient = glm::vec3(1, 0, -1);
-    } else if (result == 2) {
+    } else if (result > 0.25f) {
         glm::vec2 LRcorner = LLcorner + glm::vec2(BLOCK_LENGTH_IN_TERRAIN, 0.f);
         currentTurtle.pos = glm::vec3(LRcorner.x - offset, riverY, LRcorner.y + offset);
         currentTurtle.orient = glm::vec3(-1, 0, 1);
@@ -41,30 +40,48 @@ void Lsystem::setRiverStart()
         currentTurtle.pos = glm::vec3(URcorner.x - offset, riverY, URcorner.y - offset);
         currentTurtle.orient = glm::vec3(-1, 0, 1);
     }
+
     // set segement length
-    currentTurtle.length = 10.0f;
     // set diameter of river
-    currentTurtle.depth = 8.f;
+    int m = ((int) result * 100) % 3;
+    if (m == 0) {
+        currentTurtle.length = 3.f;
+    } else if (m == 1) {
+        currentTurtle.length = 4.f;
+    } else {
+        currentTurtle.length = 5.f;
+    }
+
+    int n = Noise::random1(glm::vec2(inputPosition[0] + 9, inputPosition[1] + 9));
+    if (n == 0) {
+        currentTurtle.depth = 8.f;
+    } else if (n == 1) {
+        currentTurtle.depth = 4.f;
+    } else {
+        currentTurtle.depth = 6.f;
+    }
+}
+
+void Lsystem::makeLava() {
+    riverType = LAVA;
+//    grammarMap[QChar('X')] = QString("A+[+++A-A+X-AAX]--AA++A+AX");
+//    grammarMap[QChar('A')] = QString("A-B");
+//    grammarMap[QChar('B')] = QString("XX");
 }
 
 void Lsystem::makeRivers()
 {
-    // randomly decide whether or not create river with 0.6 chance
-//    float result = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
-//    if (result < 0.33) {
-//        return;
-//    }
-//    return;
-
     setRiverStart();
 
-    grammarMap[QChar('X')] = QString("F+[+++F-F+X-FFX]--FF++F+FX");
-    grammarMap[QChar('F')] = QString("F-B");
-    grammarMap[QChar('B')] = QString("XX");
+    grammarMap[QChar('A')] = QString("AGK");
+    grammarMap[QChar('M')] = QString("B+A[AG]-AG");
+    grammarMap[QChar('B')] = QString("[K+[AGK]G+G+K]-K");
+    grammarMap[QChar('G')] = QString("A+A");
+    grammarMap[QChar('K')] = QString("A-A");
 
     void (Lsystem::*fPtr)(void);
     fPtr = &Lsystem::fRule;
-    ruleMap[QChar('F')] = fPtr;
+    ruleMap[QChar('A')] = fPtr;
 
     void (Lsystem::*popPtr)(void);
     popPtr = &Lsystem::popState;
@@ -82,18 +99,19 @@ void Lsystem::makeRivers()
     rotLeft = &Lsystem::rotateLeft;
     ruleMap[QChar('+')] = rotLeft;
 
-    srand((unsigned) time(0));
-    float prob = rand() / RAND_MAX;
-    float iter = 0;
-//    if (prob < 0.2) {
-//        iter = 1;
-//    } else if (prob < 0.70) {
+    int noise = Noise::random1(glm::vec2(inputPosition[0] + 4, inputPosition[1] + 2));
+    float iter = 3;
+    if (noise < 0.3) {
+        iter = 1;
+    } else if (noise > 0.7) {
         iter = 2;
-//    } else {
-//        iter = 3;
-//    }
+    }
 
-    QString q = strMaker(iter, "FX");
+    if (noise > 0.5) {
+        makeLava();
+    }
+
+    QString q = strMaker(3, "AB+G-K+M");
     //std::cout << q.toUtf8().constData() << std::endl;
     lsystemParser(q);
 }
@@ -110,8 +128,8 @@ void Lsystem::lsystemParser(QString str)
         third = QChar(str[i]);
         if (ruleMap.contains(QChar(str[i]))) {
             currentTurtle.isNewBranch = // pop, rot, F creates new branch
-                    ((first == QChar(']')) && (sec == QChar('+')) && (third == QChar('F'))) ||
-                    ((first == QChar(']')) && (sec == QChar('-')) && (third == QChar('F')));
+                    ((first == QChar(']')) && (sec == QChar('+')) && (third == QChar('A'))) ||
+                    ((first == QChar(']')) && (sec == QChar('-')) && (third == QChar('A')));
             void (Lsystem::*drawingFunction) (void) = this->ruleMap[QChar(str[i])];
             (this->*drawingFunction)();
         }
@@ -153,8 +171,8 @@ void Lsystem::rotateRight()
 {
 
     srand((unsigned) time(0));
-    float ran = (rand() / RAND_MAX) * 2 - 1;
-    float angle = -20.f + (ran * 4);
+    float x = rand() % 5;
+    float angle = -20.f - x;
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec4 newOrient = rotation * glm::vec4(this->currentTurtle.orient, 1.f);
     this->currentTurtle.orient = glm::vec3(newOrient.x, newOrient.y, newOrient.z);
@@ -163,8 +181,8 @@ void Lsystem::rotateRight()
 void Lsystem::rotateLeft()
 {
     srand((unsigned) time(0));
-    float ran = (rand() / RAND_MAX) * 2 - 1;
-    float angle = 20.f + (ran * 4);
+    float x = rand() % 5;
+    float angle = 20.f + x;
     glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::vec4 newOrient = rotation * glm::vec4(this->currentTurtle.orient, 1.f);
     this->currentTurtle.orient = glm::vec3(newOrient.x, newOrient.y, newOrient.z);
@@ -181,9 +199,11 @@ void Lsystem::fRule()
 //    std::cout << " " << std::endl;
 
     if (currentTurtle.isNewBranch) {
-        this->currentTurtle.depth = std::max(this->currentTurtle.depth - 1, 2.f);
+        this->currentTurtle.depth = std::max(this->currentTurtle.depth - 1, 0.f);
         currentTurtle.isNewBranch = false;
     }
+
+    if (this->currentTurtle.depth == 0) {return;}
 
     float capsuelRad = this->currentTurtle.depth;
     float capsuleCenterY = this->currentTurtle.pos.y;
@@ -209,7 +229,7 @@ void Lsystem::fRule()
                 if (sdCapsule(glm::vec3(x, y, z), a, b, capsuelRad) <= 0.f) {
                     // If y <= waterlevel, put water block
                     if (y <= waterLevel) {
-                        this->terrain.setBlockAt(x, y, z, WATER);
+                        this->terrain.setBlockAt(x, y, z, riverType);
                     } else if (y < capsuleCenterY) { // If y > waterlevel but < capsuleCenterY put empty
                         this->terrain.setBlockAt(x, y, z, EMPTY);
                     } else if (y == capsuleCenterY) { // If y == capsuleCenterY, carve out everything on top
@@ -223,9 +243,17 @@ void Lsystem::fRule()
     }
 
     // update current turtle
-//    srand((unsigned) time(0));
-//    float ran = (rand() / RAND_MAX) * 2 - 1;
-//    this->currentTurtle.length = currentTurtle.length + ran * currentTurtle.length;
+    srand((unsigned) time(0));
+    float x = rand() % 4;
+    if (x == 0) {
+        currentTurtle.length = 10.f;
+    } else if (x == 1) {
+        currentTurtle.length = 7.f;
+    } else if (x == 2) {
+        currentTurtle.length = 5.f;
+    } else {
+        currentTurtle.length = 3.f;
+    }
     this->currentTurtle = Turtle(b, this->currentTurtle.orient, this->currentTurtle.length, this->currentTurtle.depth);
 }
 

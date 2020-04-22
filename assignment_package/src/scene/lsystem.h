@@ -20,11 +20,13 @@ private:
     std::stack<Turtle> tStack;
     QHash<QChar, QString> grammarMap;
     QHash<QChar, Rule> ruleMap;
+    BlockType riverType;
     void saveState();
     void popState();
     void rotateRight();
     void rotateLeft();
     void fRule();
+    void makeLava();
     float sdCapsule(glm::vec3 p, glm::vec3 a, glm::vec3 b, float r);
     Terrain &terrain;
     // recursive grammar subsitution method
