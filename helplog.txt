@@ -10,3 +10,7 @@ Use the method void glVertexAttribPointer(GLuint index,
  	GLsizei stride,
  	const void * pointer);
 The stride represents the how the elements are grouped. If we have pos1nor1col1pos2nor1col2 then the stride is 3. The pointer tells us the byte offset from the first element. So nor1 is the byte size of 1 vec4 away from the start. 
+
+4/16/20 12pm est: (Ruth) Discussed with Alex, high level, how to implement texturing. Got help on how to set glTexParameteri.
+
+4/17/20 8pm est: (Ruth) Textures were showing up black, Felicity helped me debug. I had to hardcode the image file path rather than pass it in via a pointer.

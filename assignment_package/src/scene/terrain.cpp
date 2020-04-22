@@ -152,6 +152,14 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
                 shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
                 chunk->bufferToDrawableVBOs();
                 shaderProgram->draw(*chunk);
+            }
+        }
+    }
+    for(int x = minX; x <= maxX; x += BLOCK_LENGTH_IN_CHUNK) {
+        for(int z = minZ; z <= maxZ; z += BLOCK_LENGTH_IN_CHUNK) {
+            if (hasChunkAt(x, z)) {
+                const uPtr<Chunk> &chunk = getChunkAt(x, z);
+                shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
                 chunk->bufferTransparentDrawableVBOs();
                 shaderProgram->draw(*chunk);
             }
