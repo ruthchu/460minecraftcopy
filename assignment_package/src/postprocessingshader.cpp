@@ -73,15 +73,15 @@ void PostProcessingShader::draw(Drawable &d, int textureSlot)
 {
     useMe();
 
-    if(d.elemCount() < 0) {
-        throw std::out_of_range("Attempting to draw a drawable with m_count of " + std::to_string(d.elemCount()) + "!");
+    if(d.elemCountOpaque() < 0) {
+        throw std::out_of_range("Attempting to draw a drawable with m_count of " + std::to_string(d.elemCountOpaque()) + "!");
     }
 
     // Set our "u_sampler1" sampler to user Texture Unit 1
     context->glUniform1i(unifSampler2D, textureSlot);
 
     // bind
-    if (d.bindAll()) {
+    if (d.bindAllOpaque()) {
         int stride = 2 * 4 * sizeof(float);
         // Pos
         context->glEnableVertexAttribArray(attrPos);
@@ -94,7 +94,7 @@ void PostProcessingShader::draw(Drawable &d, int textureSlot)
     // Bind the index buffer and then draw shapes from it.
     // This invokes the shader program, which accesses the vertex buffers.
     d.bindIdx();
-    context->glDrawElements(d.drawMode(), d.elemCount(), GL_UNSIGNED_INT, 0);
+    context->glDrawElements(d.drawMode(), d.elemCountOpaque(), GL_UNSIGNED_INT, 0);
 
     if (attrPos != -1) context->glDisableVertexAttribArray(attrPos);
     if (attrUV != -1) context->glDisableVertexAttribArray(attrUV);

@@ -496,37 +496,35 @@ glm::vec4 Chunk::getUVs(BlockType &type, Direction face)
 void Chunk::bufferToDrawableVBOs()
 {
     m_count = this->idx.size();
-
     // Generate index buffer
     generateIdx();
     // Bind index buffer
     bindIdx();
-//    mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufIdx);
     // Buffer index data
-    mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof (GLuint), this->idx.data(), GL_STATIC_DRAW);
+    mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, elemCountOpaque() * sizeof (GLuint), this->idx.data(), GL_STATIC_DRAW);
     // Generate data buffer
-    generateAll();
+    generateAllOpaque();
     // Bind data buffer
-    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
+    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAllOpaque);
+//    bindAllOpaque();
     // Buffer data to GPU
     mp_context->glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(glm::vec4), this->data.data(), GL_STATIC_DRAW);
 }
 
 void Chunk::bufferTransparentDrawableVBOs()
 {
-    m_count = this->tIdx.size();
-
+    m_count_t = this->tIdx.size();
     // Generate index buffer
-    generateIdx();
+    generateIdxTransparent();
     // Bind index buffer
-    bindIdx();
-//    mp_context->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufIdx);
+    bindIdxTransparent();
     // Buffer index data
-    mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_count * sizeof (GLuint), this->tIdx.data(), GL_STATIC_DRAW);
+    mp_context->glBufferData(GL_ELEMENT_ARRAY_BUFFER, elemCountTransparent() * sizeof (GLuint), this->tIdx.data(), GL_STATIC_DRAW);
     // Generate data buffer
-    generateAll();
+    generateAllTransparent();
     // Bind data buffer
-    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAll);
+    mp_context->glBindBuffer(GL_ARRAY_BUFFER, m_buffAllTransparent);
+//    bindAllTransparent();
     // Buffer data to GPU
     mp_context->glBufferData(GL_ARRAY_BUFFER, tData.size() * sizeof(glm::vec4), this->tData.data(), GL_STATIC_DRAW);
 }

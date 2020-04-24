@@ -123,7 +123,6 @@ public:
     static int heightMountain(int x, int z);
 
     static void fillBlockData(int xPos, int zPos, Chunk* c, BlockData *chunksWithData);
-//    static void fillBlockData(std::vector<Chunk*> c, BlockData *chunksWithData);
 
     static void setBlockAtStatic(int x, int y, int z, BlockType t, Chunk* c);
     static void fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c);

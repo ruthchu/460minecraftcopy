@@ -151,7 +151,9 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
                 const uPtr<Chunk> &chunk = getChunkAt(x, z);
                 shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
 //                chunk->bufferToDrawableVBOs();
-                shaderProgram->draw(*chunk);
+//                chunk->bufferTransparentDrawableVBOs();
+                shaderProgram->drawTransparent(*chunk);
+                shaderProgram->drawOpaque(*chunk);
             } else {
 //                START_PRINT "No chunk at " << x << ", " << z END_PRINT;
             }
@@ -284,11 +286,10 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
     chunksWithVBO.mu.lock();
     for (Chunk* c : chunksWithVBO.getVectorData()) {
         c->bufferToDrawableVBOs();
-//        c->bufferTransparentDrawableVBOs();
+        c->bufferTransparentDrawableVBOs();
     }
     chunksWithVBO.clearChunkData();
     chunksWithVBO.mu.unlock();
-
 }
 
 void Terrain::makeRivers(glm::ivec2 zonePosition)
@@ -318,7 +319,7 @@ void Terrain::generateTerrainZone(int x, int z) {
         }
 //        std::thread t(fillBlockData, chunks, &this->chunksWithData);
 //        t.detach();
-//        makeRivers(glm::ivec2(x, z));
+        makeRivers(glm::ivec2(x, z));
         this->m_generatedTerrain.insert(coord);
     }
 }
@@ -348,36 +349,6 @@ void Terrain::fillBlockData(int xPos, int zPos, Chunk* chunk, BlockData *chunksW
     }
     chunksWithData->addChunk(chunk);
 }
-
-//void Terrain::fillBlockData(std::vector<Chunk*> chunks, BlockData *chunksWithData) {
-//    // Fill chunk with procedural height and blocktype data
-//    for (Chunk* chunk : chunks) {
-//        int xPos = chunk->X;
-//        int zPos = chunk->Z;
-//        for(int x = xPos; x < xPos + BLOCK_LENGTH_IN_CHUNK; ++x) {
-//            for(int z = zPos; z < zPos + BLOCK_LENGTH_IN_CHUNK; ++z) {
-//                int grass = heightGrassland(x, z);
-//                int mountain = heightMountain(x, z);
-//                float perlin = (Noise::perlinNoise(glm::vec2(float(x) / 64, float(z) / 64)) + 1) / 2.f;
-//                perlin = glm::smoothstep(0.25f, 0.75f, perlin);
-//                BlockType t;
-//                if (perlin > 0.5) {
-//                    t = STONE; //stone
-//                } else {
-//                    t = GRASS; //GRASS
-//                }
-//                int y = glm::mix(grass, mountain, perlin);
-//                setBlockAtStatic(x, y, z, t, chunk);
-
-//                if (t == GRASS) {
-//                    t = DIRT;
-//                }
-//                fillColumnStatic(x, y - 1, z, t, chunk);
-//            }
-//        }
-//        chunksWithData->addChunk(chunk);
-//    }
-//}
 
 void Terrain::setBlockAtStatic(int x, int y, int z, BlockType t, Chunk* c)
 {
