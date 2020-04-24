@@ -16,7 +16,7 @@
 #define CHUNK_LENGTH_IN_TERRAIN 4
 #define BLOCK_LENGTH_IN_CHUNK 16
 #define BLOCK_LENGTH_IN_TERRAIN (CHUNK_LENGTH_IN_TERRAIN * BLOCK_LENGTH_IN_CHUNK)
-
+//#define MAC
 
 //using namespace std;
 
@@ -122,7 +122,7 @@ public:
     static int heightGrassland(int x, int z);
     static int heightMountain(int x, int z);
 
-    static void fillBlockData(int xPos, int zPos, Chunk* c, BlockData *chunksWithData);
+    static void fillBlockData(std::vector<Chunk*> chunks, BlockData *chunksWithData);
 
     static void setBlockAtStatic(int x, int y, int z, BlockType t, Chunk* c);
     static void fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c);
