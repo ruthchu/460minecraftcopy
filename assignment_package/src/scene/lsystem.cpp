@@ -53,24 +53,27 @@ void Lsystem::setRiverStart()
     }
 
     int n = Noise::random1(glm::vec2(inputPosition[0] + 9, inputPosition[1] + 9));
+    std::cout << "n " << n << std::endl;
     if (n == 0) {
-        currentTurtle.depth = 8.f;
+        currentTurtle.depth = 6.f;
     } else if (n == 1) {
         currentTurtle.depth = 4.f;
     } else {
-        currentTurtle.depth = 6.f;
+        currentTurtle.depth = 3.f;
     }
 }
 
 void Lsystem::makeLava() {
     riverType = LAVA;
-//    grammarMap[QChar('X')] = QString("A+[+++A-A+X-AAX]--AA++A+AX");
-//    grammarMap[QChar('A')] = QString("A-B");
-//    grammarMap[QChar('B')] = QString("XX");
 }
 
 void Lsystem::makeRivers()
 {
+    int noise = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
+    std::cout << noise << std::endl;
+    if (noise > 0.6) {
+        return;
+    }
     setRiverStart();
 
     grammarMap[QChar('A')] = QString("AGK");
@@ -99,19 +102,18 @@ void Lsystem::makeRivers()
     rotLeft = &Lsystem::rotateLeft;
     ruleMap[QChar('+')] = rotLeft;
 
-    int noise = Noise::random1(glm::vec2(inputPosition[0] + 4, inputPosition[1] + 2));
-    float iter = 3;
-    if (noise < 0.3) {
-        iter = 1;
-    } else if (noise > 0.7) {
-        iter = 2;
+    noise = Noise::random1(glm::vec2(inputPosition[0] + 4, inputPosition[1] + 2));
+    float iter = 2;
+    if (noise > 0.5) {
+        iter = 3;
     }
 
-    if (noise > 0.5) {
+    srand((unsigned) time(0));
+    if (rand() % 4 == 0) {
         makeLava();
     }
 
-    QString q = strMaker(3, "AB+G-K+M");
+    QString q = strMaker(iter, "AB+G-K+M");
     //std::cout << q.toUtf8().constData() << std::endl;
     lsystemParser(q);
 }

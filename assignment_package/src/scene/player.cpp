@@ -118,7 +118,7 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                     if (gridMarch(origin, moveX, terrain, &xDist, &blockHit)) {
                         BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
                         if (type == WATER || type == LAVA) {
-                            move.x = move.x * 0.66;
+                            move.x = move.x * 0.7;
                         } else {
                             if (xDist < std::abs(move.x)) {
                                 if (move.x < 0.f) {
@@ -133,7 +133,7 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                     if (move.y < 0 && gridMarch(origin, moveY, terrain, &yDist, &blockHit)) {
                         BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
                         if (type == WATER || type == LAVA) {
-                            move.y = move.y * 0.66;
+                            move.y = move.y * 0.7;
                             if (m_spacePressed) {
                                 move.y = -move.y;
                             }
@@ -151,7 +151,7 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                     if (gridMarch(origin, moveZ, terrain, &zDist, &blockHit)) {
                         BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
                         if (type == WATER || type == LAVA) {
-                            move.z = move.z * 0.66;
+                            move.z = move.z * 0.7;
                         } else {
                             if (zDist < std::abs(move.z)) {
                                 if (move.z < 0.f) {
