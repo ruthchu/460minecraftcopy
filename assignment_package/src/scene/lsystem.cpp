@@ -11,8 +11,7 @@
 Lsystem::Lsystem(Terrain &terrain, glm::ivec2 position)
     : currentTurtle(Turtle(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), 0.f, 0.f)),
       tStack(std::stack<Turtle>()), grammarMap(QHash<QChar, QString>()),
-      ruleMap(QHash<QChar, Rule>()), terrain(terrain), inputPosition(position),
-      riverType(WATER)
+      ruleMap(QHash<QChar, Rule>()), riverType(WATER), terrain(terrain), inputPosition(position)
 {}
 
 void Lsystem::setRiverStart()
@@ -53,7 +52,7 @@ void Lsystem::setRiverStart()
     }
 
     int n = Noise::random1(glm::vec2(inputPosition[0] + 9, inputPosition[1] + 9));
-    std::cout << "n " << n << std::endl;
+    //std::cout << "n " << n << std::endl;
     if (n == 0) {
         currentTurtle.depth = 6.f;
     } else if (n == 1) {
@@ -70,10 +69,11 @@ void Lsystem::makeLava() {
 void Lsystem::makeRivers()
 {
     int noise = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
-    std::cout << noise << std::endl;
+    //std::cout << noise << std::endl;
     if (noise > 0.6) {
         return;
     }
+
     setRiverStart();
 
     grammarMap[QChar('A')] = QString("AGK");
