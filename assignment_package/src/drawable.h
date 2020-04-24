@@ -8,18 +8,25 @@ class Drawable
 {
 protected:
     int m_count;     // The number of indices stored in bufIdx.
+    int m_count_t;  // number of indices stored in bufIndexTransparent
+
     GLuint m_bufIdx; // A Vertex Buffer Object that we will use to store triangle indices (GLuints)
+    GLuint m_bufIdxTransparent;
+
     GLuint m_bufPos; // A Vertex Buffer Object that we will use to store mesh vertices (vec4s)
     GLuint m_bufNor; // A Vertex Buffer Object that we will use to store mesh normals (vec4s)
     GLuint m_bufCol; // Can be used to pass per-vertex color information to the shader, but is currently unused.
                    // Instead, we use a uniform vec4 in the shader to set an overall color for the geometry
-    GLuint m_buffAll;
+    GLuint m_buffAllOpaque;
+    GLuint m_buffAllTransparent;
 
     bool m_idxGenerated; // Set to TRUE by generateIdx(), returned by bindIdx().
+    bool m_idxTransparentGenerated; // Set to TRUE by generateIdx(), returned by bindIdx().
     bool m_posGenerated;
     bool m_norGenerated;
     bool m_colGenerated;
-    bool m_allGenerated;
+    bool m_allGeneratedOpaque;
+    bool m_allGeneratedTransparent;
 
     OpenGLContext* mp_context; // Since Qt's OpenGL support is done through classes like QOpenGLFunctions_3_2_Core,
                           // we need to pass our OpenGL context to the Drawable in order to call GL functions
@@ -35,21 +42,26 @@ public:
 
     // Getter functions for various GL data
     virtual GLenum drawMode();
-    int elemCount();
+    int elemCountOpaque();
+    int elemCountTransparent();
 
     // Call these functions when you want to call glGenBuffers on the buffers stored in the Drawable
     // These will properly set the values of idxBound etc. which need to be checked in ShaderProgram::draw()
     void generateIdx();
+    void generateIdxTransparent();
     void generatePos();
     void generateNor();
     void generateCol();
-    void generateAll();
+    void generateAllOpaque();
+    void generateAllTransparent();
 
     bool bindIdx();
+    bool bindIdxTransparent();
     bool bindPos();
     bool bindNor();
     bool bindCol();
-    bool bindAll();
+    bool bindAllOpaque();
+    bool bindAllTransparent();
 
     friend class Terrain;
 };

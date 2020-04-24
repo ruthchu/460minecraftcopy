@@ -168,7 +168,7 @@ void MyGL::paintGL() {
     glDisable(GL_DEPTH_TEST);
     m_progFlat.setModelMatrix(glm::mat4());
     m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
-    m_progFlat.draw(m_worldAxes);
+    m_progFlat.drawOpaque(m_worldAxes);
     glEnable(GL_DEPTH_TEST);
 }
 

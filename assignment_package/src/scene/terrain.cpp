@@ -151,7 +151,9 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
                 const uPtr<Chunk> &chunk = getChunkAt(x, z);
                 shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
 //                chunk->bufferToDrawableVBOs();
-                shaderProgram->draw(*chunk);
+//                chunk->bufferTransparentDrawableVBOs();
+                shaderProgram->drawTransparent(*chunk);
+                shaderProgram->drawOpaque(*chunk);
             } else {
 //                START_PRINT "No chunk at " << x << ", " << z END_PRINT;
             }
@@ -284,11 +286,10 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
     chunksWithVBO.mu.lock();
     for (Chunk* c : chunksWithVBO.getVectorData()) {
         c->bufferToDrawableVBOs();
-//        c->bufferTransparentDrawableVBOs();
+        c->bufferTransparentDrawableVBOs();
     }
     chunksWithVBO.clearChunkData();
     chunksWithVBO.mu.unlock();
-
 }
 
 void Terrain::makeRivers(glm::ivec2 zonePosition)

@@ -42,7 +42,7 @@ void Quad::bufferVBOdata() {
 
     // The next few sets of function calls are basically the same as above, except bufPos and bufNor are
     // array buffers rather than element array buffers, as they store vertex attributes like position.
-    generateAll();
-    bindAll();
+    generateAllOpaque();
+    bindAllOpaque();
     mp_context->glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(glm::vec4), this->data.data(), GL_STATIC_DRAW);
 }
