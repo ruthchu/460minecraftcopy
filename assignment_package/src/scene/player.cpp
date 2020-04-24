@@ -12,7 +12,7 @@ Player::~Player()
 {}
 
 void Player::tick(float dT, InputBundle &input) {
-    this->accel = 1.7f / dT;
+    this->accel = 3.5f / dT;
     processInputs(input, dT);
     computePhysics(dT, mcr_terrain);
 }
@@ -59,7 +59,6 @@ void Player::processInputs(InputBundle &inputs, float dT) {
         }
     } else if (!m_flightOn) {
         m_acceleration.y = -accel * 2.f;
-//        m_acceleration.y -= .5;
         // Movement in non-flight mode
         glm::vec3 flatForward =
                 glm::normalize(glm::vec3(m_forward.x, 0.f, m_forward.z));
@@ -99,15 +98,15 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                 for (float z = -.5f; x <= .5f; x += 1.f) {
                     glm::vec3 blockBelow =
                     {m_position.x + x, m_position.y - 0.5f, m_position.z + z};
-                    if (terrain.getBlockAt(glm::floor(blockBelow.x),
-                                           glm::floor(blockBelow.y),
-                                           glm::floor(blockBelow.z)) != EMPTY) {
+                    glm::ivec3 blockPos = glm::ivec3(glm::floor(blockBelow));
+                    if (terrain.getBlockAt(blockPos.x, blockPos.y, blockPos.z)
+                                           != EMPTY) {
                         onGround = true;
                     }
                 }
             }
             if (onGround) {
-                m_velocity.y += accel * 2.f;
+                m_velocity.y += accel * .2f;
                 move = m_velocity * dT;
             }
         }
@@ -146,9 +145,6 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                         BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
                         if (type == WATER || type == LAVA) {
                             move.y = move.y * 0.7;
-//                            if (m_spacePressed) {
-//                                move.y = -move.y;
-//                            }
                         } else {
                             if (yDist < std::abs(move.y)) {
                                 if (move.y < 0.f) {
