@@ -213,10 +213,10 @@ void Terrain::createMoreTerrainAt(int xPos, int zPos)
 
 int Terrain::heightGrassland(int x, int z) {
     int baseHeight = 128;
-    int heightRange = 10;
+    int heightRange = 20;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
-    float filterIdx = 0.50f;
+    float filterIdx = 1.0f;
     glm::vec2 uv = glm::vec2(xNew, zNew);
     float y = std::pow(Noise::worleyNoise(uv), filterIdx);
     y *= heightRange;
@@ -226,7 +226,7 @@ int Terrain::heightGrassland(int x, int z) {
 
 int Terrain::heightMountain(int x, int z) {
     int baseHeight = 140;
-    int heightRange = 20;
+    int heightRange = 255 - baseHeight;
     float xNew = float(x) / 64.0f;
     float zNew = float(z) / 64.0f;
     float freq = 2.5f;
@@ -301,6 +301,7 @@ void Terrain::generateTerrainZone(int x, int z) {
     int64_t coord = toKey(x, z);
     if (this->m_generatedTerrain.find(coord) == this->m_generatedTerrain.end()) {
         // generate chunk data in terrain zone
+        std::vector<Chunk*> chunks;
         for (int i = 0; i <= BLOCK_LENGTH_IN_TERRAIN - BLOCK_LENGTH_IN_CHUNK; i += BLOCK_LENGTH_IN_CHUNK) {
             for (int j = 0; j <= BLOCK_LENGTH_IN_TERRAIN - BLOCK_LENGTH_IN_CHUNK; j += BLOCK_LENGTH_IN_CHUNK) {
                 Chunk* cPtr = createChunkAt(x + i, z + j);
