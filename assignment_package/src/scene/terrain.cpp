@@ -280,7 +280,7 @@ void Terrain::expandTerrainBasedOnPlayer(glm::vec3 pos)
     for (Chunk* c : chunksWithData.getVectorData()) {
         std::thread t(fillVBO, std::ref(*c), std::ref(this->chunksWithVBO));
 #ifdef MAC
-        threads.push_back(t);
+        threads.push_back(std::move(t));
 #endif
 #ifndef MAC
         t.detach();
@@ -330,9 +330,14 @@ void Terrain::generateTerrainZone(int x, int z) {
             }
         }
         std::thread t(fillBlockData, chunks, &this->chunksWithData);
+#ifndef MAC
         t.detach();
+#endif
         makeRivers(glm::ivec2(x, z));
         this->m_generatedTerrain.insert(coord);
+#ifdef MAC
+        t.join();
+#endif
     }
 }
 
