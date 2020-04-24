@@ -13,7 +13,7 @@ MyGL::MyGL(QWidget *parent)
       m_terrain(this), m_player(glm::vec3(48.f, 170.f, 48.f), m_terrain),
       m_currTime(QDateTime::currentMSecsSinceEpoch()), m_timeSinceStart(0),
       framebuffer(FrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
-      m_progTint(this), m_progNoOp(this), quad(Quad(this))
+      m_progTint(this), m_progNoOp(this), quad(Quad(this)), ticksPassed(0)
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -116,6 +116,8 @@ void MyGL::resizeGL(int w, int h) {
 
     // resize frame buffer
     framebuffer.resize(w, h, this->devicePixelRatio());
+    framebuffer.destroy();
+    framebuffer.create();
 
     printGLErrorLog();
 }
@@ -126,6 +128,7 @@ void MyGL::resizeGL(int w, int h) {
 // all per-frame actions here, such as performing physics updates on all
 // entities in the scene.
 void MyGL::tick() {
+
     // Calculate dT and pass relevant time values to tick and shader
     float dT = (QDateTime::currentMSecsSinceEpoch() - m_currTime) / 1000.f;
     m_progLambert.setTime(m_timeSinceStart);

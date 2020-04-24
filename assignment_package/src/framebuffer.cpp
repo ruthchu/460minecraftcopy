@@ -24,7 +24,7 @@ void FrameBuffer::create() {
     // Bind our texture so that all functions that deal with textures will interact with this one
     mp_context->glBindTexture(GL_TEXTURE_2D, m_outputTexture);
     // Give an empty image to OpenGL ( the last "0" )
-    mp_context->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width * m_devicePixelRatio, m_height * m_devicePixelRatio, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
+    mp_context->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
 
     // Set the render settings for the texture we've just created.
     // Essentially zero filtering on the "texture" so it appears exactly as rendered

@@ -54,6 +54,8 @@ private:
 
     bool playerIsInWater();
 
+    int ticksPassed;
+
 public:
     explicit MyGL(QWidget *parent = nullptr);
     ~MyGL();
