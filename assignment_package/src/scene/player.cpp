@@ -24,17 +24,10 @@ void Player::processInputs(InputBundle &inputs, float dT) {
         return;
     }
     rotateOnUpGlobal(inputs.mouseX / 40.f * mod);
-    if (std::isnan(this->m_forward.x)) {
-        START_PRINT "Is nan" END_PRINT;
+    if (m_phi < 89.999f && m_phi > -89.999f) {
+        rotateOnRightLocal(inputs.mouseY / 40.f * mod);
     }
-    if (m_phi < 90.f && m_phi > -90.f) {
-        rotateOnRightLocal
-            (glm::clamp(inputs.mouseY / 40.f * mod, -89.99f - m_phi, 89.99f - m_phi));
-        if (std::isnan(this->m_forward.x)) {
-            START_PRINT "Is nan" END_PRINT;
-        }
-    }
-    m_phi = glm::clamp(m_phi + inputs.mouseY, -89.99f, 89.99f);
+    m_phi = m_phi + inputs.mouseY;
     inputs.mouseX = 0.f;
     inputs.mouseY = 0.f;
     m_acceleration = {0.f, 0.f, 0.f};
@@ -99,6 +92,25 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
 //    m_velocity += dT * m_acceleration;
     glm::vec3 move = m_velocity * dT;
     if (!m_flightOn) {
+        if (m_spacePressed == true) {
+            // Figure out if the player is on the ground
+            bool onGround = false;
+            for (float x = -.5f; x <= .5f; x += 1.f) {
+                for (float z = -.5f; x <= .5f; x += 1.f) {
+                    glm::vec3 blockBelow =
+                    {m_position.x + x, m_position.y - 0.5f, m_position.z + z};
+                    if (terrain.getBlockAt(glm::floor(blockBelow.x),
+                                           glm::floor(blockBelow.y),
+                                           glm::floor(blockBelow.z)) != EMPTY) {
+                        onGround = true;
+                    }
+                }
+            }
+            if (onGround) {
+                m_velocity.y += accel * 2.f;
+                move = m_velocity * dT;
+            }
+        }
         float xDist;
         float yDist;
         float zDist;
@@ -134,9 +146,9 @@ void Player::computePhysics(float dT, const Terrain &terrain) {
                         BlockType type = terrain.getBlockAt(blockHit.x, blockHit.y, blockHit.z);
                         if (type == WATER || type == LAVA) {
                             move.y = move.y * 0.7;
-                            if (m_spacePressed) {
-                                move.y = -move.y;
-                            }
+//                            if (m_spacePressed) {
+//                                move.y = -move.y;
+//                            }
                         } else {
                             if (yDist < std::abs(move.y)) {
                                 if (move.y < 0.f) {
