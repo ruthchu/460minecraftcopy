@@ -20,10 +20,19 @@ void Player::tick(float dT, InputBundle &input) {
 void Player::processInputs(InputBundle &inputs, float dT) {
     // Rotate the local axis' based on mouse input
     float mod = 0.2f / dT;
+    if (dT == 0) {
+        return;
+    }
     rotateOnUpGlobal(inputs.mouseX / 40.f * mod);
+    if (std::isnan(this->m_forward.x)) {
+        START_PRINT "Is nan" END_PRINT;
+    }
     if (m_phi < 90.f && m_phi > -90.f) {
         rotateOnRightLocal
             (glm::clamp(inputs.mouseY / 40.f * mod, -89.99f - m_phi, 89.99f - m_phi));
+        if (std::isnan(this->m_forward.x)) {
+            START_PRINT "Is nan" END_PRINT;
+        }
     }
     m_phi = glm::clamp(m_phi + inputs.mouseY, -89.99f, 89.99f);
     inputs.mouseX = 0.f;

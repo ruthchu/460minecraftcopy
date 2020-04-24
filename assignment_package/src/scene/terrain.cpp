@@ -153,7 +153,7 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
 //                chunk->bufferToDrawableVBOs();
                 shaderProgram->draw(*chunk);
             } else {
-                START_PRINT "No chunk at " << x << ", " << z END_PRINT;
+//                START_PRINT "No chunk at " << x << ", " << z END_PRINT;
             }
         }
     }
