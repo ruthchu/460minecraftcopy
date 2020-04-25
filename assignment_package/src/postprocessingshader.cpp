@@ -10,7 +10,7 @@
 
 PostProcessingShader::PostProcessingShader(OpenGLContext* context)
     : vertShader(), fragShader(), prog(), unifSampler2D(-1), unifTime(-1),
-      attrPos(-1), attrUV(-1), unifDimensions(-1), context(context)
+      attrPos(-1), attrUV(-1), unifDimensions(-1), unifDepthMatrixID(-1), context(context)
 {}
 
 PostProcessingShader::~PostProcessingShader()
@@ -67,6 +67,8 @@ void PostProcessingShader::create(const char *vertfile, const char *fragfile)
     unifTime = context->glGetUniformLocation(prog, "u_Time");
     unifSampler2D = context->glGetUniformLocation(prog, "u_sampler1");
     unifDimensions = context->glGetUniformLocation(prog, "u_Dimensions");
+
+    unifDepthMatrixID = context->glGetUniformLocation(prog, "u_depthMVP");
 }
 
 void PostProcessingShader::draw(Drawable &d, int textureSlot)
@@ -172,11 +174,25 @@ void PostProcessingShader::setDimensions(glm::ivec2 dims)
         context->glUniform2i(unifDimensions, dims.x, dims.y);
     }
 }
+
 void PostProcessingShader::setTime(int t) {
     useMe();
 
     if (unifTime != -1) {
         context->glUniform1i(unifTime, t);
+    }
+}
+
+void PostProcessingShader::setDepthMVP(const glm::vec3 inverseLightRay)
+{
+    useMe();
+
+    if (unifDepthMatrixID != -1) {
+        glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
+        glm::mat4 depthViewMatrix = glm::lookAt(inverseLightRay, glm::vec3(0,0,0), glm::vec3(0,1,0));
+        glm::mat4 depthModelMatrix = glm::mat4(1.0);
+        glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
+        context->glUniformMatrix4fv(unifDepthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
     }
 }
 

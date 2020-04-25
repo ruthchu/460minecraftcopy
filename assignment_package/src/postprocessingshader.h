@@ -28,6 +28,8 @@ public:
     int attrUV; // A handle for the "in" vec2 representing the UV coordinates in the vertex shader
 
     int unifDimensions; // A handle to the "uniform" ivec2 that stores the width and height of the texture being rendered
+
+    int unifDepthMatrixID; // A handle to the "unifrom" mat that projects us from world to light pov
 public:
     PostProcessingShader(OpenGLContext* context);
     // draw given object to screen using shaderprogram shaders
@@ -47,6 +49,8 @@ public:
     void setTime(int t);
 
     void setModelMatrix(const glm::mat4 &model);
+
+    void setDepthMVP(const glm::vec3 inverseLightRay);
 protected:
     OpenGLContext* context;
 };

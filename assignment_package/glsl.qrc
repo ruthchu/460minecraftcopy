@@ -7,5 +7,7 @@
         <file>glsl/noOp.frag.glsl</file>
         <file>glsl/screentint.frag.glsl</file>
         <file>glsl/passthrough.vert.glsl</file>
+        <file>glsl/depthThrough.frag.glsl</file>
+        <file>glsl/depthThrough.vert.glsl</file>
     </qresource>
 </RCC>
