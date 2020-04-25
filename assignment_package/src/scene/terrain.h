@@ -16,7 +16,7 @@
 #define CHUNK_LENGTH_IN_TERRAIN 4
 #define BLOCK_LENGTH_IN_CHUNK 16
 #define BLOCK_LENGTH_IN_TERRAIN (CHUNK_LENGTH_IN_TERRAIN * BLOCK_LENGTH_IN_CHUNK)
-//#define MAC
+#define MAC
 
 //using namespace std;
 

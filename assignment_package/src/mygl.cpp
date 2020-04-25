@@ -28,7 +28,7 @@ MyGL::MyGL(QWidget *parent)
 MyGL::~MyGL() {
     makeCurrent();
     glDeleteVertexArrays(1, &vao);
-//    framebuffer.destroy();
+    framebuffer.destroy();
 }
 
 
@@ -62,7 +62,7 @@ void MyGL::initializeGL()
     glGenVertexArrays(1, &vao);
 
     // Create render buffers
-//    framebuffer.create();
+    framebuffer.create();
 
     //Create the instance of the world axes
     m_worldAxes.create();
@@ -115,7 +115,9 @@ void MyGL::resizeGL(int w, int h) {
     m_progTint.setDimensions(glm::ivec2(w, h));
 
     // resize frame buffer
-//    framebuffer.resize(w, h, this->devicePixelRatio());
+    framebuffer.resize(w, h, this->devicePixelRatio());
+    framebuffer.destroy();
+    framebuffer.create();
 
     printGLErrorLog();
 }
@@ -176,12 +178,13 @@ void MyGL::paintGL() {
 // terrain that surround the player (refer to Terrain::m_generatedTerrain
 // for more info)
 void MyGL::renderTerrain() {
-//    // Render to our framebuffer rather than the viewport
-//    framebuffer.bindFrameBuffer();
-//    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    // Render to our framebuffer rather than the viewport
+    framebuffer.bindFrameBuffer();
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
 //    glViewport(0,0,this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
-//    // Clear the screen so that we only see newly drawn images
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glViewport(0,0,2 * this->width(),2 * this->height());
+    // Clear the screen so that we only see newly drawn images
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     int renderRadius = 1;
     glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
@@ -202,20 +205,21 @@ void MyGL::renderTerrain() {
 
 void MyGL::performTerrainPostprocessRenderPass()
 {
-//    // Render to our framebuffer rather than the viewport
-//    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
-//    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    // Render to our framebuffer rather than the viewport
+    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
 //    glViewport(0,0,this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
-//    // Clear the screen so that we only see newly drawn images
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    // bind the texture to slot number 1
-//    framebuffer.bindToTextureSlot(1);
+    glViewport(0,0, 2 * this->width(),2 * this->height());
+    // Clear the screen so that we only see newly drawn images
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // bind the texture to slot number 1
+    framebuffer.bindToTextureSlot(1);
 
-//    quad.bufferVBOdata();
-//    if (playerIsInWater()) {
+    quad.bufferVBOdata();
+//    if (playerIsInLiquid()) {
 //       m_progTint.draw(quad, 1);
 //    } else {
-//        m_progNoOp.draw(quad, 1);
+        m_progNoOp.draw(quad, 1);
 //    }
 }
 
