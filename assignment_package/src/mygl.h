@@ -16,7 +16,6 @@
 #include <QOpenGLShaderProgram>
 #include <smartpointerhelp.h>
 
-
 class MyGL : public OpenGLContext
 {
     Q_OBJECT

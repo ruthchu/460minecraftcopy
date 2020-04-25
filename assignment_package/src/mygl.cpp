@@ -181,8 +181,15 @@ void MyGL::renderTerrain() {
     // Render to our framebuffer rather than the viewport
     framebuffer.bindFrameBuffer();
     // Render on the whole framebuffer, complete from the lower left corner to the upper right
-//    glViewport(0,0,this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
-    glViewport(0,0,2 * this->width(),2 * this->height());
+
+    int viewW = this->width() * this->devicePixelRatio();
+    int viewH = this->height() * this->devicePixelRatio();
+#ifdef MAC
+    viewW = this->width() * 2;
+    viewH = this->height() * 2;
+#endif
+    glViewport(0,0, viewW, viewH);
+
     // Clear the screen so that we only see newly drawn images
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -208,8 +215,15 @@ void MyGL::performTerrainPostprocessRenderPass()
     // Render to our framebuffer rather than the viewport
     glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
     // Render on the whole framebuffer, complete from the lower left corner to the upper right
-//    glViewport(0,0,this->width() * this->devicePixelRatio(), this->height() * this->devicePixelRatio());
-    glViewport(0,0, 2 * this->width(),2 * this->height());
+
+    int viewW = this->width() * this->devicePixelRatio();
+    int viewH = this->height() * this->devicePixelRatio();
+#ifdef MAC
+    viewW = this->width() * 2;
+    viewH = this->height() * 2;
+#endif
+    glViewport(0,0, viewW, viewH);
+
     // Clear the screen so that we only see newly drawn images
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // bind the texture to slot number 1

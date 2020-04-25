@@ -1,6 +1,7 @@
 #pragma once
 #include "openglcontext.h"
 #include "glm_includes.h"
+#include <smartpointerhelp.h>
 
 // A class representing a frame buffer in the OpenGL pipeline.
 // Stores three GPU handles: one to a frame buffer object, one to
@@ -12,6 +13,8 @@
 // from the frame buffer's output texture by invoking
 // bindToTextureSlot() and then associating a ShaderProgram's
 // sampler2d with the appropriate texture slot.
+#define MAC
+
 class FrameBuffer {
 protected:
     OpenGLContext *mp_context;

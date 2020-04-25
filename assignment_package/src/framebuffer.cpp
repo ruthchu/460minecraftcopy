@@ -9,8 +9,13 @@ FrameBuffer::FrameBuffer(OpenGLContext *context,
 {}
 
 void FrameBuffer::resize(unsigned int width, unsigned int height, unsigned int devicePixelRatio) {
+
+    m_width = width;
+    m_height = height;
+#ifdef MAC
     m_width = 2 * width;
     m_height = 2 * height;
+#endif
     m_devicePixelRatio = devicePixelRatio;
 }
 
@@ -24,8 +29,15 @@ void FrameBuffer::create() {
     // Bind our texture so that all functions that deal with textures will interact with this one
     mp_context->glBindTexture(GL_TEXTURE_2D, m_outputTexture);
     // Give an empty image to OpenGL ( the last "0" )
-//    mp_context->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width * m_devicePixelRatio, m_height * m_devicePixelRatio, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
-    mp_context->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
+
+    int newW = m_width * m_devicePixelRatio;
+    int newH = m_height * m_devicePixelRatio;
+#ifdef MAC
+    newW = m_width;
+    newH = m_height;
+#endif
+    mp_context->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, newW, newH, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
+
 
     // Set the render settings for the texture we've just created.
     // Essentially zero filtering on the "texture" so it appears exactly as rendered

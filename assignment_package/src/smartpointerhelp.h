@@ -15,3 +15,6 @@
 
 #define START_PRINT std::cout <<
 #define END_PRINT << std::endl
+
+#define MAC
+
