@@ -2,6 +2,7 @@ INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD
 
 SOURCES += \
+    $$PWD/depthframebuffer.cpp \
     $$PWD/framebuffer.cpp \
     $$PWD/main.cpp \
     $$PWD/mainwindow.cpp \
@@ -28,6 +29,7 @@ SOURCES += \
     $$PWD/turtle.cpp \
 
 HEADERS += \
+    $$PWD/depthframebuffer.h \
     $$PWD/framebuffer.h \
     $$PWD/mainwindow.h \
     $$PWD/mygl.h \

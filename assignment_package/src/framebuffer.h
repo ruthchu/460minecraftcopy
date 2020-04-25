@@ -13,7 +13,7 @@
 // bindToTextureSlot() and then associating a ShaderProgram's
 // sampler2d with the appropriate texture slot.
 class FrameBuffer {
-private:
+protected:
     OpenGLContext *mp_context;
     unsigned int m_width, m_height, m_devicePixelRatio;
     bool m_created;
