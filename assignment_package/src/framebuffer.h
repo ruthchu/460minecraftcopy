@@ -13,7 +13,6 @@
 // from the frame buffer's output texture by invoking
 // bindToTextureSlot() and then associating a ShaderProgram's
 // sampler2d with the appropriate texture slot.
-#define MAC
 
 class FrameBuffer {
 protected:
