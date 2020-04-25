@@ -152,8 +152,8 @@ void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shader
                 shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
 //                chunk->bufferToDrawableVBOs();
 //                chunk->bufferTransparentDrawableVBOs();
-                shaderProgram->drawTransparent(*chunk);
                 shaderProgram->drawOpaque(*chunk);
+                shaderProgram->drawTransparent(*chunk);
             } else {
 //                START_PRINT "No chunk at " << x << ", " << z END_PRINT;
             }
@@ -369,6 +369,7 @@ void Terrain::fillBlockData(std::vector<Chunk*> chunks, BlockData *chunksWithDat
         }
         chunksWithData->addChunk(chunk);
     }
+
 }
 
 void Terrain::setBlockAtStatic(int x, int y, int z, BlockType t, Chunk* c)
