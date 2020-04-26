@@ -232,8 +232,8 @@ void MyGL::renderTerrain() {
 void MyGL::performTerrainPostprocessRenderPass()
 {
     // Render to our framebuffer rather than the viewport
-//    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
-    m_depthFrameBuffer.bindFrameBuffer();
+    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
+//    m_depthFrameBuffer.bindFrameBuffer();
 
     // Render on the whole framebuffer, complete from the lower left corner to the upper right
     int viewW = this->width() * this->devicePixelRatio();

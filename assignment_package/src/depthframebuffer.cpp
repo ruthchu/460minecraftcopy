@@ -24,6 +24,7 @@ void DepthFrameBuffer::create()
 
     mp_context->glDrawBuffer(GL_NONE); // no color drawn
 
+    m_created = true;
     if(mp_context->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
         m_created = false;
