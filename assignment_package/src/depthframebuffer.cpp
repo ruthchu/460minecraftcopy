@@ -10,8 +10,8 @@ void DepthFrameBuffer::create()
     mp_context->glGenFramebuffers(1, &m_frameBuffer);
     mp_context->glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
 
-    mp_context->glGenTextures(1, &m_depthTexture);
-    mp_context->glBindTexture(GL_TEXTURE_2D, m_depthTexture);
+    mp_context->glGenTextures(1, &m_outputTexture);
+    mp_context->glBindTexture(GL_TEXTURE_2D, m_outputTexture);
 
 //    mp_context->glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
     mp_context->glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
@@ -20,7 +20,7 @@ void DepthFrameBuffer::create()
     mp_context->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     mp_context->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    mp_context->glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_depthTexture, 0);
+    mp_context->glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_outputTexture, 0);
 
     mp_context->glDrawBuffer(GL_NONE); // no color drawn
 
@@ -36,6 +36,6 @@ void DepthFrameBuffer::destroy() {
     if(m_created) {
         m_created = false;
         mp_context->glDeleteFramebuffers(1, &m_frameBuffer);
-        mp_context->glDeleteTextures(1, &m_depthTexture);
+        mp_context->glDeleteTextures(1, &m_outputTexture);
     }
 }

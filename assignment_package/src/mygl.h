@@ -11,6 +11,7 @@
 #include "framebuffer.h"
 #include "postprocessingshader.h"
 #include "scene/quad.h"
+#include "depthframebuffer.h"
 
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
@@ -37,11 +38,14 @@ private:
     double m_currTime; // Current time used to compute dT for player movement
     int m_timeSinceStart; // Time passed to UVs to warp LAVA and WATER UV coords
 
-    FrameBuffer framebuffer; // Frame buffer for post processing
+    FrameBuffer m_framebuffer; // Frame buffer for post processing
     PostProcessingShader m_progTint; // A post processing shader program that handels water and lava tinting
-    PostProcessingShader m_progNoOp; // A post processing shader program that handels water and lava tinting
+    PostProcessingShader m_progNoOp; // A post processing shader program that does nothing
+    PostProcessingShader m_progDepthThough; // A post processing shader program to see depth values
 
     Quad quad;
+
+    DepthFrameBuffer m_depthFrameBuffer;
 
     void moveMouseToCenter(); // Forces the mouse position to the screen's center. You should call this
                               // from within a mouse move event after reading the mouse movement so that

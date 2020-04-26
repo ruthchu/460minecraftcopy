@@ -1,6 +1,6 @@
 #version 150
 
-out vec4 fragmentdepth;
+out float fragmentdepth;
 
 uniform sampler2D u_sampler1;
 

@@ -12,8 +12,8 @@ MyGL::MyGL(QWidget *parent)
       m_progLambert(this), m_progFlat(this), m_texture(this),
       m_terrain(this), m_player(glm::vec3(48.f, 170.f, 48.f), m_terrain),
       m_currTime(QDateTime::currentMSecsSinceEpoch()), m_timeSinceStart(0),
-      framebuffer(FrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
-      m_progTint(this), m_progNoOp(this), quad(Quad(this))
+      m_framebuffer(FrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
+      m_progTint(this), m_progNoOp(this), m_progDepthThough(this), quad(Quad(this)), m_depthFrameBuffer(DepthFrameBuffer(this, this->width(), this->height(), this->devicePixelRatio()))
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -28,7 +28,8 @@ MyGL::MyGL(QWidget *parent)
 MyGL::~MyGL() {
     makeCurrent();
     glDeleteVertexArrays(1, &vao);
-    framebuffer.destroy();
+    m_framebuffer.destroy();
+    m_depthFrameBuffer.destroy();
 }
 
 
@@ -62,7 +63,10 @@ void MyGL::initializeGL()
     glGenVertexArrays(1, &vao);
 
     // Create render buffers
-    framebuffer.create();
+    m_framebuffer.create();
+
+    // Create a depth buffer
+    m_depthFrameBuffer.create();
 
     //Create the instance of the world axes
     m_worldAxes.create();
@@ -73,9 +77,11 @@ void MyGL::initializeGL()
     m_progFlat.create(":/glsl/flat.vert.glsl", ":/glsl/flat.frag.glsl");
 
     // Create post processing shader for tinting in water
-    m_progTint.create(":/glsl/passthrough.vert.glsl", ":/glsl/screentint.frag.glsl");
-    // Create post processing shader for no operation
-    m_progNoOp.create(":/glsl/passthrough.vert.glsl", ":/glsl/noOp.frag.glsl");
+//    m_progTint.create(":/glsl/passthrough.vert.glsl", ":/glsl/screentint.frag.glsl");
+//    // Create post processing shader for no operation
+//    m_progNoOp.create(":/glsl/passthrough.vert.glsl", ":/glsl/noOp.frag.glsl");
+    // Create post processing shader for depth
+    m_progDepthThough.create(":/glsl/depthThrough.vert.glsl", ":/glsl/depthThrough.frag.glsl");
 
     // Set a color with which to draw geometry.
     // This will ultimately not be used when you change
@@ -98,6 +104,10 @@ void MyGL::initializeGL()
 
     // create quad for post processing
     quad.create();
+
+    m_progNoOp.setDimensions(glm::ivec2(this->width(), this->height()));
+    m_progTint.setDimensions(glm::ivec2(this->width(), this->height()));
+    m_progDepthThough.setDimensions(glm::ivec2(this->width(), this->height()));
 }
 
 void MyGL::resizeGL(int w, int h) {
@@ -113,11 +123,17 @@ void MyGL::resizeGL(int w, int h) {
 
     m_progNoOp.setDimensions(glm::ivec2(w, h));
     m_progTint.setDimensions(glm::ivec2(w, h));
+    m_progDepthThough.setDimensions(glm::ivec2(w, h));
 
     // resize frame buffer
-    framebuffer.resize(w, h, this->devicePixelRatio());
-    framebuffer.destroy();
-    framebuffer.create();
+    m_framebuffer.resize(w, h, this->devicePixelRatio());
+    m_framebuffer.destroy();
+    m_framebuffer.create();
+
+    // resize depth buffer
+    m_depthFrameBuffer.resize(w, h, this->devicePixelRatio());
+    m_depthFrameBuffer.destroy();
+    m_depthFrameBuffer.create();
 
     printGLErrorLog();
 }
@@ -164,6 +180,8 @@ void MyGL::paintGL() {
     m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
     m_progLambert.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 
+    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(-0.5, -1, -0.75)));
+
     renderTerrain();
     performTerrainPostprocessRenderPass();
 
@@ -179,9 +197,10 @@ void MyGL::paintGL() {
 // for more info)
 void MyGL::renderTerrain() {
     // Render to our framebuffer rather than the viewport
-    framebuffer.bindFrameBuffer();
-    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    //m_framebuffer.bindFrameBuffer();
+    m_depthFrameBuffer.bindFrameBuffer();
 
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
     int viewW = this->width() * this->devicePixelRatio();
     int viewH = this->height() * this->devicePixelRatio();
 #ifdef MAC
@@ -213,9 +232,10 @@ void MyGL::renderTerrain() {
 void MyGL::performTerrainPostprocessRenderPass()
 {
     // Render to our framebuffer rather than the viewport
-    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
-    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+//    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
+    m_depthFrameBuffer.bindFrameBuffer();
 
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
     int viewW = this->width() * this->devicePixelRatio();
     int viewH = this->height() * this->devicePixelRatio();
 #ifdef MAC
@@ -226,14 +246,17 @@ void MyGL::performTerrainPostprocessRenderPass()
 
     // Clear the screen so that we only see newly drawn images
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     // bind the texture to slot number 1
-    framebuffer.bindToTextureSlot(1);
+//    m_framebuffer.bindToTextureSlot(1);
+    m_depthFrameBuffer.bindToTextureSlot(2);
 
     quad.bufferVBOdata();
 //    if (playerIsInLiquid()) {
 //       m_progTint.draw(quad, 1);
 //    } else {
-        m_progNoOp.draw(quad, 1);
+//        m_progNoOp.draw(quad, 1);
+    m_progDepthThough.draw(quad, 2);
 //    }
 }
 
