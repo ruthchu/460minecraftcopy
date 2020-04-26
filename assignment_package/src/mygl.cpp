@@ -233,7 +233,6 @@ void MyGL::performTerrainPostprocessRenderPass()
 {
     // Render to our framebuffer rather than the viewport
     glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
-//    m_depthFrameBuffer.bindFrameBuffer();
 
     // Render on the whole framebuffer, complete from the lower left corner to the upper right
     int viewW = this->width() * this->devicePixelRatio();
@@ -249,7 +248,7 @@ void MyGL::performTerrainPostprocessRenderPass()
 
     // bind the texture to slot number 1
 //    m_framebuffer.bindToTextureSlot(1);
-    m_depthFrameBuffer.bindToTextureSlot(2);
+//    m_depthFrameBuffer.bindToTextureSlot(2);
 
     quad.bufferVBOdata();
 //    if (playerIsInLiquid()) {
