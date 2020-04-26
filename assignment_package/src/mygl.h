@@ -42,6 +42,7 @@ private:
     PostProcessingShader m_progNoOp; // A post processing shader program that handels water and lava tinting
 
     ShaderProgram m_progSky; // A screen-space shader for creating the sky background
+    float time;
 
     Quad quad;
 

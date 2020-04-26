@@ -78,7 +78,6 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
     // Sky
     unifDimensions = context->glGetUniformLocation(prog, "u_Dimensions");
     unifEye = context->glGetUniformLocation(prog, "u_Eye");
-    unifTime = context->glGetUniformLocation(prog, "u_Time");
 }
 
 void ShaderProgram::useMe()

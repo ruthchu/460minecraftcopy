@@ -115,9 +115,10 @@ void MyGL::resizeGL(int w, int h) {
     m_progFlat.setViewProjMatrix(viewproj);
     m_progSky.setViewProjMatrix(viewproj);
 
+    m_progSky.useMe();
     this->glUniform2i(m_progSky.unifDimensions, width() * this->devicePixelRatio(),
                       height() * this->devicePixelRatio());
-    glm::vec3 cam = m_player.mcr_camera.getLookVec();
+    glm::vec3 cam = m_player.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
 
     m_progNoOp.setDimensions(glm::ivec2(w, h));
@@ -174,11 +175,11 @@ void MyGL::paintGL() {
     m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
     m_progLambert.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 
-    m_progSky.setViewProjMatrix(m_player.mcr_camera.getViewProj());
+    m_progSky.setViewProjMatrix(glm::inverse(m_player.mcr_camera.getViewProj()));
     m_progSky.useMe();
-    glm::vec3 cam = m_player.mcr_camera.getLookVec();
+    glm::vec3 cam = m_player.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
-    this->glUniform1f(m_progSky.unifTime, 1.f);
+    this->glUniform1f(m_progSky.unifTime, time++);
 
     renderTerrain();
     performTerrainPostprocessRenderPass();
