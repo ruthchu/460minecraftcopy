@@ -41,6 +41,8 @@ private:
     PostProcessingShader m_progTint; // A post processing shader program that handels water and lava tinting
     PostProcessingShader m_progNoOp; // A post processing shader program that handels water and lava tinting
 
+    ShaderProgram m_progSky; // A screen-space shader for creating the sky background
+
     Quad quad;
 
     void moveMouseToCenter(); // Forces the mouse position to the screen's center. You should call this

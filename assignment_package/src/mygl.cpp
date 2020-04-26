@@ -13,7 +13,7 @@ MyGL::MyGL(QWidget *parent)
       m_terrain(this), m_player(glm::vec3(48.f, 170.f, 48.f), m_terrain),
       m_currTime(QDateTime::currentMSecsSinceEpoch()), m_timeSinceStart(0),
       framebuffer(FrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
-      m_progTint(this), m_progNoOp(this), quad(Quad(this))
+      m_progTint(this), m_progNoOp(this), m_progSky(this),quad(Quad(this))
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -77,6 +77,9 @@ void MyGL::initializeGL()
     // Create post processing shader for no operation
     m_progNoOp.create(":/glsl/passthrough.vert.glsl", ":/glsl/noOp.frag.glsl");
 
+    // Create and set up sky shader
+    m_progSky.create(":/glsl/sky.vert.glsl", ":/glsl/sky.frag.glsl");
+
     // Set a color with which to draw geometry.
     // This will ultimately not be used when you change
     // your program to render Chunks with vertex colors
@@ -110,6 +113,12 @@ void MyGL::resizeGL(int w, int h) {
 
     m_progLambert.setViewProjMatrix(viewproj);
     m_progFlat.setViewProjMatrix(viewproj);
+    m_progSky.setViewProjMatrix(viewproj);
+
+    this->glUniform2i(m_progSky.unifDimensions, width() * this->devicePixelRatio(),
+                      height() * this->devicePixelRatio());
+    glm::vec3 cam = m_player.mcr_camera.getLookVec();
+    this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
 
     m_progNoOp.setDimensions(glm::ivec2(w, h));
     m_progTint.setDimensions(glm::ivec2(w, h));
@@ -131,6 +140,7 @@ void MyGL::tick() {
     // Calculate dT and pass relevant time values to tick and shader
     float dT = (QDateTime::currentMSecsSinceEpoch() - m_currTime) / 1000.f;
     m_progLambert.setTime(m_timeSinceStart);
+    m_progSky.setTime(m_timeSinceStart);
 
     m_player.tick(dT, m_inputs);
 
@@ -163,6 +173,12 @@ void MyGL::paintGL() {
 
     m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
     m_progLambert.setViewProjMatrix(m_player.mcr_camera.getViewProj());
+
+    m_progSky.setViewProjMatrix(m_player.mcr_camera.getViewProj());
+    m_progSky.useMe();
+    glm::vec3 cam = m_player.mcr_camera.getLookVec();
+    this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
+    this->glUniform1f(m_progSky.unifTime, 1.f);
 
     renderTerrain();
     performTerrainPostprocessRenderPass();

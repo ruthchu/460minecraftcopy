@@ -29,6 +29,10 @@ public:
 
     int uniEnviorment; // A handle that tells us what enviorment we are in
 
+    // Sky
+    int unifDimensions;
+    int unifEye;
+
 public:
     ShaderProgram(OpenGLContext* context);
     // Sets up the requisite GL data and shaders from the given .glsl files
