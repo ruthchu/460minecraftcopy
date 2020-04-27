@@ -113,8 +113,8 @@ void MyGL::resizeGL(int w, int h) {
 
     m_progLambert.setViewProjMatrix(viewproj);
     m_progFlat.setViewProjMatrix(viewproj);
-    m_progSky.setViewProjMatrix(viewproj);
 
+    m_progSky.setViewProjMatrix(viewproj);
     m_progSky.useMe();
     this->glUniform2i(m_progSky.unifDimensions, width() * this->devicePixelRatio(),
                       height() * this->devicePixelRatio());
@@ -181,20 +181,6 @@ void MyGL::paintGL() {
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
     this->glUniform1f(m_progSky.unifTime, time++);
 
-    renderTerrain();
-    performTerrainPostprocessRenderPass();
-
-//    glDisable(GL_DEPTH_TEST);
-//    m_progFlat.setModelMatrix(glm::mat4());
-//    m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
-//    m_progFlat.drawOpaque(m_worldAxes);
-//    glEnable(GL_DEPTH_TEST);
-}
-
-// TODO: Change this so it renders the nine zones of generated
-// terrain that surround the player (refer to Terrain::m_generatedTerrain
-// for more info)
-void MyGL::renderTerrain() {
 //     Render to our framebuffer rather than the viewport
     framebuffer.bindFrameBuffer();
 //     Render on the whole framebuffer, complete from the lower left corner to the upper right
@@ -213,21 +199,53 @@ void MyGL::renderTerrain() {
     quad.bufferVBOdata();
     m_progSky.drawQuad(quad);
 
-//    int renderRadius = 1;
-//    glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
-//    glm::ivec2 centerTerrain = m_terrain.getTerrainAt(pPos[0], pPos[1]);
+    renderTerrain();
+    performTerrainPostprocessRenderPass();
 
-//    // Bind the texture
-//    m_texture.bind(0);
+    glDisable(GL_DEPTH_TEST);
+    m_progFlat.setModelMatrix(glm::mat4());
+    m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
+    m_progFlat.drawOpaque(m_worldAxes);
+    glEnable(GL_DEPTH_TEST);
+}
 
-//    int xmin = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * renderRadius /*- BLOCK_LENGTH_IN_TERRAIN*/;//16 * (xFloor - range);
-//    int xmax = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * renderRadius + BLOCK_LENGTH_IN_TERRAIN; //16 * (xFloor + range);
-//    int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius - BLOCK_LENGTH_IN_TERRAIN;//16 * (zFloor - range);
-//    int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius /*+ BLOCK_LENGTH_IN_TERRAIN*/;//16 * (zFloor + range);
+// TODO: Change this so it renders the nine zones of generated
+// terrain that surround the player (refer to Terrain::m_generatedTerrain
+// for more info)
+void MyGL::renderTerrain() {
+////     Render to our framebuffer rather than the viewport
+//    framebuffer.bindFrameBuffer();
+////     Render on the whole framebuffer, complete from the lower left corner to the upper right
 
-//    m_progLambert.setEnviorment(playerIsInLiquid());
+//    int viewW = this->width() * this->devicePixelRatio();
+//    int viewH = this->height() * this->devicePixelRatio();
+//#ifdef MAC
+//    viewW = this->width() * 2;
+//    viewH = this->height() * 2;
+//#endif
+//    glViewport(0,0, viewW, viewH);
 
-//    m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
+//    // Clear the screen so that we only see newly drawn images
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+//    quad.bufferVBOdata();
+//    m_progSky.drawQuad(quad);
+
+    int renderRadius = 1;
+    glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
+    glm::ivec2 centerTerrain = m_terrain.getTerrainAt(pPos[0], pPos[1]);
+
+    // Bind the texture
+    m_texture.bind(0);
+
+    int xmin = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * renderRadius /*- BLOCK_LENGTH_IN_TERRAIN*/;//16 * (xFloor - range);
+    int xmax = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * renderRadius + BLOCK_LENGTH_IN_TERRAIN; //16 * (xFloor + range);
+    int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius - BLOCK_LENGTH_IN_TERRAIN;//16 * (zFloor - range);
+    int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius /*+ BLOCK_LENGTH_IN_TERRAIN*/;//16 * (zFloor + range);
+
+    m_progLambert.setEnviorment(playerIsInLiquid());
+
+    m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
 }
 
 void MyGL::performTerrainPostprocessRenderPass()

@@ -14,8 +14,8 @@ in vec4 vs_Pos;
 void main()
 {
 //    fs_Col = vs_Col;
-    vec4 modelposition = u_Model * vs_Pos;
-
+//    vec4 modelposition = u_Model * vs_Pos;
     //built-in things to pass down the pipeline
-    gl_Position = u_ViewProj * modelposition;
+//    gl_Position = u_ViewProj * modelposition;
+    gl_Position = vs_Pos;
 }

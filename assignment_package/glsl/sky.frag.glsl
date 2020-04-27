@@ -43,18 +43,17 @@ vec2 sphereToUV(vec3 p) {
 void main()
 {
     // Copy the color; there is no shading.
-//    vec2 ndc = (gl_FragCoord.xy / vec2(u_Dimensions)) * 2.0 - 1.0; // -1 to 1 NDC
+    vec2 ndc = (gl_FragCoord.xy / vec2(u_Dimensions)) * 2.0 - 1.0; // -1 to 1 NDC
 
-//    vec4 p = vec4(ndc.xy, 1, 1); // Pixel at the far clip plane
-//    p *= 1000.0; // Times far clip plane value
-//    p = /*Inverse of*/ u_ViewProj * p; // Convert from unhomogenized screen to world
+    vec4 p = vec4(ndc.xy, 1, 1); // Pixel at the far clip plane
+    p *= 1000.0; // Times far clip plane value
+    p = /*Inverse of*/ u_ViewProj * p; // Convert from unhomogenized screen to world
 
-//    vec3 rayDir = normalize(p.xyz - u_Eye);
+    vec3 rayDir = normalize(p.xyz - u_Eye);
 
-//    vec3 col  = 0.5 * (rayDir + vec3(1,1,1));
-    out_Col = vec4(gl_FragCoord.x, gl_FragCoord.y, 0, 1);
-//    return;
-//    vec2 uv = sphereToUV(rayDir);
+    vec3 col  = 0.5 * (rayDir + vec3(1,1,1));
 
-//    out_Col = vec4(1, 1, 1, 1);
+    vec2 uv = sphereToUV(rayDir);
+
+    out_Col = vec4(col, 1);
 }
