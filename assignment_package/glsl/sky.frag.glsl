@@ -20,7 +20,7 @@ const float TWO_PI = 6.28318530718;
 #define DUSK_THRESHOLD -0.1
 
 // sun parameters
-const vec4 sunDir = normalize(vec4(0.5, 1, 0.75, 0));
+const vec3 sunDir = normalize(vec3(0, 0.1, 1.0));
 const float sunSize = 20.0;
 const float sunCoreSize = 7.5;
 
@@ -45,7 +45,7 @@ const vec3 cloudColor = sunset[3];
 int getIndex(int i, int c) {
     return (i + c) % 5;
 }
-const int SKY_INDEX = 1;
+const int SKY_INDEX = 0;
 
 vec3 toSunset(float y) {
     if(y < 0.5) {
@@ -239,12 +239,12 @@ float snoise(vec3 v){
 }
 
 float fbm(vec3 p) {
-    const int NUM_OCTAVES = 11;
+    const int NUM_OCTAVES = 3;
     float v = 0.0;
     float a = 0.5;
     vec3 shift = vec3(100);
     for (int i = 0; i < NUM_OCTAVES; ++i) {
-        v += a * WorleyNoise3D(p);
+        v += a * snoise(p);
         p = p * 2.0 + shift;
         a *= 0.5;
     }
@@ -261,24 +261,23 @@ float warpFBM(vec3 p) {
                   fbm(p + 1.0 * q + vec3(8.3, 2.8, 331.3)),
                   fbm(p + 1.0 * q + vec3(420.69, 631.2,109.21)));
     float f = fbm(p + r);
-    if (f < 0.5) {
-        f = 1.;
-    } else {
-        f = 0.;
-    }
     return f;
 }
 
-float worleyFBM(vec3 uv) {
+float snoiseFBM(vec3 p) {
     float sum = 0;
     float freq = 4;
     float amp = 0.5;
     for(int i = 0; i < 8; i++) {
-        sum += snoise(uv * freq) * amp;
+        sum += snoise(p * freq) * amp;
         freq *= 2;
         amp *= 0.5;
     }
     return sum;
+}
+
+vec3 rotateY(vec3 p, float a) {
+    return vec3(cos(a) * p.x + sin(a) * p.z, p.y, -sin(a) * p.x + cos(a) * p.z);
 }
 
 void main()
@@ -300,8 +299,8 @@ void main()
     // convert ray to 2d uv coords
     vec2 uv = sphereToUV(rayDir /*- clamp(u_Eye, 0.f,1.f)*/);
 
-    float skyInput = uv.y;
-    vec2 offset = vec2(warpFBM(rayDir));
+    vec2 offset = vec2(snoiseFBM(rayDir));
+//    vec2 offset = vec2(warpFBM(rayDir));
     uv = uv + offset * 0.1;
 
     vec3 sunsetCol = toSunset(uv.y);
@@ -310,7 +309,8 @@ void main()
     vec3 col = sunsetCol;
     // recall the definition of a dot product. The angle between two normalized vectors
     // can be found by taking the arccos(a dot b). theta: [0,pi]. Multiply by 2 to get [0,two_pi]
-    float raySunDot = dot(rayDir, sunDir.xyz);
+    vec3 newSunDir = rotateY(sunDir, u_Time * 0.01);
+    float raySunDot = dot(rayDir, newSunDir);
     float angle = acos(raySunDot) * 2.f * (180.f / PI);
 
     if (angle < sunSize) {
