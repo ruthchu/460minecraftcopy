@@ -39,6 +39,7 @@ private:
 public:
     Lsystem(Terrain &terrain, glm::ivec2 inputPosition);
     void makeRivers();
+    void makeTreeTrunk();
 };
 
 #endif // LSYSTEM_H

@@ -66,11 +66,16 @@ void Lsystem::makeLava() {
     riverType = LAVA;
 }
 
+
+void Lsystem::makeTreeTrunk() {
+
+}
+
 void Lsystem::makeRivers()
 {
     int noise = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
     //std::cout << noise << std::endl;
-    if (noise > 0.6) {
+    if (noise > 0.8) {
         return;
     }
 
@@ -113,7 +118,7 @@ void Lsystem::makeRivers()
         makeLava();
     }
 
-    QString q = strMaker(iter, "AB+G-K+M");
+    QString q = strMaker(3, "AB+G-K+M");
     //std::cout << q.toUtf8().constData() << std::endl;
     lsystemParser(q);
 }
