@@ -181,11 +181,14 @@ void MyGL::paintGL() {
     m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
     m_progLambert.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 
-    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
-    m_progLambert.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
+//    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
+    m_progDepthThough.setDepthMVP(glm::normalize(m_player.mcr_camera.getLookVec()));
+    m_progDepthThough.setModelMatrix(glm::mat4());
+    m_progDepthThough.setViewProjMatrix(m_player.mcr_camera.getViewProj());
+//    m_progLambert.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
 
     preformLightPerspectivePass();
-    preformPlayerPerspectivePass();
+//    preformPlayerPerspectivePass();
     performTerrainPostprocessRenderPass();
 
     glDisable(GL_DEPTH_TEST);
@@ -241,20 +244,20 @@ void MyGL::performTerrainPostprocessRenderPass()
     prepareViewportForFBO();
     // bind the final scene to texture slot 1
     m_framebuffer.bindToTextureSlot(1);
-    quad.bufferVBOdata();
 
+    quad.bufferVBOdata();
 //    if (playerIsInLiquid()) {
 //       m_progTint.draw(quad, 2);
 //    } else {
 //     m_progNoOp.draw(quad, 1);
 //    }
-//    m_progShandow.draw(quad, 2);
+    m_progShandow.draw(quad, 2);
 
-     if (playerIsInLiquid() == 1) {
-        m_progTint.draw(quad, 1);
-     } else {
-        m_progNoOp.draw(quad, 1);
-     }
+//     if (playerIsInLiquid() == 1) {
+//        m_progTint.draw(quad, 1);
+//     } else {
+//        m_progNoOp.draw(quad, 1);
+//     }
 }
 
 void MyGL::prepareViewportForFBO()
