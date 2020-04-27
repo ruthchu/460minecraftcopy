@@ -11,6 +11,7 @@ void main()
 {
     vec4 modelposition = u_Model * vs_Pos;
 
-    gl_Position = u_depthMVP * u_ViewProj * vs_Pos;
+//    gl_Position = u_depthMVP * u_ViewProj * vs_Pos;
+    gl_Position = u_depthMVP * vs_Pos;
 //    gl_Position = vs_Pos;
 }

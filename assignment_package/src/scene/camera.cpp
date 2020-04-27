@@ -36,6 +36,10 @@ glm::mat4 Camera::getViewProj() const {
     return glm::perspective(glm::radians(m_fovy), m_aspect, m_near_clip, m_far_clip) * glm::lookAt(m_position, m_position + m_forward, m_up);
 }
 
+glm::mat4 Camera::getView() const {
+    return glm::lookAt(m_position, m_position + m_forward, m_up);
+}
+
 glm::vec3 Camera::getLookVec() const {
     return m_forward;
 }

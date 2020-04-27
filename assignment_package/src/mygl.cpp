@@ -182,7 +182,14 @@ void MyGL::paintGL() {
     m_progLambert.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 
 //    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
-    m_progDepthThough.setDepthMVP(glm::normalize(m_player.mcr_camera.getLookVec()));
+    glEnable(GL_DEPTH_TEST);
+
+//    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, 0.1f, 1000.f);
+    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-50.f, 50.f, -50.f, 50.f, 0.1f, 1000.f);
+    glm::mat4 cameraView = m_player.mcr_camera.getView();
+    m_progDepthThough.setDepthMVP(depthProjectionMatrix * cameraView);
+
+//    m_progDepthThough.setDepthMVP(glm::normalize(m_player.mcr_camera.getLookVec()));
     m_progDepthThough.setModelMatrix(glm::mat4());
     m_progDepthThough.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 //    m_progLambert.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));

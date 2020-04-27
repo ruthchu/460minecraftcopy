@@ -22,6 +22,7 @@ public:
     void tick(float dT, InputBundle &input) override;
 
     glm::mat4 getViewProj() const;
+    glm::mat4 getView() const;
 
     // Used for removing and placing blocks
     glm::vec3 getLookVec() const;

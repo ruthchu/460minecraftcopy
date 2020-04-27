@@ -175,6 +175,20 @@ void ShaderProgram::setDepthMVP(const glm::vec3 light)
     }
 }
 
+void ShaderProgram::setDepthMVP(const glm::mat4 mat)
+{
+    useMe();
+
+    if (unifDepthMatrixID != -1) {
+//        glm::mat4 depthProjectionMatrix = glm::ortho<float>(-1.f, 1.f, -1.f, 1.f, 0.1f, 1000.f);
+//        glm::mat4 depthViewMatrix = glm::lookAt(light, glm::vec3(0,0,0), glm::vec3(0,1,0));
+//        glm::mat4 depthModelMatrix = glm::mat4(1.0);
+//        glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
+        glm::mat4 depthMVP = mat;
+        context->glUniformMatrix4fv(unifDepthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
+    }
+}
+
 //This function, as its name implies, uses the passed in GL widget
 void ShaderProgram::drawOpaque(Drawable &d)
 {
