@@ -194,7 +194,7 @@ void MyGL::paintGL() {
 
 void MyGL::preformLightPerspectivePass()
 {
-    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(-0.5, -1, -0.75)));
+    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
     // Bind depth frame buffer
     m_depthFrameBuffer.bindFrameBuffer();
     prepareViewportForFBO();

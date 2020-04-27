@@ -162,13 +162,13 @@ void ShaderProgram::setTime(int t) {
     }
 }
 
-void ShaderProgram::setDepthMVP(const glm::vec3 inverseLightRay)
+void ShaderProgram::setDepthMVP(const glm::vec3 light)
 {
     useMe();
 
     if (unifDepthMatrixID != -1) {
-        glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
-        glm::mat4 depthViewMatrix = glm::lookAt(inverseLightRay, glm::vec3(0,0,0), glm::vec3(0,1,0));
+        glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, -10.f, 10.f);
+        glm::mat4 depthViewMatrix = glm::lookAt(light, glm::vec3(0,0,0), glm::vec3(0,1,0));
         glm::mat4 depthModelMatrix = glm::mat4(1.0);
         glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
         context->glUniformMatrix4fv(unifDepthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);

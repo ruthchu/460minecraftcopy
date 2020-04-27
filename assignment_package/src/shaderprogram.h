@@ -60,7 +60,7 @@ public:
 
     void setEnviorment(int i); // set enivorment handle
 
-    void setDepthMVP(const glm::vec3 inverseLightRay);
+    void setDepthMVP(const glm::vec3 light);
 
     QString qTextFileRead(const char*);
 
