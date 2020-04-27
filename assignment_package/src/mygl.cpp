@@ -181,8 +181,11 @@ void MyGL::paintGL() {
     m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
     m_progLambert.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 
+    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
+    m_progLambert.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
+
     preformLightPerspectivePass();
-//    preformPlayerPerspectivePass();
+    preformPlayerPerspectivePass();
     performTerrainPostprocessRenderPass();
 
     glDisable(GL_DEPTH_TEST);
@@ -194,7 +197,6 @@ void MyGL::paintGL() {
 
 void MyGL::preformLightPerspectivePass()
 {
-    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
     // Bind depth frame buffer
     m_depthFrameBuffer.bindFrameBuffer();
     prepareViewportForFBO();
@@ -210,9 +212,11 @@ void MyGL::preformPlayerPerspectivePass()
     // Bind standard frame buffer
     m_framebuffer.bindFrameBuffer();
     prepareViewportForFBO();
-    // Bind minecraft texture
+    // Bind minecraft texture to slot 0
     m_texture.bind(0);
-    // Bind shadow map texture
+    // Bind shadow map texture to slot 2
+    m_depthFrameBuffer.bindToTextureSlot(2);
+    // Render with lambert
     renderTerrain(&m_progLambert);
 }
 
@@ -235,16 +239,16 @@ void MyGL::performTerrainPostprocessRenderPass()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
     prepareViewportForFBO();
-    // bind the final scene to texture slot number 1
-//    m_framebuffer.bindToTextureSlot(1);
+    // bind the final scene to texture slot 1
+    m_framebuffer.bindToTextureSlot(1);
     quad.bufferVBOdata();
-//    m_depthFrameBuffer.bindToTextureSlot(1);
+
 //    if (playerIsInLiquid()) {
 //       m_progTint.draw(quad, 2);
 //    } else {
-//     m_progNoOp.draw(quad, 2);
+     m_progNoOp.draw(quad, 1);
 //    }
-    m_progShandow.draw(quad, 2);
+//    m_progShandow.draw(quad, 2);
 }
 
 void MyGL::prepareViewportForFBO()

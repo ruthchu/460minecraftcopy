@@ -13,7 +13,15 @@
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
 uniform sampler2D u_Texture; // The texture to be read from by this shader
+
 uniform sampler2D u_ShadowMap; // Shadow map texture read from by labert shader
+
+uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.
+
+uniform mat4 u_Model;       // The matrix that defines the transformation of the
+
+uniform mat4 u_depthMVP;
+
 uniform int u_Time; // A time value that changes once every tick
 
 uniform int u_enviorment;
@@ -107,6 +115,25 @@ void main()
        } else if (u_enviorment == 2) {
            finCol.r = clamp(finCol.r * 2.3f, 0.7f, 1.f);
            finCol.g = clamp(finCol.g * 1.3f, 0.f, 1.f);
+       }
+
+       // Draw shadows
+       // frag world pos -> unhomogenized screen pos -> light pos
+       vec4 fragPosLight =  u_depthMVP * u_ViewProj * u_Model * fs_Pos;
+       // To NDC [-1,1]
+       vec3 shadowCoord = fragPosLight.xyz / fragPosLight.w;
+       // To [0,1] for sampling
+       shadowCoord = shadowCoord / 2 + 0.5;
+       // Get shadow mapped stored depth
+       float closestObjectDepth = texture(u_ShadowMap, shadowCoord.xy).r;
+       float fragmentDepth = shadowCoord.z;
+       // Check if fragment is in shadow with bias
+//       float bias = max(0.05 * (1.0 - dot(fs_Nor, u_Eye)), 0.005);
+       float bias = 0.005;
+       bool isInShadow = fragmentDepth - bias > closestObjectDepth;
+
+       if (isInShadow) {
+           finCol = vec4(0, 0, 0, finCol.w);
        }
 
        out_Col = finCol;
