@@ -246,9 +246,15 @@ void MyGL::performTerrainPostprocessRenderPass()
 //    if (playerIsInLiquid()) {
 //       m_progTint.draw(quad, 2);
 //    } else {
-     m_progNoOp.draw(quad, 1);
+//     m_progNoOp.draw(quad, 1);
 //    }
 //    m_progShandow.draw(quad, 2);
+
+     if (playerIsInLiquid() == 1) {
+        m_progTint.draw(quad, 1);
+     } else {
+        m_progNoOp.draw(quad, 1);
+     }
 }
 
 void MyGL::prepareViewportForFBO()
