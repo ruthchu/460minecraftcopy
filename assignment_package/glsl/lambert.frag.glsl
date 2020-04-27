@@ -15,8 +15,6 @@ uniform vec4 u_Color; // The color with which to render this instance of geometr
 uniform sampler2D u_Texture; // The texture to be read from by this shader
 uniform int u_Time; // A time value that changes once every tick
 
-uniform int u_enviorment;
-
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
 in vec4 fs_Pos;
@@ -25,7 +23,7 @@ in vec4 fs_LightVec;
 in vec4 fs_UV;
 
 out vec4 out_Col; // This is the final output color that you will see on your
-                  // screen for the pixel that is currently being processed.
+// screen for the pixel that is currently being processed.
 
 float random1(vec3 p) {
     return fract(sin(dot(p,vec3(127.1, 311.7, 191.999)))
@@ -75,38 +73,29 @@ vec3 fbm(vec3 p) {
 void main()
 {
     // Material base color (before shading)
-        vec4 diffuseColor;
-        if (fs_UV.x >= 13.0 / 16.0) {
-            // If this block has UV coords that fall in the range of LAVA or WATER
-            // offset the UVs as a function of time
-            diffuseColor = texture(u_Texture, vec2(fs_UV.x + mod(u_Time / 1000.0, 2.0 / 16.0), fs_UV.y));
-        } else {
-            // Draw with static UV coords
-            diffuseColor = texture(u_Texture, vec2(fs_UV.x, fs_UV.y));
-        }
+    vec4 diffuseColor;
+    if (fs_UV.x >= 13.0 / 16.0) {
+        // If this block has UV coords that fall in the range of LAVA or WATER
+        // offset the UVs as a function of time
+        diffuseColor = texture(u_Texture, vec2(fs_UV.x + mod(u_Time / 1000.0, 2.0 / 16.0), fs_UV.y));
+    } else {
+        // Draw with static UV coords
+        diffuseColor = texture(u_Texture, vec2(fs_UV.x, fs_UV.y));
+    }
 
-        // Calculate the diffuse term for Lambert shading
-        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
-        // Avoid negative lighting values
-        diffuseTerm = clamp(diffuseTerm, 0, 1);
+    // Calculate the diffuse term for Lambert shading
+    float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
+    // Avoid negative lighting values
+    diffuseTerm = clamp(diffuseTerm, 0, 1);
 
-        float ambientTerm = 0.2;
+    float ambientTerm = 0.2;
 
-        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier
-                                                            //to simulate ambient lighting. This ensures that faces that are not
-                                                            //lit by our point light are not completely black.
+    float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier
+    //to simulate ambient lighting. This ensures that faces that are not
+    //lit by our point light are not completely black.
 
-        // Compute final shaded color
-        vec4 finCol = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
+    // Compute final shaded color
+    vec4 finCol = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
 
-        // Check enviroment
-//       if (u_enviorment == 1) {
-//           finCol.g = clamp(finCol.g * 1.5f, 0.f, 1.f);
-//           finCol.b = clamp(finCol.b * 2.2f, 0.7f, 1.f);
-//       } else if (u_enviorment == 2) {
-//           finCol.r = clamp(finCol.r * 2.3f, 0.7f, 1.f);
-//           finCol.g = clamp(finCol.g * 1.3f, 0.f, 1.f);
-//       }
-
-       out_Col = finCol;
+    out_Col = finCol;
 }
