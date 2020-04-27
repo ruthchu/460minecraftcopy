@@ -38,6 +38,7 @@ const vec4 lightDir = normalize(vec4(0.5, 1, 0.75, 0));  // The direction of our
 
 void main()
 {
+    fs_Pos = vs_Pos;
     fs_UV = vs_Col;                         // Pass the vertex colors to the fragment shader for interpolation
 
     mat3 invTranspose = mat3(u_ModelInvTr);
@@ -52,7 +53,6 @@ void main()
 
     fs_LightVec = (lightDir);  // Compute the direction in which the light source lies
 
-    fs_Pos = u_ViewProj * modelposition;
     gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is
                                              // used to render the final positions of the geometry's vertices
 }
