@@ -2,9 +2,9 @@
 
 in vec4 fs_UV;
 
-uniform sampler2D u_sampler1;
-
 out vec4 out_Col;
+
+uniform sampler2D u_sampler1;
 
 void main()
 {
@@ -16,5 +16,4 @@ void main()
         blueparam *= 1.3;
     }
     vec4 col = vec4(txCol.r, txCol.g, blueparam, txCol[3]);
-    out_Col = col;
 }

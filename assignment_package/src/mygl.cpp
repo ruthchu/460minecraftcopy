@@ -13,7 +13,8 @@ MyGL::MyGL(QWidget *parent)
       m_terrain(this), m_player(glm::vec3(48.f, 170.f, 48.f), m_terrain),
       m_currTime(QDateTime::currentMSecsSinceEpoch()), m_timeSinceStart(0),
       m_framebuffer(FrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
-      m_progTint(this), m_progNoOp(this), m_progDepthThough(this), quad(Quad(this)), m_depthFrameBuffer(DepthFrameBuffer(this, this->width(), this->height(), this->devicePixelRatio()))
+      m_progTint(this), m_progNoOp(this), m_progDepthThough(this), m_progShandow(this), quad(Quad(this)),
+      m_depthFrameBuffer(DepthFrameBuffer(this, this->width(), this->height(), this->devicePixelRatio()))
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -75,13 +76,14 @@ void MyGL::initializeGL()
     m_progLambert.create(":/glsl/lambert.vert.glsl", ":/glsl/lambert.frag.glsl");
     // Create and set up the flat lighting shader
     m_progFlat.create(":/glsl/flat.vert.glsl", ":/glsl/flat.frag.glsl");
+    // Create shader for depth map
+    m_progDepthThough.create(":/glsl/depthThrough.vert.glsl", ":/glsl/depthThrough.frag.glsl");
 
     // Create post processing shader for tinting in water
-//    m_progTint.create(":/glsl/passthrough.vert.glsl", ":/glsl/screentint.frag.glsl");
-//    // Create post processing shader for no operation
-//    m_progNoOp.create(":/glsl/passthrough.vert.glsl", ":/glsl/noOp.frag.glsl");
-    // Create post processing shader for depth
-    m_progDepthThough.create(":/glsl/depthThrough.vert.glsl", ":/glsl/depthThrough.frag.glsl");
+    m_progTint.create(":/glsl/passthrough.vert.glsl", ":/glsl/screentint.frag.glsl");
+    // Create post processing shader for no operation
+    m_progNoOp.create(":/glsl/passthrough.vert.glsl", ":/glsl/noOp.frag.glsl");
+    m_progShandow.create(":/glsl/passthrough.vert.glsl", ":/glsl/shadowMap.frag.glsl");
 
     // Set a color with which to draw geometry.
     // This will ultimately not be used when you change
@@ -107,7 +109,6 @@ void MyGL::initializeGL()
 
     m_progNoOp.setDimensions(glm::ivec2(this->width(), this->height()));
     m_progTint.setDimensions(glm::ivec2(this->width(), this->height()));
-    m_progDepthThough.setDimensions(glm::ivec2(this->width(), this->height()));
 }
 
 void MyGL::resizeGL(int w, int h) {
@@ -120,10 +121,10 @@ void MyGL::resizeGL(int w, int h) {
 
     m_progLambert.setViewProjMatrix(viewproj);
     m_progFlat.setViewProjMatrix(viewproj);
+    m_progDepthThough.setViewProjMatrix(viewproj);
 
     m_progNoOp.setDimensions(glm::ivec2(w, h));
     m_progTint.setDimensions(glm::ivec2(w, h));
-    m_progDepthThough.setDimensions(glm::ivec2(w, h));
 
     // resize frame buffer
     m_framebuffer.resize(w, h, this->devicePixelRatio());
@@ -180,9 +181,8 @@ void MyGL::paintGL() {
     m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
     m_progLambert.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 
-    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(-0.5, -1, -0.75)));
-
-    renderTerrain();
+    preformLightPerspectivePass();
+//    preformPlayerPerspectivePass();
     performTerrainPostprocessRenderPass();
 
     glDisable(GL_DEPTH_TEST);
@@ -192,48 +192,63 @@ void MyGL::paintGL() {
     glEnable(GL_DEPTH_TEST);
 }
 
+void MyGL::preformLightPerspectivePass()
+{
+    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(-0.5, -1, -0.75)));
+    // Bind depth frame buffer
+    m_depthFrameBuffer.bindFrameBuffer();
+    prepareViewportForFBO();
+    // Bind shadow map to texture slot 2
+    m_depthFrameBuffer.bindToTextureSlot(2);
+    glUniform1i(m_progDepthThough.unifSampler2DShadow, 2);
+    renderTerrain(&m_progDepthThough);
+    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
+}
+
+void MyGL::preformPlayerPerspectivePass()
+{
+    // Bind standard frame buffer
+    m_framebuffer.bindFrameBuffer();
+    prepareViewportForFBO();
+    // Bind minecraft texture
+    m_texture.bind(0);
+    // Bind shadow map texture
+    renderTerrain(&m_progLambert);
+}
+
 // TODO: Change this so it renders the nine zones of generated
 // terrain that surround the player (refer to Terrain::m_generatedTerrain
 // for more info)
-void MyGL::renderTerrain() {
-    // Render to our framebuffer rather than the viewport
-    //m_framebuffer.bindFrameBuffer();
-    m_depthFrameBuffer.bindFrameBuffer();
-
-    // Render on the whole framebuffer, complete from the lower left corner to the upper right
-    int viewW = this->width() * this->devicePixelRatio();
-    int viewH = this->height() * this->devicePixelRatio();
-#ifdef MAC
-    viewW = this->width() * 2;
-    viewH = this->height() * 2;
-#endif
-    glViewport(0,0, viewW, viewH);
-
-    // Clear the screen so that we only see newly drawn images
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+void MyGL::renderTerrain(ShaderProgram *prog) {
     int renderRadius = 1;
     glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
     glm::ivec2 centerTerrain = m_terrain.getTerrainAt(pPos[0], pPos[1]);
-
-    // Bind the texture
-    m_texture.bind(0);
-
     int xmin = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * renderRadius /*- BLOCK_LENGTH_IN_TERRAIN*/;//16 * (xFloor - range);
     int xmax = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * renderRadius + BLOCK_LENGTH_IN_TERRAIN; //16 * (xFloor + range);
     int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius - BLOCK_LENGTH_IN_TERRAIN;//16 * (zFloor - range);
     int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius /*+ BLOCK_LENGTH_IN_TERRAIN*/;//16 * (zFloor + range);
-
     m_progLambert.setEnviorment(playerIsInLiquid());
-
-    m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
+    m_terrain.draw(xmin, xmax, zmin, zmax, prog);
 }
 
 void MyGL::performTerrainPostprocessRenderPass()
 {
-    // Render to our framebuffer rather than the viewport
     glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
+    prepareViewportForFBO();
+    // bind the final scene to texture slot number 1
+//    m_framebuffer.bindToTextureSlot(1);
+    quad.bufferVBOdata();
+//    m_depthFrameBuffer.bindToTextureSlot(1);
+//    if (playerIsInLiquid()) {
+//       m_progTint.draw(quad, 2);
+//    } else {
+//        m_progNoOp.draw(quad, 2);
+//    }
+    m_progShandow.draw(quad, 2);
+}
 
+void MyGL::prepareViewportForFBO()
+{
     // Render on the whole framebuffer, complete from the lower left corner to the upper right
     int viewW = this->width() * this->devicePixelRatio();
     int viewH = this->height() * this->devicePixelRatio();
@@ -242,21 +257,8 @@ void MyGL::performTerrainPostprocessRenderPass()
     viewH = this->height() * 2;
 #endif
     glViewport(0,0, viewW, viewH);
-
     // Clear the screen so that we only see newly drawn images
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // bind the texture to slot number 1
-//    m_framebuffer.bindToTextureSlot(1);
-//    m_depthFrameBuffer.bindToTextureSlot(2);
-
-    quad.bufferVBOdata();
-//    if (playerIsInLiquid()) {
-//       m_progTint.draw(quad, 1);
-//    } else {
-//        m_progNoOp.draw(quad, 1);
-    m_progDepthThough.draw(quad, 2);
-//    }
 }
 
 int MyGL::playerIsInLiquid() {

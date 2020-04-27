@@ -10,7 +10,7 @@ ShaderProgram::ShaderProgram(OpenGLContext *context)
     : vertShader(), fragShader(), prog(),
       attrPos(-1), attrNor(-1), attrCol(-1),
       unifModel(-1), unifModelInvTr(-1), unifViewProj(-1), unifColor(-1),
-      unifSampler2D(-1), unifTime(-1), context(context)
+      unifSampler2D(-1), unifTime(-1), unifDepthMatrixID(-1), context(context)
 {}
 
 void ShaderProgram::create(const char *vertfile, const char *fragfile)
@@ -74,6 +74,9 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
     unifTime       = context->glGetUniformLocation(prog, "u_Time");
 
     uniEnviorment   = context->glGetUniformLocation(prog, "u_enviorment");
+
+    unifDepthMatrixID = context->glGetUniformLocation(prog, "u_depthMVP");
+    unifSampler2DShadow  = context->glGetUniformLocation(prog, "u_ShadowMap");
 }
 
 void ShaderProgram::useMe()
@@ -156,6 +159,19 @@ void ShaderProgram::setTime(int t) {
 
     if (unifTime != -1) {
         context->glUniform1i(unifTime, t);
+    }
+}
+
+void ShaderProgram::setDepthMVP(const glm::vec3 inverseLightRay)
+{
+    useMe();
+
+    if (unifDepthMatrixID != -1) {
+        glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
+        glm::mat4 depthViewMatrix = glm::lookAt(inverseLightRay, glm::vec3(0,0,0), glm::vec3(0,1,0));
+        glm::mat4 depthModelMatrix = glm::mat4(1.0);
+        glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
+        context->glUniformMatrix4fv(unifDepthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
     }
 }
 

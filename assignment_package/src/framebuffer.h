@@ -15,7 +15,7 @@
 // sampler2d with the appropriate texture slot.
 
 class FrameBuffer {
-protected:
+private:
     OpenGLContext *mp_context;
     unsigned int m_width, m_height, m_devicePixelRatio;
     bool m_created;

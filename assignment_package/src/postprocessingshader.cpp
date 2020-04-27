@@ -10,7 +10,7 @@
 
 PostProcessingShader::PostProcessingShader(OpenGLContext* context)
     : vertShader(), fragShader(), prog(), unifSampler2D(-1), unifTime(-1),
-      attrPos(-1), attrUV(-1), unifDimensions(-1), unifDepthMatrixID(-1), context(context)
+      attrPos(-1), attrUV(-1), unifDimensions(-1), context(context)
 {}
 
 PostProcessingShader::~PostProcessingShader()
@@ -68,7 +68,7 @@ void PostProcessingShader::create(const char *vertfile, const char *fragfile)
     unifSampler2D = context->glGetUniformLocation(prog, "u_sampler1");
     unifDimensions = context->glGetUniformLocation(prog, "u_Dimensions");
 
-    unifDepthMatrixID = context->glGetUniformLocation(prog, "u_depthMVP");
+//    unifDepthMatrixID = context->glGetUniformLocation(prog, "u_depthMVP");
 }
 
 void PostProcessingShader::draw(Drawable &d, int textureSlot)
@@ -79,7 +79,7 @@ void PostProcessingShader::draw(Drawable &d, int textureSlot)
         throw std::out_of_range("Attempting to draw a drawable with m_count of " + std::to_string(d.elemCountOpaque()) + "!");
     }
 
-    // Set our "u_sampler1" sampler to user Texture Unit 1
+    // Set our "u_sampler1" sampler to user Texture Unit
     context->glUniform1i(unifSampler2D, textureSlot);
 
     // bind
@@ -183,16 +183,16 @@ void PostProcessingShader::setTime(int t) {
     }
 }
 
-void PostProcessingShader::setDepthMVP(const glm::vec3 inverseLightRay)
-{
-    useMe();
+//void PostProcessingShader::setDepthMVP(const glm::vec3 inverseLightRay)
+//{
+//    useMe();
 
-    if (unifDepthMatrixID != -1) {
-        glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
-        glm::mat4 depthViewMatrix = glm::lookAt(inverseLightRay, glm::vec3(0,0,0), glm::vec3(0,1,0));
-        glm::mat4 depthModelMatrix = glm::mat4(1.0);
-        glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
-        context->glUniformMatrix4fv(unifDepthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
-    }
-}
+//    if (unifDepthMatrixID != -1) {
+//        glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
+//        glm::mat4 depthViewMatrix = glm::lookAt(inverseLightRay, glm::vec3(0,0,0), glm::vec3(0,1,0));
+//        glm::mat4 depthModelMatrix = glm::mat4(1.0);
+//        glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
+//        context->glUniformMatrix4fv(unifDepthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
+//    }
+//}
 

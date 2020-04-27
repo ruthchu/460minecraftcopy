@@ -13,6 +13,7 @@
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
 uniform sampler2D u_Texture; // The texture to be read from by this shader
+uniform sampler2D u_ShadowMap; // Shadow map texture read from by labert shader
 uniform int u_Time; // A time value that changes once every tick
 
 uniform int u_enviorment;

@@ -25,10 +25,13 @@ public:
     int unifColor; // A handle for the "uniform" vec4 representing color of geometry in the vertex shader
 
     int unifSampler2D; // A handle to the "uniform" sampler2D that will be used to read the texture containing the scene render
+    int unifSampler2DShadow;
+
     int unifTime; // A handle for the "uniform" float representing time in the shader
 
     int uniEnviorment; // A handle that tells us what enviorment we are in
 
+    int unifDepthMatrixID; // A handle to the "unifrom" mat that projects us from world to light pov
 public:
     ShaderProgram(OpenGLContext* context);
     // Sets up the requisite GL data and shaders from the given .glsl files
@@ -56,6 +59,8 @@ public:
     void printLinkInfoLog(int prog);
 
     void setEnviorment(int i); // set enivorment handle
+
+    void setDepthMVP(const glm::vec3 inverseLightRay);
 
     QString qTextFileRead(const char*);
 
