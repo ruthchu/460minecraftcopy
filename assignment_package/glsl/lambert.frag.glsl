@@ -108,5 +108,10 @@ void main()
            finCol.g = clamp(finCol.g * 1.3f, 0.f, 1.f);
        }
 
+//       if (true) {
+//       } else {
+//           out_Col = finCol;
+//       }
+//       finCol = vec4(1.0, 1.0, 1.0, 1.0);
        out_Col = finCol;
 }

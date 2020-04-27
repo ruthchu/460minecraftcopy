@@ -50,6 +50,7 @@ public:
     // Pass a time variable to this shader on the GPU
     void setTime(int t);
     // Draw the given object to our screen using this ShaderProgram's shaders
+    void drawQuad(Drawable &d);
     void drawOpaque(Drawable &d);
     void drawTransparent(Drawable &d);
     // Utility function used in create()

@@ -27,9 +27,34 @@ const vec3 dusk[5] = vec3[](vec3(144, 96, 144) / 255.0,
                             vec3(48, 24, 96) / 255.0,
                             vec3(0, 24, 72) / 255.0);
 
+const vec3 sunColor = vec3(255, 255, 190) / 255.0;
+const vec3 cloudColor = sunset[3];
+
+
+vec2 sphereToUV(vec3 p) {
+    float phi = atan(p.z, p.x);
+    if(phi < 0) {
+        phi += TWO_PI;
+    }
+    float theta = acos(p.y);
+    return vec2(1 - phi / TWO_PI, 1 - theta / PI);
+}
+
 void main()
 {
     // Copy the color; there is no shading.
-    vec2 ndc = ((gl_FragCoord.xy / vec2(u_Dimensions)) -0.5) * 2.0;
-    out_Col = vec4(1, 1, 1, 1);
+    vec2 ndc = (gl_FragCoord.xy / vec2(u_Dimensions)) * 2.0 - 1.0; // -1 to 1 NDC
+
+    vec4 p = vec4(ndc.xy, 1, 1); // Pixel at the far clip plane
+    p *= 1000.0; // Times far clip plane value
+    p = /*Inverse of*/ u_ViewProj * p; // Convert from unhomogenized screen to world
+
+    vec3 rayDir = normalize(p.xyz - u_Eye);
+
+    vec3 col  = 0.5 * (rayDir + vec3(1,1,1));
+    out_Col = vec4(col, 1);
+//    return;
+//    vec2 uv = sphereToUV(rayDir);
+
+//    out_Col = vec4(1, 1, 1, 1);
 }

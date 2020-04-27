@@ -118,7 +118,7 @@ void MyGL::resizeGL(int w, int h) {
     m_progSky.useMe();
     this->glUniform2i(m_progSky.unifDimensions, width() * this->devicePixelRatio(),
                       height() * this->devicePixelRatio());
-    glm::vec3 cam = m_player.mcr_position;
+    glm::vec3 cam = m_player.mcr_camera.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
 
     m_progNoOp.setDimensions(glm::ivec2(w, h));
@@ -177,7 +177,7 @@ void MyGL::paintGL() {
 
     m_progSky.setViewProjMatrix(glm::inverse(m_player.mcr_camera.getViewProj()));
     m_progSky.useMe();
-    glm::vec3 cam = m_player.mcr_position;
+    glm::vec3 cam = m_player.mcr_camera.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
     this->glUniform1f(m_progSky.unifTime, time++);
 
@@ -195,9 +195,9 @@ void MyGL::paintGL() {
 // terrain that surround the player (refer to Terrain::m_generatedTerrain
 // for more info)
 void MyGL::renderTerrain() {
-    // Render to our framebuffer rather than the viewport
+//     Render to our framebuffer rather than the viewport
     framebuffer.bindFrameBuffer();
-    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+//     Render on the whole framebuffer, complete from the lower left corner to the upper right
 
     int viewW = this->width() * this->devicePixelRatio();
     int viewH = this->height() * this->devicePixelRatio();
@@ -225,6 +225,9 @@ void MyGL::renderTerrain() {
     m_progLambert.setEnviorment(playerIsInLiquid());
 
     m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
+
+    quad.bufferVBOdata();
+    m_progSky.drawQuad(quad);
 }
 
 void MyGL::performTerrainPostprocessRenderPass()
