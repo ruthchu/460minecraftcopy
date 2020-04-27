@@ -14,6 +14,7 @@
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
 uniform sampler2D u_Texture; // The texture to be read from by this shader
 uniform int u_Time; // A time value that changes once every tick
+uniform mat4 u_View;
 
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
@@ -99,8 +100,11 @@ void main()
     // Compute final shaded color
     vec4 finCol = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
 
-    float depth = fs_Pos.z;
+    vec4 camPos = u_View * fs_Pos;
 
+    float depth = camPos.z;
+
+    depth = smoothstep(0, 0.5, depth);
     vec3 col = mix(finCol.xyz, fogCol, depth);
-    out_Col = vec4(col, 1);
+    out_Col = vec4(col, finCol.w);
 }

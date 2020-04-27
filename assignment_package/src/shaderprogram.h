@@ -26,6 +26,7 @@ public:
 
     int unifSampler2D; // A handle to the "uniform" sampler2D that will be used to read the texture containing the scene render
     int unifTime; // A handle for the "uniform" float representing time in the shader
+    int unifView; // A handle for the "uniform" mat4 to bring from
 
 public:
     ShaderProgram(OpenGLContext* context);
@@ -36,6 +37,7 @@ public:
     // Pass the given model matrix to this shader on the GPU
     void setModelMatrix(const glm::mat4 &model);
     // Pass the given Projection * View matrix to this shader on the GPU
+    void setViewMatrix(const glm::mat4 &v);
     void setViewProjMatrix(const glm::mat4 &vp);
     // Pass the given color to this shader on the GPU
     void setGeometryColor(glm::vec4 color);

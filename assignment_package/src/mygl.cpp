@@ -109,6 +109,7 @@ void MyGL::resizeGL(int w, int h) {
     // Upload the view-projection matrix to our shaders (i.e. onto the graphics card)
 
     m_progLambert.setViewProjMatrix(viewproj);
+    m_progLambert.setViewMatrix(glm::inverse(m_player.mcr_camera.getProj()) * viewproj);
     m_progFlat.setViewProjMatrix(viewproj);
 
     m_progNoOp.setDimensions(glm::ivec2(w, h));
@@ -163,6 +164,7 @@ void MyGL::paintGL() {
 
     m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
     m_progLambert.setViewProjMatrix(m_player.mcr_camera.getViewProj());
+    m_progLambert.setViewMatrix(glm::inverse(m_player.mcr_camera.getProj()) * m_player.mcr_camera.getViewProj());
 
     renderTerrain();
     performTerrainPostprocessRenderPass();
