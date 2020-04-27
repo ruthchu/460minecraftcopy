@@ -242,7 +242,7 @@ void MyGL::performTerrainPostprocessRenderPass()
 //    if (playerIsInLiquid()) {
 //       m_progTint.draw(quad, 2);
 //    } else {
-//        m_progNoOp.draw(quad, 2);
+//     m_progNoOp.draw(quad, 2);
 //    }
     m_progShandow.draw(quad, 2);
 }

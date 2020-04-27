@@ -45,7 +45,7 @@ private:
 
     ShaderProgram m_progDepthThough; // A post shader program to see depth values
 
-    PostProcessingShader m_progShandowMap; // A post processing shader program that does nothing
+    PostProcessingShader m_progShandow; // A post processing shader program that does nothing
 
     Quad quad;
 

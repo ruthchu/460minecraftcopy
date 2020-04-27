@@ -1,4 +1,4 @@
-#version 330 core
+#version 150
 
 uniform mat4 u_depthMVP;
 
