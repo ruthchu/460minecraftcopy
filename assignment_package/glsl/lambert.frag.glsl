@@ -25,6 +25,8 @@ in vec4 fs_UV;
 out vec4 out_Col; // This is the final output color that you will see on your
 // screen for the pixel that is currently being processed.
 
+const vec3 fogCol = vec3(178.f / 255.f, 175.f / 255.f, 226.f / 255.f);
+
 float random1(vec3 p) {
     return fract(sin(dot(p,vec3(127.1, 311.7, 191.999)))
                  *43758.5453);
@@ -97,5 +99,8 @@ void main()
     // Compute final shaded color
     vec4 finCol = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
 
-    out_Col = finCol;
+    float depth = fs_Pos.z;
+
+    vec3 col = mix(finCol.xyz, fogCol, depth);
+    out_Col = vec4(col, 1);
 }
