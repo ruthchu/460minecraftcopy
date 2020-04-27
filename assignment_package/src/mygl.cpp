@@ -179,7 +179,7 @@ void MyGL::paintGL() {
     m_progSky.useMe();
     glm::vec3 cam = m_player.mcr_camera.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
-    this->glUniform1f(m_progSky.unifTime, time++);
+//    this->glUniform1f(m_progSky.unifTime, time++);
 
 //     Render to our framebuffer rather than the viewport
     framebuffer.bindFrameBuffer();
@@ -213,23 +213,23 @@ void MyGL::paintGL() {
 // terrain that surround the player (refer to Terrain::m_generatedTerrain
 // for more info)
 void MyGL::renderTerrain() {
-////     Render to our framebuffer rather than the viewport
-//    framebuffer.bindFrameBuffer();
-////     Render on the whole framebuffer, complete from the lower left corner to the upper right
+//     Render to our framebuffer rather than the viewport
+    framebuffer.bindFrameBuffer();
+//     Render on the whole framebuffer, complete from the lower left corner to the upper right
 
-//    int viewW = this->width() * this->devicePixelRatio();
-//    int viewH = this->height() * this->devicePixelRatio();
-//#ifdef MAC
-//    viewW = this->width() * 2;
-//    viewH = this->height() * 2;
-//#endif
-//    glViewport(0,0, viewW, viewH);
+    int viewW = this->width() * this->devicePixelRatio();
+    int viewH = this->height() * this->devicePixelRatio();
+#ifdef MAC
+    viewW = this->width() * 2;
+    viewH = this->height() * 2;
+#endif
+    glViewport(0,0, viewW, viewH);
 
-//    // Clear the screen so that we only see newly drawn images
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // Clear the screen so that we only see newly drawn images
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//    quad.bufferVBOdata();
-//    m_progSky.drawQuad(quad);
+    quad.bufferVBOdata();
+    m_progSky.drawQuad(quad);
 
     int renderRadius = 1;
     glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
