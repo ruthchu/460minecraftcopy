@@ -148,6 +148,63 @@ float warpFBM(vec2 uv) {
     return f;
 }
 
+vec2 random2( vec2 p ) {
+    return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
+}
+
+vec3 random3( vec3 p ) {
+    return fract(sin(vec3(dot(p,vec3(127.1, 311.7, 191.999)),
+                          dot(p,vec3(269.5, 183.3, 765.54)),
+                          dot(p, vec3(420.69, 631.2,109.21))))
+                 *43758.5453);
+}
+
+float WorleyNoise3D(vec3 p)
+{
+    // Tile the space
+    vec3 pointInt = floor(p);
+    vec3 pointFract = fract(p);
+
+    float minDist = 1.0; // Minimum distance initialized to max.
+
+    // Search all neighboring cells and this cell for their point
+    for(int z = -1; z <= 1; z++)
+    {
+        for(int y = -1; y <= 1; y++)
+        {
+            for(int x = -1; x <= 1; x++)
+            {
+                vec3 neighbor = vec3(float(x), float(y), float(z));
+
+                // Random point inside current neighboring cell
+                vec3 point = random3(pointInt + neighbor);
+
+                // Animate the point
+                point = 0.5 + 0.5 * sin(u_Time * 0.01 + 6.2831 * point); // 0 to 1 range
+
+                // Compute the distance b/t the point and the fragment
+                // Store the min dist thus far
+                vec3 diff = neighbor + point - pointFract;
+                float dist = length(diff);
+                minDist = min(minDist, dist);
+            }
+        }
+    }
+    return minDist;
+}
+
+float worleyFBM(vec3 uv) {
+    float sum = 0;
+    float freq = 4;
+    float amp = 0.5;
+    for(int i = 0; i < 8; i++) {
+        sum += WorleyNoise3D(uv * freq) * amp;
+        freq *= 2;
+        amp *= 0.5;
+    }
+    return sum;
+}
+
 void main()
 {
     // We want to project our pixel to a plane in our viewing frustum
@@ -167,7 +224,7 @@ void main()
     // convert ray to 2d uv coords
     vec2 uv = sphereToUV(rayDir /*- clamp(sin(u_Eye * 0.01), 0.f, .75f)*/);
 
-//    float skyInput = uv.y;
+    float skyInput = uv.y;
     vec2 offset = vec2(warpFBM(uv));
     uv = uv + offset * 0.1;
 
@@ -193,16 +250,16 @@ void main()
             coronaDist = smoothstep(0.0, 1.0, coronaDist);
             col = mix(sunColor, col, coronaDist);
         }
-    } /*else {
-        if (raySunDot > DUSK_THRESHOLD) {
-            col = col;
+    } else {
+        if (raySunDot > SUNSET_THRESHOLD) {
+//            col = col;
         } else if (raySunDot > DUSK_THRESHOLD) {
             float t = (raySunDot - SUNSET_THRESHOLD) / (DUSK_THRESHOLD - SUNSET_THRESHOLD);
             col = mix(col, duskCol, t);
         } else {
             col = duskCol;
         }
-    }*/
+    }
 
     out_Col = vec4(col, 1);
 }
