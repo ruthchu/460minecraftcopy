@@ -42,7 +42,6 @@ vec2 sphereToUV(vec3 p) {
 
 void main()
 {
-    // Copy the color; there is no shading.
     vec2 ndc = (gl_FragCoord.xy / vec2(u_Dimensions)) * 2.0 - 1.0; // -1 to 1 NDC
 
     vec4 p = vec4(ndc.xy, 1, 1); // Pixel at the far clip plane
