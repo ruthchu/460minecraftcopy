@@ -230,11 +230,11 @@ void MyGL::performTerrainPostprocessRenderPass()
     framebuffer.bindToTextureSlot(1);
 
     quad.bufferVBOdata();
-//    if (playerIsInLiquid()) {
-//       m_progTint.draw(quad, 1);
-//    } else {
-        m_progNoOp.draw(quad, 1);
-//    }
+    if (playerIsInLiquid() == 1) {
+       m_progTint.draw(quad, 1);
+    } else {
+       m_progNoOp.draw(quad, 1);
+    }
 }
 
 int MyGL::playerIsInLiquid() {
