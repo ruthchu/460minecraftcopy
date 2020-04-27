@@ -42,42 +42,47 @@ const vec3 cloudColor = sunset[3];
 
 /* Piecewise function which returns some linearly interpolated sunset
     values based on the input */
+int getIndex(int i, int c) {
+    return (i + c) % 5;
+}
+const int SKY_INDEX = 1;
+
 vec3 toSunset(float y) {
     if(y < 0.5) {
-        return sunset[0];
+        return sunset[getIndex(SKY_INDEX, 0)];
     }
     else if(y < 0.55) {
-        return mix(sunset[0], sunset[1], (y - 0.5) / 0.05);
+        return mix(sunset[getIndex(SKY_INDEX, 0)], sunset[getIndex(SKY_INDEX, 1)], (y - 0.5) / 0.05);
     }
     else if(y < 0.6) {
-        return mix(sunset[1], sunset[2], (y - 0.55) / 0.05);
+        return mix(sunset[getIndex(SKY_INDEX, 1)], sunset[getIndex(SKY_INDEX, 2)], (y - 0.55) / 0.05);
     }
     else if(y < 0.65) {
-        return mix(sunset[2], sunset[3], (y - 0.6) / 0.05);
+        return mix(sunset[getIndex(SKY_INDEX, 2)], sunset[getIndex(SKY_INDEX, 3)], (y - 0.6) / 0.05);
     }
     else if(y < 0.75) {
-        return mix(sunset[3], sunset[4], (y - 0.65) / 0.1);
+        return mix(sunset[getIndex(SKY_INDEX, 3)], sunset[getIndex(SKY_INDEX, 4)], (y - 0.65) / 0.1);
     }
-    return sunset[4];
+    return sunset[getIndex(SKY_INDEX, 4)];
 }
 
 vec3 toDusk(float y) {
     if(y < 0.5) {
-        return dusk[0];
+        return dusk[getIndex(SKY_INDEX, 0)];
     }
     else if(y < 0.55) {
-        return mix(dusk[0], dusk[1], (y - 0.5) / 0.05);
+        return mix(dusk[getIndex(SKY_INDEX, 0)], dusk[getIndex(SKY_INDEX, 1)], (y - 0.5) / 0.05);
     }
     else if(y < 0.6) {
-        return mix(dusk[1], dusk[2], (y - 0.55) / 0.05);
+        return mix(dusk[getIndex(SKY_INDEX, 1)], dusk[getIndex(SKY_INDEX, 2)], (y - 0.55) / 0.05);
     }
     else if(y < 0.65) {
-        return mix(dusk[2], dusk[3], (y - 0.6) / 0.05);
+        return mix(dusk[getIndex(SKY_INDEX, 2)], dusk[getIndex(SKY_INDEX, 3)], (y - 0.6) / 0.05);
     }
     else if(y < 0.75) {
-        return mix(dusk[3], dusk[4], (y - 0.65) / 0.1);
+        return mix(dusk[getIndex(SKY_INDEX, 3)], dusk[getIndex(SKY_INDEX, 4)], (y - 0.65) / 0.1);
     }
-    return dusk[4];
+    return dusk[getIndex(SKY_INDEX, 4)];
 }
 
 /* Map 3d point to polar coordinates */
@@ -296,7 +301,7 @@ void main()
     vec2 uv = sphereToUV(rayDir /*- clamp(u_Eye, 0.f,1.f)*/);
 
     float skyInput = uv.y;
-    vec2 offset = vec2(worleyFBM(rayDir));
+    vec2 offset = vec2(warpFBM(rayDir));
     uv = uv + offset * 0.1;
 
     vec3 sunsetCol = toSunset(uv.y);
