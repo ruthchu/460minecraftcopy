@@ -9,5 +9,7 @@
         <file>glsl/passthrough.vert.glsl</file>
         <file>glsl/depthThrough.frag.glsl</file>
         <file>glsl/depthThrough.vert.glsl</file>
+        <file>glsl/fog.frag.glsl</file>
+        <file>glsl/fog.vert.glsl</file>
     </qresource>
 </RCC>
