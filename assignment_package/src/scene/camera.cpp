@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "glm_includes.h"
+#include <iostream>
 
 Camera::Camera(glm::vec3 pos)
     : Camera(400, 400, pos)
@@ -37,6 +38,12 @@ glm::mat4 Camera::getViewProj() const {
 }
 
 glm::mat4 Camera::getView() const {
+    std::cout << "m_pos: " << m_position.x << ", " << m_position.y << " ," << m_position.z << std::endl;
+    glm::vec3 a = m_position + m_forward;
+    std::cout << "m_pos + forward: " << a.x << ", " << a.y << " ," << a.z << std::endl;
+    a = m_up;
+    std::cout << "m_up: " << a.x << ", " << a.y << " ," << a.z << std::endl;
+    std::cout << "--------------------------" << std::endl;
     return glm::lookAt(m_position, m_position + m_forward, m_up);
 }
 

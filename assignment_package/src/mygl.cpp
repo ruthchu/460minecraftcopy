@@ -185,17 +185,19 @@ void MyGL::paintGL() {
     glEnable(GL_DEPTH_TEST);
 
 //    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, 0.1f, 1000.f);
-    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-50.f, 50.f, -50.f, 50.f, 0.1f, 1000.f);
-    glm::mat4 cameraView = m_player.mcr_camera.getView();
+    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-50.f, 50.f, -50.f, 50.f, 0.1f, 2000.f);
+    glm::mat4 cameraView = glm::lookAt(glm::vec3(41.0529, 172.854 ,-20.898), glm::vec3(41.0529, 172.854 ,-21.898), glm::vec3(0, 1 ,0));
+//    cameraView = m_player.mcr_camera.getView();
     m_progDepthThough.setDepthMVP(depthProjectionMatrix * cameraView);
 
 //    m_progDepthThough.setDepthMVP(glm::normalize(m_player.mcr_camera.getLookVec()));
     m_progDepthThough.setModelMatrix(glm::mat4());
     m_progDepthThough.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 //    m_progLambert.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
+    m_progLambert.setDepthMVP(depthProjectionMatrix * cameraView);
 
     preformLightPerspectivePass();
-//    preformPlayerPerspectivePass();
+    preformPlayerPerspectivePass();
     performTerrainPostprocessRenderPass();
 
     glDisable(GL_DEPTH_TEST);
@@ -250,7 +252,6 @@ void MyGL::performTerrainPostprocessRenderPass()
     glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
     prepareViewportForFBO();
     // bind the final scene to texture slot 1
-    m_framebuffer.bindToTextureSlot(1);
 
     quad.bufferVBOdata();
 //    if (playerIsInLiquid()) {
@@ -258,13 +259,14 @@ void MyGL::performTerrainPostprocessRenderPass()
 //    } else {
 //     m_progNoOp.draw(quad, 1);
 //    }
-    m_progShandow.draw(quad, 2);
+//    m_progShandow.draw(quad, 2);
 
-//     if (playerIsInLiquid() == 1) {
-//        m_progTint.draw(quad, 1);
-//     } else {
-//        m_progNoOp.draw(quad, 1);
-//     }
+     m_framebuffer.bindToTextureSlot(1);
+     if (playerIsInLiquid() == 1) {
+        m_progTint.draw(quad, 1);
+     } else {
+        m_progNoOp.draw(quad, 1);
+     }
 }
 
 void MyGL::prepareViewportForFBO()
