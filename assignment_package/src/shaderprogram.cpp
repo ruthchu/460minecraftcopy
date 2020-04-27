@@ -167,28 +167,22 @@ void ShaderProgram::drawQuad(Drawable &d)
 {
     useMe();
 
-    // Each of the following blocks checks that:
-    //   * This shader has this attribute, and
-    //   * This Drawable has a vertex buffer for this attribute.
-    // If so, it binds the appropriate buffers to each attribute.
+    if(d.elemCountOpaque() < 0) {
+        throw std::out_of_range("Attempting to draw a drawable with m_count of " + std::to_string(d.elemCountOpaque()) + "!");
+    }
 
-    // Remember, by calling bindPos(), we call
-    // glBindBuffer on the Drawable's VBO for vertex position,
-    // meaning that glVertexAttribPointer associates vs_Pos
-    // (referred to by attrPos) with that VBO
-    if (attrPos != -1 && d.bindPos()) {
+    // Set our "u_sampler1" sampler to user Texture Unit 1
+//    context->glUniform1i(unifSampler2D, textureSlot);
+
+    // bind
+    if (d.bindAllOpaque()) {
+        int stride = 2 * 4 * sizeof(float);
+        // Pos
         context->glEnableVertexAttribArray(attrPos);
-        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, 0, NULL);
-    }
-
-    if (attrNor != -1 && d.bindNor()) {
-        context->glEnableVertexAttribArray(attrNor);
-        context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, 0, NULL);
-    }
-
-    if (attrCol != -1 && d.bindCol()) {
-        context->glEnableVertexAttribArray(attrCol);
-        context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, 0, NULL);
+        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, stride, (void*)(0));
+        // UV
+//        context->glEnableVertexAttribArray(attrUV);
+//        context->glVertexAttribPointer(attrUV, 4, GL_FLOAT, false, stride, (void*)(4 * sizeof(float)));
     }
 
     // Bind the index buffer and then draw shapes from it.
@@ -197,8 +191,7 @@ void ShaderProgram::drawQuad(Drawable &d)
     context->glDrawElements(d.drawMode(), d.elemCountOpaque(), GL_UNSIGNED_INT, 0);
 
     if (attrPos != -1) context->glDisableVertexAttribArray(attrPos);
-    if (attrNor != -1) context->glDisableVertexAttribArray(attrNor);
-    if (attrCol != -1) context->glDisableVertexAttribArray(attrCol);
+//    if (attrUV != -1) context->glDisableVertexAttribArray(attrUV);
 
     context->printGLErrorLog();
 }

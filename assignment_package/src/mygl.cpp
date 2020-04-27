@@ -184,11 +184,11 @@ void MyGL::paintGL() {
     renderTerrain();
     performTerrainPostprocessRenderPass();
 
-    glDisable(GL_DEPTH_TEST);
-    m_progFlat.setModelMatrix(glm::mat4());
-    m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
-    m_progFlat.drawOpaque(m_worldAxes);
-    glEnable(GL_DEPTH_TEST);
+//    glDisable(GL_DEPTH_TEST);
+//    m_progFlat.setModelMatrix(glm::mat4());
+//    m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
+//    m_progFlat.drawOpaque(m_worldAxes);
+//    glEnable(GL_DEPTH_TEST);
 }
 
 // TODO: Change this so it renders the nine zones of generated
@@ -210,24 +210,24 @@ void MyGL::renderTerrain() {
     // Clear the screen so that we only see newly drawn images
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    int renderRadius = 1;
-    glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
-    glm::ivec2 centerTerrain = m_terrain.getTerrainAt(pPos[0], pPos[1]);
-
-    // Bind the texture
-    m_texture.bind(0);
-
-    int xmin = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * renderRadius /*- BLOCK_LENGTH_IN_TERRAIN*/;//16 * (xFloor - range);
-    int xmax = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * renderRadius + BLOCK_LENGTH_IN_TERRAIN; //16 * (xFloor + range);
-    int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius - BLOCK_LENGTH_IN_TERRAIN;//16 * (zFloor - range);
-    int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius /*+ BLOCK_LENGTH_IN_TERRAIN*/;//16 * (zFloor + range);
-
-    m_progLambert.setEnviorment(playerIsInLiquid());
-
-    m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
-
     quad.bufferVBOdata();
     m_progSky.drawQuad(quad);
+
+//    int renderRadius = 1;
+//    glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
+//    glm::ivec2 centerTerrain = m_terrain.getTerrainAt(pPos[0], pPos[1]);
+
+//    // Bind the texture
+//    m_texture.bind(0);
+
+//    int xmin = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * renderRadius /*- BLOCK_LENGTH_IN_TERRAIN*/;//16 * (xFloor - range);
+//    int xmax = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * renderRadius + BLOCK_LENGTH_IN_TERRAIN; //16 * (xFloor + range);
+//    int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius - BLOCK_LENGTH_IN_TERRAIN;//16 * (zFloor - range);
+//    int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius /*+ BLOCK_LENGTH_IN_TERRAIN*/;//16 * (zFloor + range);
+
+//    m_progLambert.setEnviorment(playerIsInLiquid());
+
+//    m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
 }
 
 void MyGL::performTerrainPostprocessRenderPass()

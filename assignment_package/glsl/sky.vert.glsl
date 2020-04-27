@@ -18,5 +18,4 @@ void main()
 
     //built-in things to pass down the pipeline
     gl_Position = u_ViewProj * modelposition;
-
 }
