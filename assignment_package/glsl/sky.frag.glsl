@@ -95,6 +95,59 @@ vec2 sphereToUV(vec3 p) {
     return vec2(1 - phi / TWO_PI, 1 - theta / PI);
 }
 
+float random1(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float noise(vec2 uv) {
+    vec2 i = floor(uv);
+    vec2 f = fract(uv);
+
+    // Four corners in 2D of a tile
+    float a = random1(i);
+    float b = random1(i + vec2(1.0, 0.0));
+    float c = random1(i + vec2(0.0, 1.0));
+    float d = random1(i + vec2(1.0, 1.0));
+
+    vec2 u = f * f * (3.0 - 2.0 * f);
+
+    return mix(a, b, u.x) +
+            (c - a)* u.y * (1.0 - u.x) +
+            (d - b) * u.x * u.y;
+}
+
+#define NUM_OCTAVES 5
+
+float fbm(vec2 uv) {
+    float v = 0.0;
+    float a = 0.5;
+    vec2 shift = vec2(100.0);
+    // Rotate to reduce axial bias
+    mat2 rot = mat2(cos(0.5), sin(0.5),
+                    -sin(0.5), cos(0.50));
+    for (int i = 0; i < NUM_OCTAVES; ++i) {
+        v += a * noise(uv);
+        uv = rot * uv * 2.0 + shift;
+        a *= 0.5;
+    }
+    return v;
+}
+
+/* Warping using fbm. f(p) -> f(g(p)) -> f(p + h(p)) */
+float warpFBM(vec2 uv) {
+    vec2 q = vec2(fbm(uv), fbm(uv + vec2(1.1, 3.7)));
+
+    vec2 r = vec2(fbm(uv + 1.0 * q + vec2(1.7, 9.2)),
+                  fbm(uv + 1.0 * q + vec2(8.3, 2.8)));
+    float f = fbm(uv + r);
+    if (f < 0.5) {
+        f = 1.;
+    } else {
+        f = 0.;
+    }
+    return f;
+}
+
 void main()
 {
     // We want to project our pixel to a plane in our viewing frustum
@@ -114,7 +167,9 @@ void main()
     // convert ray to 2d uv coords
     vec2 uv = sphereToUV(rayDir /*- clamp(sin(u_Eye * 0.01), 0.f, .75f)*/);
 
-    float skyInput = uv.y;
+//    float skyInput = uv.y;
+    float skyInput = warpFBM(uv);
+
     vec3 sunsetCol = toSunset(skyInput);
     vec3 duskCol = toDusk(skyInput);
 
@@ -135,7 +190,7 @@ void main()
             coronaDist = smoothstep(0.0, 1.0, coronaDist);
             col = mix(sunColor, col, coronaDist);
         }
-    } else {
+    } /*else {
         if (raySunDot > DUSK_THRESHOLD) {
             col = col;
         } else if (raySunDot > DUSK_THRESHOLD) {
@@ -144,7 +199,7 @@ void main()
         } else {
             col = duskCol;
         }
-    }
+    }*/
 
     out_Col = vec4(col, 1);
 }
