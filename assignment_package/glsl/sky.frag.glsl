@@ -7,7 +7,7 @@ uniform ivec2 u_Dimensions; // Screen dimensions
 
 uniform vec3 u_Eye; // Camera pos
 
-uniform float u_Time;
+uniform int u_Time;
 
 out vec4 out_Col;
 
@@ -168,16 +168,19 @@ void main()
     vec2 uv = sphereToUV(rayDir /*- clamp(sin(u_Eye * 0.01), 0.f, .75f)*/);
 
 //    float skyInput = uv.y;
-    float skyInput = warpFBM(uv);
+    vec2 offset = vec2(warpFBM(uv));
+    uv = uv + offset * 0.1;
 
-    vec3 sunsetCol = toSunset(skyInput);
-    vec3 duskCol = toDusk(skyInput);
+    vec3 sunsetCol = toSunset(uv.y);
+    vec3 duskCol = toDusk(uv.y);
 
     vec3 col = sunsetCol;
     // recall the definition of a dot product. The angle between two normalized vectors
     // can be found by taking the arccos(a dot b). theta: [0,pi]. Multiply by 2 to get [0,two_pi]
     float raySunDot = dot(rayDir, sunDir.xyz);
     float angle = acos(raySunDot) * 2.f * (180.f / PI);
+
+//    u_Time;
 
     if (angle < sunSize) {
         if (angle < sunCoreSize) {
