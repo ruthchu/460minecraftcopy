@@ -233,8 +233,8 @@ float snoise(vec3 v){
                                   dot(p2,x2), dot(p3,x3) ) );
 }
 
-#define NUM_OCTAVES 5
 float fbm(vec3 p) {
+    const int NUM_OCTAVES = 11;
     float v = 0.0;
     float a = 0.5;
     vec3 shift = vec3(100);
@@ -247,7 +247,6 @@ float fbm(vec3 p) {
 }
 
 /* Warping using fbm. f(p) -> f(g(p)) -> f(p + h(p)) */
-
 float warpFBM(vec3 p) {
     vec3 q = vec3(fbm(p),
                   fbm(p + vec3(1.1, 3.7, 127.1)),
@@ -294,7 +293,7 @@ void main()
     vec3 rayDir = normalize(p.xyz - u_Eye);
 
     // convert ray to 2d uv coords
-    vec2 uv = sphereToUV(rayDir /*- clamp(sin(u_Eye * 0.01), 0.f, .75f)*/);
+    vec2 uv = sphereToUV(rayDir /*- clamp(u_Eye, 0.f,1.f)*/);
 
     float skyInput = uv.y;
     vec2 offset = vec2(worleyFBM(rayDir));
@@ -308,8 +307,6 @@ void main()
     // can be found by taking the arccos(a dot b). theta: [0,pi]. Multiply by 2 to get [0,two_pi]
     float raySunDot = dot(rayDir, sunDir.xyz);
     float angle = acos(raySunDot) * 2.f * (180.f / PI);
-
-    //    u_Time;
 
     if (angle < sunSize) {
         if (angle < sunCoreSize) {
