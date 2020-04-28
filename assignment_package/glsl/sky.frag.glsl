@@ -289,7 +289,6 @@ vec3 rotateX(vec3 p, float a) {
 }
 
 vec3 rotateY(vec3 p, float a) {
-//    return vec3(cos(a) * p.x + sin(a) * p.z, p.y, -sin(a) * p.x + cos(a) * p.z);
     mat4 rot = mat4(cos(a), 0, -sin(a), 0,
                     0, 1, 0, 0,
                     sin(a), 0, cos(a), 0,
