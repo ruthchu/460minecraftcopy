@@ -179,6 +179,16 @@ void ShaderProgram::setDepthMVP(const glm::vec3 light)
     }
 }
 
+void ShaderProgram::setDimensions(glm::ivec2 dims)
+{
+    useMe();
+
+    if(unifDimensions != -1)
+    {
+        context->glUniform2i(unifDimensions, dims.x, dims.y);
+    }
+}
+
 void ShaderProgram::setDepthMVP(const glm::mat4 mat)
 {
     useMe();

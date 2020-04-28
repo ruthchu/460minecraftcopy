@@ -68,6 +68,8 @@ public:
     void setDepthMVP(const glm::vec3 light);
     void setDepthMVP(const glm::mat4 mat);
 
+    void setDimensions(glm::ivec2 dims);
+
     QString qTextFileRead(const char*);
 
 private:

@@ -114,6 +114,7 @@ void MyGL::initializeGL()
 //    m_progNoOp.setDimensions(glm::ivec2(this->width(), this->height()));
 //    m_progTint.setDimensions(glm::ivec2(this->width(), this->height()));
     m_progShandow.setDimensions(glm::ivec2(this->width(), this->height()));
+
 }
 
 void MyGL::resizeGL(int w, int h) {
@@ -128,7 +129,6 @@ void MyGL::resizeGL(int w, int h) {
     m_progFlat.setViewProjMatrix(viewproj);
     m_progDepthThough.setViewProjMatrix(viewproj);
 
-
 //    m_progNoOp.setDimensions(glm::ivec2(w, h));
 //    m_progTint.setDimensions(glm::ivec2(w, h));
     m_progShandow.setDimensions(glm::ivec2(w, h));
@@ -136,10 +136,14 @@ void MyGL::resizeGL(int w, int h) {
     m_progShandow.setDimensions(glm::ivec2(w * 2 ,h * 2));
 #endif
 
+    // Depth throgh set dimen
+    m_progDepthThough.setDimensions(glm::ivec2(w * 2, h * 2));
+
     m_progSky.setViewProjMatrix(viewproj);
     m_progSky.useMe();
-    this->glUniform2i(m_progSky.unifDimensions, width() * this->devicePixelRatio(),
-                      height() * this->devicePixelRatio());
+//    this->glUniform2i(m_progSky.unifDimensions, width() * this->devicePixelRatio(),
+//                      height() * this->devicePixelRatio());
+    m_progSky.setDimensions(glm::ivec2(w, h));
     glm::vec3 cam = m_player.mcr_camera.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
 

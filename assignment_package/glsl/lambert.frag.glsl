@@ -20,16 +20,22 @@ uniform int u_Time; // A time value that changes once every tick
 
 uniform int u_enviorment;
 
+uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.
+// We've written a static matrix for you to use for HW2,
+// but in HW3 you'll have to generate one yourself
+uniform mat4 u_depthMVP;
+
+uniform ivec2 u_Dimensions; // screen u_Dimensions
+
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
 in vec4 fs_Pos;
 in vec4 fs_Nor;
 in vec4 fs_LightVec;
 in vec4 fs_UV;
-in vec4 fs_PosLight;
 
 out vec4 out_Col; // This is the final output color that you will see on your
-                  // screen for the pixel that is currently being processed.
+// screen for the pixel that is currently being processed.
 
 float random1(vec3 p) {
     return fract(sin(dot(p,vec3(127.1, 311.7, 191.999)))
@@ -79,55 +85,61 @@ vec3 fbm(vec3 p) {
 void main()
 {
     // Material base color (before shading)
-        vec4 diffuseColor;
-        if (fs_UV.x >= 13.0 / 16.0) {
-            // If this block has UV coords that fall in the range of LAVA or WATER
-            // offset the UVs as a function of time
-            diffuseColor = texture(u_Texture, vec2(fs_UV.x + mod(u_Time / 1000.0, 2.0 / 16.0), fs_UV.y));
-        } else {
-            // Draw with static UV coords
-            diffuseColor = texture(u_Texture, vec2(fs_UV.x, fs_UV.y));
-        }
+    vec4 diffuseColor;
+    if (fs_UV.x >= 13.0 / 16.0) {
+        // If this block has UV coords that fall in the range of LAVA or WATER
+        // offset the UVs as a function of time
+        diffuseColor = texture(u_Texture, vec2(fs_UV.x + mod(u_Time / 1000.0, 2.0 / 16.0), fs_UV.y));
+    } else {
+        // Draw with static UV coords
+        diffuseColor = texture(u_Texture, vec2(fs_UV.x, fs_UV.y));
+    }
 
-        // Calculate the diffuse term for Lambert shading
-        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
-        // Avoid negative lighting values
-        diffuseTerm = clamp(diffuseTerm, 0, 1);
+    // Calculate the diffuse term for Lambert shading
+    float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
+    // Avoid negative lighting values
+    diffuseTerm = clamp(diffuseTerm, 0, 1);
 
-        float ambientTerm = 0.2;
+    float ambientTerm = 0.2;
 
-        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier
-                                                            //to simulate ambient lighting. This ensures that faces that are not
-                                                            //lit by our point light are not completely black.
+    float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier
+    //to simulate ambient lighting. This ensures that faces that are not
+    //lit by our point light are not completely black.
 
-        // Compute final shaded color
-        vec4 finCol = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
+    // Compute final shaded color
+    vec4 finCol = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
 
-       // Draw shadows
+    // Draw shadows
+    vec4 screenSpace = vec4((gl_FragCoord.x / u_Dimensions.x) * 2.f - 1,
+                            1 - (gl_FragCoord.y / u_Dimensions.y) * 2.f,
+                            gl_FragCoord.zw);
+    vec4 unhomoScreen = screenSpace * (1.f / gl_FragCoord.w);
+    vec4 worldSpace = inverse(u_ViewProj) * unhomoScreen;
+    vec4 fs_PosLight = u_depthMVP * worldSpace;
 
-       // To NDC [-1,1]
-       vec3 shadowCoord = fs_PosLight.xyz / fs_PosLight.w;
+    // To NDC (Screen space) [-1,1]
+    vec3 shadowCoord = fs_PosLight.xyz / fs_PosLight.w;
 
-       // To [0,1] for sampling
-       shadowCoord = shadowCoord * 0.5 + 0.5;
+    // To [0,1] for sampling
+    shadowCoord = shadowCoord * 0.5 + 0.5;
 
-       // Get shadow mapped stored depth
-       float storedDepth = texture(u_ShadowMap, shadowCoord.xy).r;
-       float fragmentDepth = shadowCoord.z;
-//       float bias = max(0.05 * (1.0 - dot(fs_Nor, u_Eye)), 0.005);
+    // Get shadow mapped stored depth
+    float storedDepth = texture(u_ShadowMap, shadowCoord.xy).r;
+    float fragmentDepth = shadowCoord.z;
+    //       float bias = max(0.05 * (1.0 - dot(fs_Nor, u_Eye)), 0.005);
 
-       // Check if fragment is in shadow with bias
-       float bias = 0;
-       bool isInShadow = fragmentDepth - bias > storedDepth;
+    // Check if fragment is in shadow with bias
+    float bias = 0;
+    bool isInShadow = fragmentDepth - bias > storedDepth;
 
-//       if (isInShadow) {
-//           // magenta
-//           finCol = vec4(1, 0, 1, 1);
-//       } else {
-//           // cyan
-//           finCol = vec4(0, 1, 1, 1);
-//       }
+    if (isInShadow) {
+        // magenta
+        finCol = vec4(1, 0, 1, 1);
+    } else {
+        // cyan
+        finCol = vec4(0, 1, 1, 1);
+    }
 
-//        finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
-        out_Col = finCol;
+    //        finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
+    out_Col = finCol;
 }
