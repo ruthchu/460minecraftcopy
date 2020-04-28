@@ -181,7 +181,6 @@ void MyGL::paintGL() {
     m_progSky.useMe();
     glm::vec3 cam = m_player.mcr_camera.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
-//    this->glUniform1f(m_progSky.unifTime, time++);
 
 //     Render to our framebuffer rather than the viewport
     framebuffer.bindFrameBuffer();
@@ -240,10 +239,10 @@ void MyGL::renderTerrain() {
     // Bind the texture
     m_texture.bind(0);
 
-    int xmin = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * renderRadius /*- BLOCK_LENGTH_IN_TERRAIN*/;//16 * (xFloor - range);
-    int xmax = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * renderRadius + BLOCK_LENGTH_IN_TERRAIN; //16 * (xFloor + range);
-    int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius - BLOCK_LENGTH_IN_TERRAIN;//16 * (zFloor - range);
-    int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius /*+ BLOCK_LENGTH_IN_TERRAIN*/;//16 * (zFloor + range);
+    int xmin = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * renderRadius;// - BLOCK_LENGTH_IN_TERRAIN;
+    int xmax = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * renderRadius;// + BLOCK_LENGTH_IN_TERRAIN;
+    int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius;// - BLOCK_LENGTH_IN_TERRAIN;
+    int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius;// + BLOCK_LENGTH_IN_TERRAIN;
 
     m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
 }
