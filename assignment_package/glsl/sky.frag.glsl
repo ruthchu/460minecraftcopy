@@ -244,7 +244,7 @@ float snoise(vec3 v){
 }
 
 float fbm(vec3 p) {
-    const int NUM_OCTAVES = 11;
+    const int NUM_OCTAVES = 5;
     float v = 0.0;
     float a = 0.5;
     vec3 shift = vec3(100);
@@ -330,7 +330,8 @@ void main()
     // convert ray to 2d uv coords
     vec2 uv = sphereToUV(rayDir);
 
-    vec2 offset = vec2(snoiseFBM(rayDir));
+    vec2 offset = vec2(warpFBM(rayDir));
+//    vec2 offset = vec2(snoiseFBM(rayDir));
     uv = uv + offset * 0.1;
 
     vec3 sunsetCol = toSunset(uv.y);
