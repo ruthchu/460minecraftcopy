@@ -141,9 +141,9 @@ void main()
     float bias = max(0.05 * (1.0 - dotNorEye), 0.005);
     bool isInShadow = storedDepth < fragmentDepth - bias;
     if (isInShadow) {
-        finCol.r = clamp(finCol.r - 0.3, 0, 0.2);
-        finCol.g = clamp(finCol.g - 0.3, 0, 0.2);
-        finCol.b = clamp(finCol.b - 0.3, 0, 0.2);
+        finCol.r = clamp(finCol.r - 0.3, 0, 0.3);
+        finCol.g = clamp(finCol.g - 0.3, 0, 0.3);
+        finCol.b = clamp(finCol.b - 0.3, 0, 0.3);
     }
     out_Col = finCol;
     // finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);

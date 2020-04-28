@@ -171,8 +171,10 @@ void MyGL::resizeGL(int w, int h) {
 void MyGL::tick() {
     // Calculate dT and pass relevant time values to tick and shader
     float dT = (QDateTime::currentMSecsSinceEpoch() - m_currTime) / 1000.f;
-    m_progLambert.setTime(m_timeSinceStart);
-    m_progSky.setTime(m_timeSinceStart);
+    float time = m_timeSinceStart;
+    m_progLambert.setTime(time);
+    m_progSky.setTime(time);
+    m_progDepthThrough.setTime(time);
 
     m_player.tick(dT, m_inputs);
 
@@ -214,6 +216,8 @@ void MyGL::paintGL() {
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
     m_progLambert.useMe();
     this->glUniform3f(m_progLambert.unifEye, cam.x, cam.y, cam.z);
+    m_progDepthThrough.useMe();
+    this->glUniform3f(m_progDepthThrough.unifEye, cam.x, cam.y, cam.z);
 
 //    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
 //    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, 0.1f, 1000.f);
@@ -227,19 +231,22 @@ void MyGL::paintGL() {
 //    cameraView = m_player.mcr_camera.getView();
 
     glm::mat4 lighViewProj = lightPorj * lightView;
+    // >>>>>> REFACTORING
     m_progDepthThrough.setDepthMVP(lighViewProj);
-//    m_progDepthThough.setDepthMVP(glm::normalize(m_player.mcr_camera.getLookVec()));;
-//    m_progLambert.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
+    // TODO == SEND SUN AND U_EYE
+    m_progDepthThrough.setLightProj(lightPorj);
+    m_progDepthThrough.useMe();
+    this->glUniform3f(m_progDepthThrough.unifEye, cam.x, cam.y, cam.z);
 
-    preformLightPerspectivePass();
-
+    // >>>>>> REFACTORING
     m_progLambert.setDepthMVP(lighViewProj);
+    m_progLambert.setLightProj(lightPorj);
     m_progLambert.setViewMatrix(m_player.mcr_camera.getView());
 
+    preformLightPerspectivePass();
     // SKY
     quad.bufferVBOdata();
     m_progSky.drawQuad(quad);
-
     preformPlayerPerspectivePass();
     performTerrainPostprocessRenderPass();
 
