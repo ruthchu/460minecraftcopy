@@ -42,6 +42,7 @@ vec3(48, 24, 96) / 255.0,
 vec3(0, 24, 72) / 255.0);
 
 const vec3 sunColor = vec3(255, 255, 190) / 255.0;
+const vec3 setSunColor = vec3(254, 225, 171) / 255.0;
 const vec3 cloudColor = sunset[3];
 
 /* Piecewise function which returns some linearly interpolated sunset
@@ -334,8 +335,12 @@ void main()
 
     vec3 sunsetCol = toSunset(uv.y);
     vec3 duskCol = toDusk(uv.y);
+    vec3 nightCol = vec3(32.f, 24.f, 72.f) / 255.f;
+    vec3 dayCol = vec3(115.f, 200.f, 252.f) / 255.f;
 
-    vec3 col; // Default night color
+    vec3 col;
+    vec3 sunMoveCol;
+
     // recall the definition of a dot product. The angle between two normalized vectors
     // can be found by taking the arccos(a dot b). theta: [0,pi]. Multiply by 2 to get [0,two_pi]
     vec3 newSunDir = rotateX(sunDir, u_Time * 0.01);
@@ -343,35 +348,25 @@ void main()
     float raySunDot = dot(rayDir, newSunDir);
     float angle = acos(raySunDot) * 2.f * (180.f / PI);
 
-    vec3 nightCol = vec3(32.f, 24.f, 72.f) / 255.f;
-    vec3 dayCol = vec3(115.f, 200.f, 252.f) / 255.f;
-
     // Base day and night color
     col = mix(nightCol, dayCol, smoothstep(.3f, .5f,(newSunDir.y + 1.f) / 2.f));
 
-//    if (newSunDir.y > .25f) { // Daytime
-//        col = vec3(115.f, 200.f, 252.f) / 255.f;
-//    }
-//    if (newSunDir.y > -.1f && newSunDir.y < .25f) { // Sunset and sunrise
-//        col = sunsetCol;
-//    }
-//    if (newSunDir.y > -.3f && newSunDir.y < -.1f) { // Dusk and dawn
-//        col = duskCol;
-//    }
-//    if (newSunDir.y < -.3f) { // Nightime
-//        col = vec3(32.f, 24.f, 72.f) / 255.f;
-//    }
-    if (angle < 50.f) {
-        if (newSunDir.y > -.1f && newSunDir.y < .25f) { // Sunset and sunrise
-            float haze = angle / hazeDist;
-            haze = smoothstep(6.f, 1.f, haze);
-            col = mix(sunsetCol, col, haze);
+    // Mixing in sunset/sunrise and dusk/dawn color surrounding the sun
+    // when the sun is near the "horizon line"
+    if (angle < 180.f) {
+        float haze = smoothstep(-.3f, .2f, newSunDir.y);
+        sunMoveCol = mix(duskCol, sunsetCol, haze);
+        vec3 haloCol;
+        if (newSunDir.y < -.3f) {
+            haloCol = mix(col, sunMoveCol, smoothstep(-.6f, -.3f, newSunDir.y));
+        } else if (newSunDir.y > .25f) {
+            haloCol = mix(sunMoveCol, col, smoothstep(.2f, .4f, newSunDir.y));
+        } else {
+            haloCol = sunMoveCol;
         }
-        if (newSunDir.y > -.3f && newSunDir.y < -.1f) { // Dusk and dawn
-            float haze = angle / hazeDist * 1.5f;
-            haze = smoothstep(6.f, 1.f, haze);
-            col = mix(duskCol, col, haze);
-        }
+        float dist = angle / 180.f;
+        dist = smoothstep(.7f, 1.f, dist);
+        col = mix(haloCol, col, dist);
     }
 
     // Draw the sun over everything
@@ -379,8 +374,8 @@ void main()
         if (angle < sunCoreSize) {
             // clear center of the sun
             if (newSunDir.y < .25f) {
-                float weight = smoothstep(0.f, .25f, newSunDir.y);
-                col = mix(vec3(255.f, 198.f, 119.f) / 255.f, sunColor, weight);
+                float weight = smoothstep(-1.f, .25f, newSunDir.y);
+                col = mix(setSunColor, sunColor, weight);
             } else {
                 col = sunColor;
             }
@@ -390,9 +385,8 @@ void main()
             float coronaDist = (angle - sunCoreSize) / (sunSize - sunCoreSize);
             coronaDist = smoothstep(0.0, 1.0, coronaDist);
             if (newSunDir.y < .25f) {
-                float weight = smoothstep(0.f, .25f, newSunDir.y);
-                vec3 orangeSun = mix(vec3(255.f, 198.f, 119.f) / 255.f, sunColor, weight);
-                col = mix(orangeSun, col, coronaDist);
+                float weight = smoothstep(-1.f, .25f, newSunDir.y);
+                col = mix(mix(setSunColor, sunColor, weight), col, coronaDist);
             } else {
                 col = mix(sunColor, col, coronaDist);
             }
