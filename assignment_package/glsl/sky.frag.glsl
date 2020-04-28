@@ -315,7 +315,7 @@ void main()
     vec2 ndc = ((gl_FragCoord.xy / vec2(u_Dimensions)) - 0.5) * 2.0;
 
     vec4 p = vec4(ndc, 1, 1); // Pixel at the far clip plane
-    p *= FAR_CLIP; // Screen spae -> unhomogenized screen space
+    p *= FAR_CLIP; //project the pixel to far clip plane
     p = /*Inverse of*/ u_ViewProj * p; // Convert from unhomogenized screen to world
 
     // To get direction of ray, we "draw" a line from player's eye to the recently
@@ -357,6 +357,8 @@ void main()
         if (raySunDot > SUNSET_THRESHOLD) {
             //            col = col;
         } else if (raySunDot > DUSK_THRESHOLD) {
+            // if the player is looking sufficiently away from the sun, then
+            // transition to dusk with a linear interpolation
             float t = (raySunDot - SUNSET_THRESHOLD) / (DUSK_THRESHOLD - SUNSET_THRESHOLD);
             col = mix(col, duskCol, t);
         } else {
