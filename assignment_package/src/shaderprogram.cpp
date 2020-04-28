@@ -82,6 +82,7 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
     unifEye = context->glGetUniformLocation(prog, "u_Eye");
 
     unifView = context->glGetUniformLocation(prog, "u_View");
+    unifSun = context->glGetUniformLocation(prog, "u_sunDir");
 }
 
 void ShaderProgram::useMe()
@@ -185,6 +186,15 @@ void ShaderProgram::setTime(int t) {
 
     if (unifTime != -1) {
         context->glUniform1i(unifTime, t);
+    }
+}
+
+void ShaderProgram::setSun(const glm::vec3 &v)
+{
+    useMe();
+
+    if (unifSun != -1) {
+        context->glUniform3f(unifSun, v.x, v.y, v.z);
     }
 }
 

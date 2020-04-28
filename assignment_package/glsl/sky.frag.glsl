@@ -9,6 +9,7 @@ uniform vec3 u_Eye; // Camera pos
 
 uniform int u_Time;
 
+
 out vec4 out_Col;
 
 const float FAR_CLIP = 1000.0;
@@ -22,6 +23,7 @@ const float TWO_PI = 6.28318530718;
 
 // sun parameters
 const vec3 sunDir = normalize(vec3(0, 0.1, 1.0));
+uniform vec3 u_sunDir;
 const float sunSize = 20.0;
 const float sunCoreSize = 7.5;
 const float hazeDist = 50.0;
@@ -343,8 +345,9 @@ void main()
 
     // recall the definition of a dot product. The angle between two normalized vectors
     // can be found by taking the arccos(a dot b). theta: [0,pi]. Multiply by 2 to get [0,two_pi]
-    vec3 newSunDir = rotateX(sunDir, u_Time * 0.01);
-    newSunDir = normalize(newSunDir);
+    vec3 newSunDir = u_sunDir;
+//    vec3 newSunDir = rotateX(sunDir, u_Time * 0.01);
+//    newSunDir = normalize(newSunDir);
     float raySunDot = dot(rayDir, newSunDir);
     float angle = acos(raySunDot) * 2.f * (180.f / PI);
 

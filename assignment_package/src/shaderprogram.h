@@ -35,6 +35,8 @@ public:
     int unifDimensions;
     int unifEye;
 
+    int unifSun;
+
 public:
     ShaderProgram(OpenGLContext* context);
     // Sets up the requisite GL data and shaders from the given .glsl files
@@ -66,6 +68,7 @@ public:
 
     void setDepthMVP(const glm::vec3 light);
     void setDepthMVP(const glm::mat4 mat);
+    void setSun(const glm::vec3 &v);
 
     void setDimensions(glm::ivec2 dims);
 

@@ -15,7 +15,7 @@ MyGL::MyGL(QWidget *parent)
       m_framebuffer(FrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
       m_progTint(this), m_progNoOp(this), m_progDepthThrough(this), m_progShandow(this), quad(Quad(this)),
       m_depthFrameBuffer(DepthFrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
-      m_progSky(this)
+      m_progSky(this), sunDir(glm::vec3(0, 0.1, 1.0))
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -147,6 +147,8 @@ void MyGL::resizeGL(int w, int h) {
 
     glm::vec3 cam = m_player.mcr_camera.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
+    m_progLambert.setSun(this->sunDir);
+    m_progSky.setSun(this->sunDir);
 
     // resize frame buffer
     m_framebuffer.resize(w, h, this->devicePixelRatio());
@@ -161,6 +163,14 @@ void MyGL::resizeGL(int w, int h) {
     printGLErrorLog();
 }
 
+glm::vec3 MyGL::rotateX(glm::vec3 p, float a) {
+    glm::mat4 rot = glm::mat4(1, 0, 0, 0,
+                    0, glm::cos(a), glm::sin(a), 0,
+                    0, -glm::sin(a), glm::cos(a), 0,
+                    0, 0, 0, 1);
+    glm::vec4 v = rot * glm::vec4(p, 1);
+    return glm::vec3(v.x, v.y, v.z);
+}
 
 // MyGL's constructor links tick() to a timer that fires 60 times per second.
 // We're treating MyGL as our game engine class, so we're going to perform
@@ -171,6 +181,9 @@ void MyGL::tick() {
     float dT = (QDateTime::currentMSecsSinceEpoch() - m_currTime) / 1000.f;
     m_progLambert.setTime(m_timeSinceStart);
     m_progSky.setTime(m_timeSinceStart);
+    this->sunDir = glm::normalize(rotateX(this->sunDir, m_timeSinceStart * 0.00005));
+    m_progLambert.setSun(this->sunDir);
+    m_progSky.setSun(this->sunDir);
 
     m_player.tick(dT, m_inputs);
 

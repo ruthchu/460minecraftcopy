@@ -70,6 +70,8 @@ private:
 
     int playerIsInLiquid();
 
+    glm::vec3 sunDir;
+
 public:
     explicit MyGL(QWidget *parent = nullptr);
     ~MyGL();
@@ -88,6 +90,8 @@ public:
     // Called from paintGL().
     // Calls Terrain::draw().
     void renderTerrain(ShaderProgram *prog);
+
+    glm::vec3 rotateX(glm::vec3 p, float a);
 
 protected:
     // Automatically invoked when the user
