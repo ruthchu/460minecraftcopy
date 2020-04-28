@@ -20,4 +20,12 @@ Various code samples for noise functions including simplex was found here: https
 An article discussing FBM as well as interesting warping was found here: https://thebookofshaders.com/13/
 Further reading on noise was done in Inigo Quilez's website including this one: http://www.iquilezles.org/www/articles/warp/warp.htm
 
+4/26 For framebuffer understanding
+https://learnopengl.com/Advanced-OpenGL/Framebuffers
+
 4/27 Clarification on how to blend fog was found here: https://webglfundamentals.org/webgl/lessons/webgl-fog.html
+
+4/28 For shadow mapping guidance. How I calculated bias to cancel acne was also found here. 
+http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/
+https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
+
