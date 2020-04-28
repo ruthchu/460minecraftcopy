@@ -220,6 +220,7 @@ void MyGL::paintGL() {
 //    m_progLambert.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
 
     m_progLambert.setDepthMVP(depthProjectionMatrix * cameraView);
+    m_progLambert.setViewMatrix(m_player.mcr_camera.getView());
 
     preformLightPerspectivePass();
 

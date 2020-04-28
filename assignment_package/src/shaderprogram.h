@@ -36,6 +36,8 @@ public:
     int unifDimensions;
     int unifEye;
 
+    int unifView;
+
 public:
     ShaderProgram(OpenGLContext* context);
     // Sets up the requisite GL data and shaders from the given .glsl files
@@ -69,6 +71,8 @@ public:
     void setDepthMVP(const glm::mat4 mat);
 
     void setDimensions(glm::ivec2 dims);
+
+    void setViewMatrix(const glm::mat4 &v);
 
     QString qTextFileRead(const char*);
 

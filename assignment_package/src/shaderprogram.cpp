@@ -81,6 +81,8 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
     // Sky
     unifDimensions = context->glGetUniformLocation(prog, "u_Dimensions");
     unifEye = context->glGetUniformLocation(prog, "u_Eye");
+
+    unifView = context->glGetUniformLocation(prog, "u_View");
 }
 
 void ShaderProgram::useMe()
@@ -186,6 +188,24 @@ void ShaderProgram::setDimensions(glm::ivec2 dims)
     if(unifDimensions != -1)
     {
         context->glUniform2i(unifDimensions, dims.x, dims.y);
+    }
+}
+
+void ShaderProgram::setViewMatrix(const glm::mat4 &v)
+{
+    // Tell OpenGL to use this shader program for subsequent function calls
+    useMe();
+
+    if(unifView != -1) {
+    // Pass a 4x4 matrix into a uniform variable in our shader
+                    // Handle to the matrix variable on the GPU
+    context->glUniformMatrix4fv(unifView,
+                    // How many matrices to pass
+                       1,
+                    // Transpose the matrix? OpenGL uses column-major, so no.
+                       GL_FALSE,
+                    // Pointer to the first element of the matrix
+                       &v[0][0]);
     }
 }
 

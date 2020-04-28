@@ -21,6 +21,8 @@ uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformati
                             // but in HW3 you'll have to generate one yourself
 uniform mat4 u_depthMVP;
 
+uniform mat4 u_View;
+
 uniform ivec2 u_Dimensions; // screen u_Dimensions
 
 uniform vec4 u_Color;       // When drawing the cube instance, we'll set our uniform color to represent different block types.
@@ -35,6 +37,8 @@ out vec4 fs_Pos;
 out vec4 fs_Nor;            // The array of normals that has been transformed by u_ModelInvTr. This is implicitly passed to the fragment shader.
 out vec4 fs_LightVec;       // The direction in which our virtual light lies, relative to each vertex. This is implicitly passed to the fragment shader.
 out vec4 fs_UV;            // The color of each vertex. This is implicitly passed to the fragment shader.
+
+out vec4 fs_PosLight;
 
 const vec4 lightDir = normalize(vec4(0.5, 1, 0.75, 0));  // The direction of our virtual light, which is used to compute the shading of
                                         // the geometry in the fragment shader.
@@ -57,7 +61,7 @@ void main()
     fs_LightVec = (lightDir);  // Compute the direction in which the light source lies
 
     // frag world pos -> unhomogenized screen pos -> light pos
-//    fs_PosLight =  u_depthMVP * u_ViewProj * modelposition;
+    fs_PosLight =  u_depthMVP * u_View * modelposition;
 
     //((gl_FragCoord.xy / vec2(u_Dimensions)) - 0.5) * 2.0;
 

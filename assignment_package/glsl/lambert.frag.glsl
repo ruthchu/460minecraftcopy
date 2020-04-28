@@ -33,6 +33,8 @@ in vec4 fs_Pos;
 in vec4 fs_Nor;
 in vec4 fs_LightVec;
 in vec4 fs_UV;
+in vec4 gl_FragCoord;
+in vec4 fs_PosLight;
 
 out vec4 out_Col; // This is the final output color that you will see on your
 // screen for the pixel that is currently being processed.
@@ -110,12 +112,12 @@ void main()
     vec4 finCol = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
 
     // Draw shadows
-    vec4 screenSpace = vec4((gl_FragCoord.x / u_Dimensions.x) * 2.f - 1,
-                            1 - (gl_FragCoord.y / u_Dimensions.y) * 2.f,
-                            gl_FragCoord.zw);
-    vec4 unhomoScreen = screenSpace * (1.f / gl_FragCoord.w);
-    vec4 worldSpace = inverse(u_ViewProj) * unhomoScreen;
-    vec4 fs_PosLight = u_depthMVP * worldSpace;
+//    vec4 screenSpace = vec4((gl_FragCoord.x / u_Dimensions.x) * 2.f - 1,
+//                            1 - (gl_FragCoord.y / u_Dimensions.y) * 2.f,
+//                            gl_FragCoord.zw);
+//    vec4 unhomoScreen = screenSpace * (1.f / gl_FragCoord.w);
+//    vec4 worldSpace = inverse(u_ViewProj) * unhomoScreen;
+//    vec4 fs_PosLight = u_depthMVP * worldSpace;
 
     // To NDC (Screen space) [-1,1]
     vec3 shadowCoord = fs_PosLight.xyz / fs_PosLight.w;
@@ -141,6 +143,6 @@ void main()
 //        finCol = vec4(0, 1, 1, 1);
     }
 
-    finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
+//    finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
     out_Col = finCol;
 }
