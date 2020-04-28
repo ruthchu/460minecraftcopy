@@ -11,6 +11,7 @@
 #include "framebuffer.h"
 #include "postprocessingshader.h"
 #include "scene/quad.h"
+#include "depthframebuffer.h"
 
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLShaderProgram>
@@ -37,14 +38,21 @@ private:
     double m_currTime; // Current time used to compute dT for player movement
     int m_timeSinceStart; // Time passed to UVs to warp LAVA and WATER UV coords
 
-    FrameBuffer framebuffer; // Frame buffer for post processing
+    FrameBuffer m_framebuffer; // Frame buffer for post processing
+
     PostProcessingShader m_progTint; // A post processing shader program that handels water and lava tinting
-    PostProcessingShader m_progNoOp; // A post processing shader program that handels water and lava tinting
+    PostProcessingShader m_progNoOp; // A post processing shader program that does nothing
+
+    DepthThroughShader m_progDepthThrough; // A post shader program to see depth values
+
+    PostProcessingShader m_progShandow; // A post processing shader program that does nothing
 
     ShaderProgram m_progSky; // A screen-space shader for creating the sky background
     float time;
 
     Quad quad;
+
+    DepthFrameBuffer m_depthFrameBuffer;
 
     void moveMouseToCenter(); // Forces the mouse position to the screen's center. You should call this
                               // from within a mouse move event after reading the mouse movement so that
@@ -53,6 +61,12 @@ private:
     void sendPlayerDataToGUI() const;
 
     void performTerrainPostprocessRenderPass();
+
+    void preformLightPerspectivePass();
+
+    void preformPlayerPerspectivePass();
+
+    void prepareViewportForFBO();
 
     int playerIsInLiquid();
 
@@ -73,8 +87,7 @@ public:
 
     // Called from paintGL().
     // Calls Terrain::draw().
-    void renderTerrain();
-
+    void renderTerrain(ShaderProgram *prog);
 
 protected:
     // Automatically invoked when the user
