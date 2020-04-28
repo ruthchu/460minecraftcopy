@@ -243,6 +243,7 @@ void MyGL::preformLightPerspectivePass()
     // Bind depth frame buffer
     m_depthFrameBuffer.bindFrameBuffer();
     prepareViewportForFBO();
+    // set unifsampler2D shadow to 2
     glUniform1i(m_progDepthThrough.unifSampler2DShadow, 2);
     renderTerrain(&m_progDepthThrough);
     glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
@@ -256,9 +257,11 @@ void MyGL::preformPlayerPerspectivePass()
     // Draw sky
 //    quad.bufferVBOdata();
 //    m_progSky.drawQuad(quad);
-    // Bind minecraft texture to slot 0
+    // Pass textures to GPU
+    m_progLambert.setTextureSampler2D(0);
+    m_progLambert.setTextureSampler2DShadow(2);
+    // Make each texture their active in their textSlot
     m_texture.bind(0);
-    // Bind shadow map texture to slot 2
     m_depthFrameBuffer.bindToTextureSlot(2);
     // Render with lambert
     renderTerrain(&m_progLambert);

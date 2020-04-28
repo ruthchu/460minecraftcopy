@@ -126,7 +126,7 @@ void main()
     shadowCoord = shadowCoord * 0.5 + 0.5;
 
     // Get shadow mapped stored depth
-    float storedDepth = texture(u_ShadowMap, shadowCoord.xy).r;
+    float storedDepth = texture(u_ShadowMap,shadowCoord.xy).r;
     float fragmentDepth = shadowCoord.z;
     //       float bias = max(0.05 * (1.0 - dot(fs_Nor, u_Eye)), 0.005);
 
@@ -140,9 +140,9 @@ void main()
     }
     else {
         // cyan
-//        finCol = vec4(0, 1, 1, 1);
+        //finCol = vec4(0, 1, 1, 1);
     }
 
-    finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
+//    finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
     out_Col = finCol;
 }
