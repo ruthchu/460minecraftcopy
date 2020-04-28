@@ -104,7 +104,6 @@ void main()
 
     float depth = camPos.z;
 
-    depth = smoothstep(0, 0.5, depth);
-    vec3 col = mix(finCol.xyz, fogCol, depth);
+    vec3 col = mix(finCol.xyz, fogCol, 0.5);
     out_Col = vec4(col, finCol.w);
 }
