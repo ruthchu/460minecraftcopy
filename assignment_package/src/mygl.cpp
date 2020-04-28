@@ -206,29 +206,31 @@ void MyGL::paintGL() {
 //    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
 
 //    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, 0.1f, 1000.f);
-    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-50.f, 50.f, -50.f, 50.f, 0.1f, 1000.f);
-//    glm::mat4 cameraView = glm::lookAt(glm::vec3(41.0529, 172.854 ,-20.898), glm::vec3(41.0529, 172.854 ,-21.898), glm::vec3(0, 1 ,0));
-    glm::mat4 cameraView = glm::lookAt(glm::vec3(41.0529, 172.854 ,-20.898),
-                                       glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)) + glm::vec3(41.0529, 172.854 ,-20.898),
-                                       glm::vec3(0, 1 ,0));
+    glm::mat4 lightPorj = glm::ortho<float>(-100.f, 100.f, -100.f, 100.f, 0.1f, 1000.f);
+    glm::vec3 lightPos = glm::vec3(-40.f, 200.f, 0.f);
+    glm::vec3 lightDir = glm::normalize(glm::vec3(0.5f, -1.f, 0.75f));
+    glm::mat4 lightView = glm::lookAt(lightPos, lightDir, glm::vec3(0, 1, 0));
+//    glm::mat4 cameraView = glm::lookAt(glm::vec3(41.0529, 172.854 ,-20.898),
+//                                       glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)) + glm::vec3(41.0529, 172.854 ,-20.898),
+//                                       glm::vec3(0, 1 ,0));
 //    cameraView = m_player.mcr_camera.getView();
-    m_progDepthThrough.setDepthMVP(depthProjectionMatrix * cameraView);
-
+    glm::mat4 lighViewProj = lightPorj * lightView;
+    m_progDepthThrough.setDepthMVP(lighViewProj);
 //    m_progDepthThough.setDepthMVP(glm::normalize(m_player.mcr_camera.getLookVec()));
     m_progDepthThrough.setModelMatrix(glm::mat4());
     m_progDepthThrough.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 //    m_progLambert.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
 
-    m_progLambert.setDepthMVP(depthProjectionMatrix * cameraView);
-    m_progLambert.setViewMatrix(m_player.mcr_camera.getView());
-
     preformLightPerspectivePass();
+
+    m_progLambert.setDepthMVP(lighViewProj);
+    m_progLambert.setViewMatrix(m_player.mcr_camera.getView());
 
 //    // SKY
 //    quad.bufferVBOdata();
 //    m_progSky.drawQuad(quad);
 
-    preformPlayerPerspectivePass();
+//    preformPlayerPerspectivePass();
     performTerrainPostprocessRenderPass();
 
     glDisable(GL_DEPTH_TEST);
@@ -242,9 +244,10 @@ void MyGL::preformLightPerspectivePass()
 {
     // Bind depth frame buffer
     m_depthFrameBuffer.bindFrameBuffer();
-    prepareViewportForFBO();
-    // Load scene into texture
-    m_depthFrameBuffer.bindToTextureSlot(2);
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    glViewport(0,0, 1024, 1024);
+    // Clear the screen so that we only see newly drawn images
+    glClear(GL_DEPTH_BUFFER_BIT);
     renderTerrain(&m_progDepthThrough);
     glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
 }
@@ -295,16 +298,16 @@ void MyGL::performTerrainPostprocessRenderPass()
 //    } else {
 //     m_progNoOp.draw(quad, 1);
 //    }
-//    m_depthFrameBuffer.bindToTextureSlot(2);
-//    m_progShandow.draw(quad, 2);
+    m_depthFrameBuffer.bindToTextureSlot(2);
+    m_progShandow.draw(quad, 2);
 //    std::cout << "--------------------------------" << std::endl;
 
-     m_framebuffer.bindToTextureSlot(1);
-     if (playerIsInLiquid() == 1) {
-        m_progTint.draw(quad, 1);
-     } else {
-        m_progNoOp.draw(quad, 1);
-     }
+//     m_framebuffer.bindToTextureSlot(1);
+//     if (playerIsInLiquid() == 1) {
+//        m_progTint.draw(quad, 1);
+//     } else {
+//        m_progNoOp.draw(quad, 1);
+//     }
 }
 
 void MyGL::prepareViewportForFBO()
