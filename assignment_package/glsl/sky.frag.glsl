@@ -239,7 +239,7 @@ float snoise(vec3 v){
 }
 
 float fbm(vec3 p) {
-    const int NUM_OCTAVES = 3;
+    const int NUM_OCTAVES = 2;
     float v = 0.0;
     float a = 0.5;
     vec3 shift = vec3(100);
@@ -276,8 +276,32 @@ float snoiseFBM(vec3 p) {
     return sum;
 }
 
+vec3 rotateX(vec3 p, float a) {
+    mat4 rot = mat4(1, 0, 0, 0,
+                    0, cos(a), sin(a), 0,
+                    0, -sin(a), cos(a), 0,
+                    0, 0, 0, 1);
+    vec4 v = rot * vec4(p, 1);
+    return v.xyz;
+}
+
 vec3 rotateY(vec3 p, float a) {
-    return vec3(cos(a) * p.x + sin(a) * p.z, p.y, -sin(a) * p.x + cos(a) * p.z);
+//    return vec3(cos(a) * p.x + sin(a) * p.z, p.y, -sin(a) * p.x + cos(a) * p.z);
+    mat4 rot = mat4(cos(a), 0, -sin(a), 0,
+                    0, 1, 0, 0,
+                    sin(a), 0, cos(a), 0,
+                    0, 0, 0, 1);
+    vec4 v = rot * vec4(p, 1);
+    return v.xyz;
+}
+
+vec3 rotateZ(vec3 p, float a) {
+    mat4 rot = mat4(cos(a), sin(a), 0, 0,
+                    -sin(a), cos(a), 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1);
+    vec4 v = rot * vec4(p, 1);
+    return v.xyz;
 }
 
 void main()
@@ -309,7 +333,10 @@ void main()
     vec3 col = sunsetCol;
     // recall the definition of a dot product. The angle between two normalized vectors
     // can be found by taking the arccos(a dot b). theta: [0,pi]. Multiply by 2 to get [0,two_pi]
-    vec3 newSunDir = rotateY(sunDir, u_Time * 0.01);
+    vec3 newSunDir = rotateX(sunDir, u_Time * 0.01);
+//    vec3 newSunDir = rotateY(sunDir, u_Time * 0.01);
+//    vec3 newSunDir = rotateZ(sunDir, u_Time * 0.01);
+    newSunDir = normalize(newSunDir);
     float raySunDot = dot(rayDir, newSunDir);
     float angle = acos(raySunDot) * 2.f * (180.f / PI);
 
