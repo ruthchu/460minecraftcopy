@@ -14,3 +14,10 @@ The stride represents the how the elements are grouped. If we have pos1nor1col1p
 4/16/20 12pm est: (Ruth) Discussed with Alex, high level, how to implement texturing. Got help on how to set glTexParameteri.
 
 4/17/20 8pm est: (Ruth) Textures were showing up black, Felicity helped me debug. I had to hardcode the image file path rather than pass it in via a pointer.
+
+4/26
+Various code samples for noise functions including simplex was found here: https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
+An article discussing FBM as well as interesting warping was found here: https://thebookofshaders.com/13/
+Further reading on noise was done in Inigo Quilez's website including this one: http://www.iquilezles.org/www/articles/warp/warp.htm
+
+4/27 Clarification on how to blend fog was found here: https://webglfundamentals.org/webgl/lessons/webgl-fog.html

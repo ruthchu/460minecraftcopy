@@ -239,7 +239,7 @@ float snoise(vec3 v){
 }
 
 float fbm(vec3 p) {
-    const int NUM_OCTAVES = 5;
+    const int NUM_OCTAVES = 11;
     float v = 0.0;
     float a = 0.5;
     vec3 shift = vec3(100);

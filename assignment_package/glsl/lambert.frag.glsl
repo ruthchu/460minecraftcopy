@@ -29,7 +29,7 @@ out vec4 out_Col; // This is the final output color that you will see on your
 const vec3 fogCol = vec3(178.f / 255.f, 175.f / 255.f, 226.f / 255.f);
 
 const float FOG_NEAR = 90.1f;
-const float FOG_FAR = 125.0f;
+const float FOG_FAR = 100.0f;
 
 float random1(vec3 p) {
     return fract(sin(dot(p,vec3(127.1, 311.7, 191.999)))
