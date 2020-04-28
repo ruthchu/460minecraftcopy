@@ -135,11 +135,12 @@ void main()
     if (isInShadow) {
         // magenta
         finCol = vec4(1, 0, 1, 1);
-    } else {
+    }
+    else {
         // cyan
-        finCol = vec4(0, 1, 1, 1);
+//        finCol = vec4(0, 1, 1, 1);
     }
 
-    //        finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
+    finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
     out_Col = finCol;
 }

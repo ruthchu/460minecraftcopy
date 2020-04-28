@@ -13,7 +13,7 @@ MyGL::MyGL(QWidget *parent)
       m_terrain(this), m_player(glm::vec3(48.f, 170.f, 48.f), m_terrain),
       m_currTime(QDateTime::currentMSecsSinceEpoch()), m_timeSinceStart(0),
       m_framebuffer(FrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
-      m_progTint(this), m_progNoOp(this), m_progDepthThough(this), m_progShandow(this), quad(Quad(this)),
+      m_progTint(this), m_progNoOp(this), m_progDepthThrough(this), m_progShandow(this), quad(Quad(this)),
       m_depthFrameBuffer(DepthFrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
       m_progSky(this)
 {
@@ -78,7 +78,7 @@ void MyGL::initializeGL()
     // Create and set up the flat lighting shader
     m_progFlat.create(":/glsl/flat.vert.glsl", ":/glsl/flat.frag.glsl");
     // Create shader for depth map
-    m_progDepthThough.create(":/glsl/depthThrough.vert.glsl", ":/glsl/depthThrough.frag.glsl");
+    m_progDepthThrough.create(":/glsl/depthThrough.vert.glsl", ":/glsl/depthThrough.frag.glsl");
 
     // Create post processing shader for tinting in water
     m_progTint.create(":/glsl/passthrough.vert.glsl", ":/glsl/screentint.frag.glsl");
@@ -127,7 +127,7 @@ void MyGL::resizeGL(int w, int h) {
 
     m_progLambert.setViewProjMatrix(viewproj);
     m_progFlat.setViewProjMatrix(viewproj);
-    m_progDepthThough.setViewProjMatrix(viewproj);
+    m_progDepthThrough.setViewProjMatrix(viewproj);
 
 //    m_progNoOp.setDimensions(glm::ivec2(w, h));
 //    m_progTint.setDimensions(glm::ivec2(w, h));
@@ -137,7 +137,7 @@ void MyGL::resizeGL(int w, int h) {
 #endif
 
     // Depth throgh set dimen
-    m_progDepthThough.setDimensions(glm::ivec2(w * 2, h * 2));
+    m_progDepthThrough.setDimensions(glm::ivec2(w * 2, h * 2));
 
     m_progSky.setViewProjMatrix(viewproj);
     m_progSky.useMe();
@@ -212,11 +212,11 @@ void MyGL::paintGL() {
                                        glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)) + glm::vec3(41.0529, 172.854 ,-20.898),
                                        glm::vec3(0, 1 ,0));
 //    cameraView = m_player.mcr_camera.getView();
-    m_progDepthThough.setDepthMVP(depthProjectionMatrix * cameraView);
+    m_progDepthThrough.setDepthMVP(depthProjectionMatrix * cameraView);
 
 //    m_progDepthThough.setDepthMVP(glm::normalize(m_player.mcr_camera.getLookVec()));
-    m_progDepthThough.setModelMatrix(glm::mat4());
-    m_progDepthThough.setViewProjMatrix(m_player.mcr_camera.getViewProj());
+    m_progDepthThrough.setModelMatrix(glm::mat4());
+    m_progDepthThrough.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 //    m_progLambert.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
 
     m_progLambert.setDepthMVP(depthProjectionMatrix * cameraView);
@@ -242,8 +242,8 @@ void MyGL::preformLightPerspectivePass()
     // Bind depth frame buffer
     m_depthFrameBuffer.bindFrameBuffer();
     prepareViewportForFBO();
-    glUniform1i(m_progDepthThough.unifSampler2DShadow, 2);
-    renderTerrain(&m_progDepthThough);
+    glUniform1i(m_progDepthThrough.unifSampler2DShadow, 2);
+    renderTerrain(&m_progDepthThrough);
     glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
 }
 

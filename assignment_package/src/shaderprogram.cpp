@@ -240,12 +240,16 @@ void ShaderProgram::drawOpaque(Drawable &d)
         int stride = 12 * sizeof (float);
         // Position
         context->glEnableVertexAttribArray(attrPos);
+        context->printGLErrorLog();
         context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, stride, (void*)(0));
+        context->printGLErrorLog();
         // Normal
         context->glEnableVertexAttribArray(attrNor);
+        context->printGLErrorLog();
         context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, stride, (void*)(4 * sizeof(float)));
         // Color
         context->glEnableVertexAttribArray(attrCol);
+        context->printGLErrorLog();
         context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, stride, (void*)(8 * sizeof(float)));
     }
 
@@ -254,9 +258,18 @@ void ShaderProgram::drawOpaque(Drawable &d)
     d.bindIdx();
     context->glDrawElements(d.drawMode(), d.elemCountOpaque(), GL_UNSIGNED_INT, 0);
 
-    if (attrPos != -1) context->glDisableVertexAttribArray(attrPos);
-    if (attrNor != -1) context->glDisableVertexAttribArray(attrNor);
-    if (attrCol != -1) context->glDisableVertexAttribArray(attrCol);
+    if (attrPos != -1) {
+        context->glDisableVertexAttribArray(attrPos);
+        context->printGLErrorLog();
+    }
+    if (attrNor != -1) {
+        context->glDisableVertexAttribArray(attrNor);
+        context->printGLErrorLog();
+    }
+    if (attrCol != -1) {
+        context->glDisableVertexAttribArray(attrCol);
+        context->printGLErrorLog();
+    }
 
 //    std::cout << "ShaderProgram Opaque" << std::endl;
     context->printGLErrorLog();
@@ -371,4 +384,70 @@ void ShaderProgram::printLinkInfoLog(int prog)
         qDebug() << "LinkInfoLog:" << endl << infoLog << endl;
         delete [] infoLog;
     }
+}
+
+
+
+DepthThroughShader::DepthThroughShader(OpenGLContext* context)
+    : ShaderProgram(context)
+{}
+
+DepthThroughShader::~DepthThroughShader() {}
+
+//This function, as its name implies, uses the passed in GL widget
+void DepthThroughShader::drawOpaque(Drawable &d)
+{
+    useMe();
+
+    if(d.elemCountOpaque() < 0) {
+        throw std::out_of_range("Attempting to draw a drawable with m_count_t of " + std::to_string(d.elemCountOpaque()) + "!");
+    }
+
+    if (d.bindAllOpaque()) {
+        int stride = 12 * sizeof (float);
+        // Position
+        context->glEnableVertexAttribArray(attrPos);
+        context->printGLErrorLog();
+        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, stride, (void*)(0));
+        context->printGLErrorLog();
+    }
+
+    // Bind the index buffer and then draw shapes from it.
+    // This invokes the shader program, which accesses the vertex buffers.
+    d.bindIdx();
+    context->glDrawElements(d.drawMode(), d.elemCountOpaque(), GL_UNSIGNED_INT, 0);
+
+    if (attrPos != -1) {
+        context->glDisableVertexAttribArray(attrPos);
+        context->printGLErrorLog();
+    }
+
+//    std::cout << "ShaderProgram Opaque" << std::endl;
+    context->printGLErrorLog();
+}
+
+void DepthThroughShader::drawTransparent(Drawable &d)
+{
+    useMe();
+
+    if(d.elemCountTransparent() < 0) {
+        throw std::out_of_range("Attempting to draw a drawable with m_count of " + std::to_string(d.elemCountTransparent()) + "!");
+    }
+
+    if (d.bindAllTransparent()) {
+        int stride = 12 * sizeof (float);
+        // Position
+        context->glEnableVertexAttribArray(attrPos);
+        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, stride, (void*)(0));
+    }
+
+    // Bind the index buffer and then draw shapes from it.
+    // This invokes the shader program, which accesses the vertex buffers.
+    d.bindIdxTransparent();
+    context->glDrawElements(d.drawMode(), d.elemCountTransparent(), GL_UNSIGNED_INT, 0);
+
+    if (attrPos != -1) context->glDisableVertexAttribArray(attrPos);
+
+//    std::cout << "ShaderProgram Transparent" << std::endl;
+    context->printGLErrorLog();
 }

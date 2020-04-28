@@ -43,7 +43,7 @@ private:
     PostProcessingShader m_progTint; // A post processing shader program that handels water and lava tinting
     PostProcessingShader m_progNoOp; // A post processing shader program that does nothing
 
-    ShaderProgram m_progDepthThough; // A post shader program to see depth values
+    DepthThroughShader m_progDepthThrough; // A post shader program to see depth values
 
     PostProcessingShader m_progShandow; // A post processing shader program that does nothing
 
