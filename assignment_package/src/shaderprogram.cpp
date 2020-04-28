@@ -220,7 +220,7 @@ void ShaderProgram::drawOpaque(Drawable &d)
     if (attrNor != -1) context->glDisableVertexAttribArray(attrNor);
     if (attrCol != -1) context->glDisableVertexAttribArray(attrCol);
 
-    std::cout << "ShaderProgram Opaque" << std::endl;
+//    std::cout << "ShaderProgram Opaque" << std::endl;
     context->printGLErrorLog();
 }
 
@@ -254,7 +254,7 @@ void ShaderProgram::drawTransparent(Drawable &d)
     if (attrNor != -1) context->glDisableVertexAttribArray(attrNor);
     if (attrCol != -1) context->glDisableVertexAttribArray(attrCol);
 
-    std::cout << "ShaderProgram Transparent" << std::endl;
+//    std::cout << "ShaderProgram Transparent" << std::endl;
     context->printGLErrorLog();
 }
 
