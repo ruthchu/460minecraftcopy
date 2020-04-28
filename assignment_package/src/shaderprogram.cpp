@@ -10,7 +10,8 @@ ShaderProgram::ShaderProgram(OpenGLContext *context)
     : vertShader(), fragShader(), prog(),
       attrPos(-1), attrNor(-1), attrCol(-1),
       unifModel(-1), unifModelInvTr(-1), unifViewProj(-1), unifColor(-1),
-      unifSampler2D(-1), unifTime(-1), unifDepthMatrixID(-1), context(context)
+      unifSampler2D(-1), unifTime(-1), unifDepthMatrixID(-1), unifLightProj(-1),
+      context(context)
 {}
 
 void ShaderProgram::create(const char *vertfile, const char *fragfile)
@@ -82,6 +83,8 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
     unifEye = context->glGetUniformLocation(prog, "u_Eye");
 
     unifView = context->glGetUniformLocation(prog, "u_View");
+
+    unifLightProj = context->glGetUniformLocation(prog, "u_LightProj");
 }
 
 void ShaderProgram::useMe()
@@ -198,6 +201,22 @@ void ShaderProgram::setDepthMVP(const glm::vec3 light)
         glm::mat4 depthModelMatrix = glm::mat4(1.0);
         glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
         context->glUniformMatrix4fv(unifDepthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
+    }
+}
+
+void ShaderProgram::setLightProj(const glm::mat4 &v)
+{
+    useMe();
+    if(unifLightProj != -1) {
+        // Pass a 4x4 matrix into a uniform variable in our shader
+        // Handle to the matrix variable on the GPU
+        context->glUniformMatrix4fv(unifLightProj,
+                                    // How many matrices to pass
+                                    1,
+                                    // Transpose the matrix? OpenGL uses column-major, so no.
+                                    GL_FALSE,
+                                    // Pointer to the first element of the matrix
+                                    &v[0][0]);
     }
 }
 

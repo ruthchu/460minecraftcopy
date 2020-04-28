@@ -16,6 +16,8 @@ uniform sampler2D u_Texture; // The texture to be read from by this shader
 
 uniform sampler2D u_ShadowMap; // Shadow map texture read from by labert shader
 
+uniform vec3 u_Eye; // Camera pos
+
 uniform int u_Time; // A time value that changes once every tick
 uniform mat4 u_View;
 
@@ -137,8 +139,8 @@ void main()
     float storedDepth = texture(u_ShadowMap, shadowCoord.xy).r;
     float fragmentDepth = shadowCoord.z;
     // Check if fragment is in shadow with bias
-    float bias = 0.0001;
-    // bias = max(0.05 * (1.0 - dot(fs_Nor, u_Eye)), 0.005);
+    float dotNorEye = dot(fs_Nor.xyz, u_Eye);
+    float bias = max(0.05 * (1.0 - dotNorEye), 0.005);
     bool isInShadow = storedDepth < fragmentDepth - bias;
     if (isInShadow) {
         finCol.r = clamp(finCol.r - 0.3, 0, 0.3);
@@ -147,7 +149,6 @@ void main()
     }
     out_Col = finCol;
     // finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
-
 
     // FOG ----------------------------------------------------------------------------
     vec4 camPos = u_View * fs_Pos;
