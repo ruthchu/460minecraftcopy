@@ -145,8 +145,8 @@ Chunk* Terrain::createChunkAt(int x, int z) {
 // it draws each Chunk with the given ShaderProgram, remembering to set the
 // model matrix to the proper X and Z translation!
 void Terrain::draw(int minX, int maxX, int minZ, int maxZ, ShaderProgram *shaderProgram) {
-    for(int x = minX; x <= maxX; x += BLOCK_LENGTH_IN_CHUNK) {
-        for(int z = minZ; z <= maxZ; z += BLOCK_LENGTH_IN_CHUNK) {
+    for(int z = minZ; z <= maxZ; z += BLOCK_LENGTH_IN_CHUNK) {
+        for(int x = minX; x <= maxX; x += BLOCK_LENGTH_IN_CHUNK) {
             if (hasChunkAt(x, z)) {
                 const uPtr<Chunk> &chunk = getChunkAt(x, z);
                 shaderProgram->setModelMatrix(glm::translate(glm::mat4(), glm::vec3(0, 0, 0)));
