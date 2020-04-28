@@ -107,8 +107,9 @@ void MyGL::initializeGL()
     // create quad for post processing
     quad.create();
 
-    m_progNoOp.setDimensions(glm::ivec2(this->width(), this->height()));
-    m_progTint.setDimensions(glm::ivec2(this->width(), this->height()));
+//    m_progNoOp.setDimensions(glm::ivec2(this->width(), this->height()));
+//    m_progTint.setDimensions(glm::ivec2(this->width(), this->height()));
+    m_progShandow.setDimensions(glm::ivec2(this->width(), this->height()));
 }
 
 void MyGL::resizeGL(int w, int h) {
@@ -123,8 +124,12 @@ void MyGL::resizeGL(int w, int h) {
     m_progFlat.setViewProjMatrix(viewproj);
     m_progDepthThough.setViewProjMatrix(viewproj);
 
-    m_progNoOp.setDimensions(glm::ivec2(w, h));
-    m_progTint.setDimensions(glm::ivec2(w, h));
+//    m_progNoOp.setDimensions(glm::ivec2(w, h));
+//    m_progTint.setDimensions(glm::ivec2(w, h));
+    m_progShandow.setDimensions(glm::ivec2(w, h));
+#ifdef MAC
+    m_progShandow.setDimensions(glm::ivec2(w * 2 ,h * 2));
+#endif
 
     // resize frame buffer
     m_framebuffer.resize(w, h, this->devicePixelRatio());
@@ -182,7 +187,6 @@ void MyGL::paintGL() {
     m_progLambert.setViewProjMatrix(m_player.mcr_camera.getViewProj());
 
 //    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
-    glEnable(GL_DEPTH_TEST);
 
 //    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, 0.1f, 1000.f);
     glm::mat4 depthProjectionMatrix = glm::ortho<float>(-50.f, 50.f, -50.f, 50.f, 0.1f, 2000.f);
@@ -197,7 +201,7 @@ void MyGL::paintGL() {
     m_progLambert.setDepthMVP(depthProjectionMatrix * cameraView);
 
     preformLightPerspectivePass();
-    preformPlayerPerspectivePass();
+//    preformPlayerPerspectivePass();
     performTerrainPostprocessRenderPass();
 
     glDisable(GL_DEPTH_TEST);
@@ -212,8 +216,6 @@ void MyGL::preformLightPerspectivePass()
     // Bind depth frame buffer
     m_depthFrameBuffer.bindFrameBuffer();
     prepareViewportForFBO();
-    // Bind shadow map to texture slot 2
-    m_depthFrameBuffer.bindToTextureSlot(2);
     glUniform1i(m_progDepthThough.unifSampler2DShadow, 2);
     renderTerrain(&m_progDepthThough);
     glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
@@ -259,14 +261,16 @@ void MyGL::performTerrainPostprocessRenderPass()
 //    } else {
 //     m_progNoOp.draw(quad, 1);
 //    }
-//    m_progShandow.draw(quad, 2);
+    m_depthFrameBuffer.bindToTextureSlot(2);
+    m_progShandow.draw(quad, 2);
+    std::cout << "--------------------------------" << std::endl;
 
-     m_framebuffer.bindToTextureSlot(1);
-     if (playerIsInLiquid() == 1) {
-        m_progTint.draw(quad, 1);
-     } else {
-        m_progNoOp.draw(quad, 1);
-     }
+//     m_framebuffer.bindToTextureSlot(1);
+//     if (playerIsInLiquid() == 1) {
+//        m_progTint.draw(quad, 1);
+//     } else {
+//        m_progNoOp.draw(quad, 1);
+//     }
 }
 
 void MyGL::prepareViewportForFBO()

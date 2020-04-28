@@ -35,7 +35,6 @@ void DepthFrameBuffer::create()
     mp_context->glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_outputTexture, 0);
 
     mp_context->glDrawBuffer(GL_NONE); // no color drawn
-    mp_context->glReadBuffer(GL_NONE);
 
     m_created = true;
     if(mp_context->glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)

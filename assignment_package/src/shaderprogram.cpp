@@ -4,7 +4,7 @@
 #include <QTextStream>
 #include <QDebug>
 #include <stdexcept>
-
+#include <iostream>
 
 ShaderProgram::ShaderProgram(OpenGLContext *context)
     : vertShader(), fragShader(), prog(),
@@ -220,7 +220,8 @@ void ShaderProgram::drawOpaque(Drawable &d)
     if (attrNor != -1) context->glDisableVertexAttribArray(attrNor);
     if (attrCol != -1) context->glDisableVertexAttribArray(attrCol);
 
-//    context->printGLErrorLog();
+    std::cout << "ShaderProgram Opaque" << std::endl;
+    context->printGLErrorLog();
 }
 
 void ShaderProgram::drawTransparent(Drawable &d)
@@ -253,7 +254,8 @@ void ShaderProgram::drawTransparent(Drawable &d)
     if (attrNor != -1) context->glDisableVertexAttribArray(attrNor);
     if (attrCol != -1) context->glDisableVertexAttribArray(attrCol);
 
-//    context->printGLErrorLog();
+    std::cout << "ShaderProgram Transparent" << std::endl;
+    context->printGLErrorLog();
 }
 
 

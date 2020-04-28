@@ -101,6 +101,7 @@ void PostProcessingShader::draw(Drawable &d, int textureSlot)
     if (attrPos != -1) context->glDisableVertexAttribArray(attrPos);
     if (attrUV != -1) context->glDisableVertexAttribArray(attrUV);
 
+    std::cout << "PostProcessing Shader " << std::endl;
     context->printGLErrorLog();
 }
 
