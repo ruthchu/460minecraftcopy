@@ -85,6 +85,8 @@ vec3 rotateX(vec3 p, float a) {
 
 const vec4 dayCol = vec4(vec3(114.f, 200.f, 252.f) / 255.f, .25f);
 const vec4 nightCol = vec4(vec3(32.f, 24.f, 72.f) / 255.f, .25f);
+const vec4 pinkCol = vec4(vec3(255.f, 255.f, 233.f) / 255.f, .25f);
+const vec4 yellowCol = vec4(vec3(255.f, 179.f, 208.f) / 255.f, .25f);
 
 void main()
 {
@@ -117,11 +119,13 @@ void main()
 
     float depth = -camPos.z;
 
+    // Calculations done to blend the fog color to match the sky color
     float fogMix = normalize(rotateX(normalize(vec3(0, 0.1, 1.0)), u_Time * 0.01)).y;
+    float modFogMix = smoothstep(.3f, .6f, (fogMix + 1.f) / 2.f);
 
-    vec4 fogCol;
-    fogCol = mix(nightCol, dayCol, smoothstep(.3f, .5f, (fogMix + 1.f) / 2.f));
-
+    vec4 fogCol = mix(nightCol, yellowCol, modFogMix);
+    vec4 secondCol = mix(pinkCol, dayCol, modFogMix);
+    fogCol = mix(fogCol, secondCol, modFogMix);
     float fogAmt = smoothstep(FOG_NEAR, FOG_FAR, depth);
 
     vec4 col = mix(finCol, fogCol, fogAmt);

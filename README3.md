@@ -10,3 +10,22 @@ Further reading on noise was done in Inigo Quilez's website including this one: 
 
 Fog:
 https://webglfundamentals.org/webgl/lessons/webgl-fog.html
+
+Biomes: (Ruth Chung)
+I added two biomes. One consists of many tall spires, with water appearing beneath a certain level, and the other consists of mostly flat terrain with sharply protruding hills. In the hills biome, the hills are made of dirt and the ground is made of grass.
+
+The spire biome is primarily Perlin noise, floored at a certain threshold. I subtracted floored Worley noise from the top to flatten the spires in a gradiated way. Then, to round the tops again, I subtracted some Perlin noise from the top.
+The hill biome is a modified Worley noise, also floored at a certain threshold. 
+I also made the mountains slightly shorter.
+
+In order to have smooth height transitions between the 4 biomes (2 existing, 2 new), I used an interpolation function as described here:
+https://parzivail.com/procedural-terrain-generaion/
+the master function being a Perlin function.
+I used that same Perlin function (1D output) to designate terrain zones. Based on terrain zone, I set the blocktype.
+For the spire biome, I added 3 new textures to the texture atlas, in order to give the spires a lighter stone color and a darker grass color. This also meant I had to add two new blocks, called SPIRE and SPIRE_TOP.
+
+
+Sky: (Ruth Chung)
+After Ben had set up the pipeline, I tweaked the sky fragment shader to make the sky look more natural. Based on the height of the sun, the sky is first shaded with a base day or night color, and if the sun is rising or setting, the base color is an interpolation of the two. If the sun is setting or rising, based on the height, I color a variating area around the sun with either a sunset palette or a dusk palette. Ben had already noised these palettes, so I simply tweaked the amount of interpolation between them.
+
+Fog: (Ruth Chung)

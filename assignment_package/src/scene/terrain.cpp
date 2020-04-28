@@ -398,6 +398,9 @@ void Terrain::fillBlockData(std::vector<Chunk*> chunks, BlockData *chunksWithDat
                     t = GRASS;
                 } else  if (perlin > 0.25f + edgeNoise && perlin < 0.5f + edgeNoise) { // hills
                     t = DIRT;
+                    if (y < 137) {
+                        t = GRASS;
+                    }
                 } else if (perlin > 0.5f+ edgeNoise && perlin < 0.75f + edgeNoise) { // mountain
                     t = STONE;
                 } else { // spire
