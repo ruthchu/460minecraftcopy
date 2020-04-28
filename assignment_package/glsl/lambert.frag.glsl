@@ -143,6 +143,6 @@ void main()
 //        finCol = vec4(0, 1, 1, 1);
     }
 
-//    finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
+    finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
     out_Col = finCol;
 }
