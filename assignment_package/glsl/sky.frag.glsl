@@ -357,6 +357,8 @@ void main()
         if (raySunDot > SUNSET_THRESHOLD) {
             //            col = col;
         } else if (raySunDot > DUSK_THRESHOLD) {
+            // if the player is looking sufficiently away from the sun, then
+            // transition to dusk with a linear interpolation
             float t = (raySunDot - SUNSET_THRESHOLD) / (DUSK_THRESHOLD - SUNSET_THRESHOLD);
             col = mix(col, duskCol, t);
         } else {
