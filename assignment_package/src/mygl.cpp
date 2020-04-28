@@ -181,7 +181,6 @@ void MyGL::paintGL() {
     m_progSky.useMe();
     glm::vec3 cam = m_player.mcr_camera.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
-//    this->glUniform1f(m_progSky.unifTime, time++);
 
 //     Render to our framebuffer rather than the viewport
     framebuffer.bindFrameBuffer();
