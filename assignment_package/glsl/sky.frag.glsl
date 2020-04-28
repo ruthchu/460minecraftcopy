@@ -265,6 +265,7 @@ float warpFBM(vec3 p) {
 }
 
 float snoiseFBM(vec3 p) {
+    p += u_Time * 0.01;
     float sum = 0;
     float freq = 4;
     float amp = 0.5;
