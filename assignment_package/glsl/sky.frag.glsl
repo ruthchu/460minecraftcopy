@@ -348,6 +348,10 @@ void main()
     float raySunDot = dot(rayDir, newSunDir);
     float angle = acos(raySunDot) * 2.f * (180.f / PI);
 
+    if (WorleyNoise3D(p.xyz) < .02f) {
+        nightCol = vec3(252.f, 255.f, 244.f) / 255.f;
+    }
+
     // Base day and night color
     col = mix(nightCol, dayCol, smoothstep(.3f, .5f,(newSunDir.y + 1.f) / 2.f));
 
