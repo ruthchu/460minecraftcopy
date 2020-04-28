@@ -21,6 +21,7 @@ void Player::processInputs(InputBundle &inputs, float dT) {
     // Rotate the local axis' based on mouse input
     float mod = 0.2f / dT;
     if (dT == 0) {
+        mod = 1.f;
         return;
     }
     rotateOnUpGlobal(inputs.mouseX / 40.f * mod);
