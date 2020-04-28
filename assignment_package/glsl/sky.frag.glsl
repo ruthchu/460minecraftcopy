@@ -18,26 +18,31 @@ const float TWO_PI = 6.28318530718;
 // sky flavors
 #define SUNSET_THRESHOLD 0.75
 #define DUSK_THRESHOLD -0.1
+#define NIGHT_THRESHOLD -.25
 
 // sun parameters
 const vec3 sunDir = normalize(vec3(0, 0.1, 1.0));
 const float sunSize = 20.0;
 const float sunCoreSize = 7.5;
+const float hazeDist = 50.0;
 
 // Sunset palette
-const vec3 sunset[5] = vec3[](vec3(255, 229, 119) / 255.0,
+const vec3 sunset[5] = vec3[](
+vec3(255, 229, 119) / 255.0,
 vec3(254, 192, 81) / 255.0,
 vec3(255, 137, 103) / 255.0,
 vec3(253, 96, 81) / 255.0,
-vec3(57, 32, 51) / 255.0);
+vec3(255, 179, 208) / 255.0);
 // Dusk palette
-const vec3 dusk[5] = vec3[](vec3(144, 96, 144) / 255.0,
+const vec3 dusk[5] = vec3[](
+vec3(144, 96, 144) / 255.0,
 vec3(96, 72, 120) / 255.0,
 vec3(72, 48, 120) / 255.0,
 vec3(48, 24, 96) / 255.0,
 vec3(0, 24, 72) / 255.0);
 
 const vec3 sunColor = vec3(255, 255, 190) / 255.0;
+const vec3 setSunColor = vec3(254, 225, 171) / 255.0;
 const vec3 cloudColor = sunset[3];
 
 /* Piecewise function which returns some linearly interpolated sunset
@@ -323,48 +328,78 @@ void main()
     vec3 rayDir = normalize(p.xyz - u_Eye);
 
     // convert ray to 2d uv coords
-    vec2 uv = sphereToUV(rayDir /*- clamp(u_Eye, 0.f,1.f)*/);
+    vec2 uv = sphereToUV(rayDir);
 
     vec2 offset = vec2(snoiseFBM(rayDir));
-//    vec2 offset = vec2(warpFBM(rayDir));
     uv = uv + offset * 0.1;
 
     vec3 sunsetCol = toSunset(uv.y);
     vec3 duskCol = toDusk(uv.y);
+    vec3 nightCol = vec3(32.f, 24.f, 72.f) / 255.f;
+    vec3 dayCol = vec3(115.f, 200.f, 252.f) / 255.f;
 
-    vec3 col = sunsetCol;
+    vec3 col;
+    vec3 sunMoveCol;
+
     // recall the definition of a dot product. The angle between two normalized vectors
     // can be found by taking the arccos(a dot b). theta: [0,pi]. Multiply by 2 to get [0,two_pi]
     vec3 newSunDir = rotateX(sunDir, u_Time * 0.01);
-//    vec3 newSunDir = rotateY(sunDir, u_Time * 0.01);
-//    vec3 newSunDir = rotateZ(sunDir, u_Time * 0.01);
     newSunDir = normalize(newSunDir);
     float raySunDot = dot(rayDir, newSunDir);
     float angle = acos(raySunDot) * 2.f * (180.f / PI);
 
+    // Base day and night color
+    col = mix(nightCol, dayCol, smoothstep(.3f, .5f,(newSunDir.y + 1.f) / 2.f));
+
+    // Mixing in sunset/sunrise and dusk/dawn color surrounding the sun
+    // when the sun is near the "horizon line"
+
+    // Mixes the sunset/sunrise and the dusk/dawn color based on the height of the sun
+    float haze = smoothstep(-.175f, -.125f, newSunDir.y);
+    sunMoveCol = mix(duskCol, sunsetCol, haze);
+
+    // Shrink or grow the size of the mixed sunrise/dawn color as well as change
+    // it's visibility based on the height of the sun to ensure a smooth sunrise and sunset
+    vec3 haloCol;
+    float haloSize;
+    float visible;
+    if (newSunDir.y < -.05f) {
+        visible = smoothstep(-.3f, -.1f, newSunDir.y);
+        haloSize = smoothstep(-.3f, -1.75f, newSunDir.y);
+        haloCol = mix(col, sunMoveCol, visible);
+    }
+    if (newSunDir.y > -.05f) {
+        visible = smoothstep(0.f, .2f, newSunDir.y);
+        haloSize = smoothstep(-.25f, .15f, newSunDir.y);
+        haloCol = mix(sunMoveCol, col, visible);
+    }
+    float disk = angle / 360.f * haloSize;
+    disk = smoothstep(.7f, 1.f, disk);
+    col = mix(haloCol, col, disk);
+
+
+    // Draw the sun over everything
     if (angle < sunSize) {
         if (angle < sunCoreSize) {
             // clear center of the sun
-            col = sunColor;
+            if (newSunDir.y < .25f) {
+                float weight = smoothstep(-1.f, .25f, newSunDir.y);
+                col = mix(setSunColor, sunColor, weight);
+            } else {
+                col = sunColor;
+            }
         } else {
             // sun corona mix with color in the sky
             // interpolate sunCoresize as 0% sunset color and 100% on the furthest reaches
             float coronaDist = (angle - sunCoreSize) / (sunSize - sunCoreSize);
             coronaDist = smoothstep(0.0, 1.0, coronaDist);
-            col = mix(sunColor, col, coronaDist);
-        }
-    } else {
-        if (raySunDot > SUNSET_THRESHOLD) {
-            //            col = col;
-        } else if (raySunDot > DUSK_THRESHOLD) {
-            // if the player is looking sufficiently away from the sun, then
-            // transition to dusk with a linear interpolation
-            float t = (raySunDot - SUNSET_THRESHOLD) / (DUSK_THRESHOLD - SUNSET_THRESHOLD);
-            col = mix(col, duskCol, t);
-        } else {
-            col = duskCol;
+            if (newSunDir.y < .25f) {
+                float weight = smoothstep(-1.f, .25f, newSunDir.y);
+                col = mix(mix(setSunColor, sunColor, weight), col, coronaDist);
+            } else {
+                col = mix(sunColor, col, coronaDist);
+            }
         }
     }
-
     out_Col = vec4(col, 1);
 }
