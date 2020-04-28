@@ -61,7 +61,8 @@ void main()
     fs_LightVec = (lightDir);  // Compute the direction in which the light source lies
 
     // frag world pos -> unhomogenized screen pos -> light pos
-    fs_PosLight =  u_depthMVP * u_View * modelposition;
+//    fs_PosLight =  u_depthMVP * u_View * modelposition;
+    fs_PosLight =  u_depthMVP * modelposition;
 
     //((gl_FragCoord.xy / vec2(u_Dimensions)) - 0.5) * 2.0;
 

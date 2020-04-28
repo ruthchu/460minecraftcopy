@@ -112,12 +112,6 @@ void main()
     vec4 finCol = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
 
     // Draw shadows
-//    vec4 screenSpace = vec4((gl_FragCoord.x / u_Dimensions.x) * 2.f - 1,
-//                            1 - (gl_FragCoord.y / u_Dimensions.y) * 2.f,
-//                            gl_FragCoord.zw);
-//    vec4 unhomoScreen = screenSpace * (1.f / gl_FragCoord.w);
-//    vec4 worldSpace = inverse(u_ViewProj) * unhomoScreen;
-//    vec4 fs_PosLight = u_depthMVP * worldSpace;
 
     // To NDC (Screen space) [-1,1]
     vec3 shadowCoord = fs_PosLight.xyz / fs_PosLight.w;
@@ -126,13 +120,13 @@ void main()
     shadowCoord = shadowCoord * 0.5 + 0.5;
 
     // Get shadow mapped stored depth
-    float storedDepth = texture(u_ShadowMap,shadowCoord.xy).r;
+    float storedDepth = texture(u_ShadowMap, shadowCoord.xy).r;
     float fragmentDepth = shadowCoord.z;
-    //       float bias = max(0.05 * (1.0 - dot(fs_Nor, u_Eye)), 0.005);
 
     // Check if fragment is in shadow with bias
     float bias = 0;
-    bool isInShadow = fragmentDepth > storedDepth;
+    // float bias = max(0.05 * (1.0 - dot(fs_Nor, u_Eye)), 0.005);
+    bool isInShadow = storedDepth < fragmentDepth - bias;
 
     if (isInShadow) {
         // magenta
