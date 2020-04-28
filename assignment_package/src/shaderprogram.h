@@ -32,6 +32,10 @@ public:
     int uniEnviorment; // A handle that tells us what enviorment we are in
 
     int unifDepthMatrixID; // A handle to the "unifrom" mat that projects us from world to light pov
+    // Sky
+    int unifDimensions;
+    int unifEye;
+
 public:
     ShaderProgram(OpenGLContext* context);
     // Sets up the requisite GL data and shaders from the given .glsl files
@@ -49,6 +53,7 @@ public:
     // Pass a time variable to this shader on the GPU
     void setTime(int t);
     // Draw the given object to our screen using this ShaderProgram's shaders
+    void drawQuad(Drawable &d);
     void drawOpaque(Drawable &d);
     void drawTransparent(Drawable &d);
     // Utility function used in create()

@@ -47,6 +47,9 @@ private:
 
     PostProcessingShader m_progShandow; // A post processing shader program that does nothing
 
+    ShaderProgram m_progSky; // A screen-space shader for creating the sky background
+    float time;
+
     Quad quad;
 
     DepthFrameBuffer m_depthFrameBuffer;

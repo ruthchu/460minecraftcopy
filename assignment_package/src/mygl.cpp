@@ -14,7 +14,8 @@ MyGL::MyGL(QWidget *parent)
       m_currTime(QDateTime::currentMSecsSinceEpoch()), m_timeSinceStart(0),
       m_framebuffer(FrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
       m_progTint(this), m_progNoOp(this), m_progDepthThough(this), m_progShandow(this), quad(Quad(this)),
-      m_depthFrameBuffer(DepthFrameBuffer(this, this->width(), this->height(), this->devicePixelRatio()))
+      m_depthFrameBuffer(DepthFrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
+      m_progSky(this)
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -85,6 +86,9 @@ void MyGL::initializeGL()
     m_progNoOp.create(":/glsl/passthrough.vert.glsl", ":/glsl/noOp.frag.glsl");
     m_progShandow.create(":/glsl/passthrough.vert.glsl", ":/glsl/shadowMap.frag.glsl");
 
+    // Create and set up sky shader
+    m_progSky.create(":/glsl/sky.vert.glsl", ":/glsl/sky.frag.glsl");
+
     // Set a color with which to draw geometry.
     // This will ultimately not be used when you change
     // your program to render Chunks with vertex colors
@@ -124,12 +128,20 @@ void MyGL::resizeGL(int w, int h) {
     m_progFlat.setViewProjMatrix(viewproj);
     m_progDepthThough.setViewProjMatrix(viewproj);
 
+
 //    m_progNoOp.setDimensions(glm::ivec2(w, h));
 //    m_progTint.setDimensions(glm::ivec2(w, h));
     m_progShandow.setDimensions(glm::ivec2(w, h));
 #ifdef MAC
     m_progShandow.setDimensions(glm::ivec2(w * 2 ,h * 2));
 #endif
+
+    m_progSky.setViewProjMatrix(viewproj);
+    m_progSky.useMe();
+    this->glUniform2i(m_progSky.unifDimensions, width() * this->devicePixelRatio(),
+                      height() * this->devicePixelRatio());
+    glm::vec3 cam = m_player.mcr_camera.mcr_position;
+    this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
 
     // resize frame buffer
     m_framebuffer.resize(w, h, this->devicePixelRatio());
@@ -153,6 +165,7 @@ void MyGL::tick() {
     // Calculate dT and pass relevant time values to tick and shader
     float dT = (QDateTime::currentMSecsSinceEpoch() - m_currTime) / 1000.f;
     m_progLambert.setTime(m_timeSinceStart);
+    m_progSky.setTime(m_timeSinceStart);
 
     m_player.tick(dT, m_inputs);
 
@@ -205,6 +218,11 @@ void MyGL::paintGL() {
     m_progLambert.setDepthMVP(depthProjectionMatrix * cameraView);
 
     preformLightPerspectivePass();
+
+//    // SKY
+//    quad.bufferVBOdata();
+//    m_progSky.drawQuad(quad);
+
     preformPlayerPerspectivePass();
     performTerrainPostprocessRenderPass();
 
@@ -230,12 +248,16 @@ void MyGL::preformPlayerPerspectivePass()
     // Bind standard frame buffer
     m_framebuffer.bindFrameBuffer();
     prepareViewportForFBO();
+    // Draw sky
+//    quad.bufferVBOdata();
+//    m_progSky.drawQuad(quad);
     // Bind minecraft texture to slot 0
     m_texture.bind(0);
     // Bind shadow map texture to slot 2
     m_depthFrameBuffer.bindToTextureSlot(2);
     // Render with lambert
     renderTerrain(&m_progLambert);
+    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
 }
 
 // TODO: Change this so it renders the nine zones of generated

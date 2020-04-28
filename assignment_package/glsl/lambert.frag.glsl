@@ -103,15 +103,6 @@ void main()
         // Compute final shaded color
         vec4 finCol = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
 
-        // Check enviroment
-//       if (u_enviorment == 1) {
-//           finCol.g = clamp(finCol.g * 1.5f, 0.f, 1.f);
-//           finCol.b = clamp(finCol.b * 2.2f, 0.7f, 1.f);
-//       } else if (u_enviorment == 2) {
-//           finCol.r = clamp(finCol.r * 2.3f, 0.7f, 1.f);
-//           finCol.g = clamp(finCol.g * 1.3f, 0.f, 1.f);
-//       }
-
        // Draw shadows
 
        // To NDC [-1,1]
@@ -137,6 +128,6 @@ void main()
 //           finCol = vec4(0, 1, 1, 1);
 //       }
 
-        finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
+//        finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
         out_Col = finCol;
 }

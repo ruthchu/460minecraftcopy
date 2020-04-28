@@ -10,5 +10,7 @@
         <file>glsl/depthThrough.frag.glsl</file>
         <file>glsl/depthThrough.vert.glsl</file>
         <file>glsl/shadowMap.frag.glsl</file>
+        <file>glsl/sky.frag.glsl</file>
+        <file>glsl/sky.vert.glsl</file>
     </qresource>
 </RCC>
