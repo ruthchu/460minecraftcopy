@@ -114,7 +114,6 @@ void MyGL::initializeGL()
 //    m_progNoOp.setDimensions(glm::ivec2(this->width(), this->height()));
 //    m_progTint.setDimensions(glm::ivec2(this->width(), this->height()));
     m_progShandow.setDimensions(glm::ivec2(this->width(), this->height()));
-
 }
 
 void MyGL::resizeGL(int w, int h) {
@@ -146,7 +145,10 @@ void MyGL::resizeGL(int w, int h) {
 #endif
 
     glm::vec3 cam = m_player.mcr_camera.mcr_position;
+    m_progSky.useMe();
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
+    m_progLambert.useMe();
+    this->glUniform3f(m_progLambert.unifEye, cam.x, cam.y, cam.z);
 
     // resize frame buffer
     m_framebuffer.resize(w, h, this->devicePixelRatio());
@@ -210,6 +212,8 @@ void MyGL::paintGL() {
     m_progSky.useMe();
     glm::vec3 cam = m_player.mcr_camera.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
+    m_progLambert.useMe();
+    this->glUniform3f(m_progLambert.unifEye, cam.x, cam.y, cam.z);
 
 //    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
 //    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, 0.1f, 1000.f);
