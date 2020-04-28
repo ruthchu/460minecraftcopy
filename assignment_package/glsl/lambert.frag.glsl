@@ -28,6 +28,9 @@ out vec4 out_Col; // This is the final output color that you will see on your
 
 const vec3 fogCol = vec3(178.f / 255.f, 175.f / 255.f, 226.f / 255.f);
 
+const float FOG_NEAR = 50.1f;
+const float FOG_FAR = 75.0f;
+
 float random1(vec3 p) {
     return fract(sin(dot(p,vec3(127.1, 311.7, 191.999)))
                  *43758.5453);
@@ -102,8 +105,10 @@ void main()
 
     vec4 camPos = u_View * fs_Pos;
 
-    float depth = camPos.z;
+    float depth = -camPos.z;
 
-    vec3 col = mix(finCol.xyz, fogCol, 0.5);
+    float fogAmt = smoothstep(FOG_NEAR, FOG_FAR, depth);
+
+    vec3 col = mix(finCol.xyz, fogCol, fogAmt);
     out_Col = vec4(col, finCol.w);
 }
