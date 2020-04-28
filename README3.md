@@ -26,6 +26,9 @@ For the spire biome, I added 3 new textures to the texture atlas, in order to gi
 
 
 Sky: (Ruth Chung)
-After Ben had set up the pipeline, I tweaked the sky fragment shader to make the sky look more natural. Based on the height of the sun, the sky is first shaded with a base day or night color, and if the sun is rising or setting, the base color is an interpolation of the two. If the sun is setting or rising, based on the height, I color a variating area around the sun with either a sunset palette or a dusk palette. Ben had already noised these palettes, so I simply tweaked the amount of interpolation between them.
+After Ben had set up the shaders, I tweaked the sky fragment shader to make the sky look more natural. Based on the height of the sun, the sky is first shaded with a base day or night color, and if the sun is rising or setting, the base color is an interpolation of the two. If the sun is setting or rising, then I bring in the dusk and the sunset palette. When the sun rises, I first blend the dusk palette into the base sky color, as well as color only the area around the sun with the palette. As the sun rises, the color of the palette grows to fill the whole sky, as well as turns more opaque. Then, I blend that palette into the sunrise palette and do the reverse to get to a fully blue, daytime sky.
+
+I also added in stars during the night. I used 3D Worley noise (provided by Ben) to procedurally add stars to the base night sky color.
 
 Fog: (Ruth Chung)
+After Ben had set up the shaders, I tweaked the color of the fog so that it would match the color of the sky better. Rather than pass the lambert frag shader (which draws the fog) the sky color at that point, I decided to bring over the math I used to adjust the sky color, and use that to determine the color of the fog. I also made the fog color slightly transparent so it would blend into the sky better.
