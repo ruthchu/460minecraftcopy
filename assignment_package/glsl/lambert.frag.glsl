@@ -137,18 +137,16 @@ void main()
     float storedDepth = texture(u_ShadowMap, shadowCoord.xy).r;
     float fragmentDepth = shadowCoord.z;
     // Check if fragment is in shadow with bias
-    float bias = 0.001;
     float dotNorEye = dot(fs_Nor.xyz, u_Eye);
-//    float bias = max(0.05 * (1.0 - dotNorEye), 0.005);
+    float bias = max(0.05 * (1.0 - dotNorEye), 0.005);
     bool isInShadow = storedDepth < fragmentDepth - bias;
     if (isInShadow) {
-        finCol.r = clamp(finCol.r - 0.3, 0, 0.3);
-        finCol.g = clamp(finCol.g - 0.3, 0, 0.3);
-        finCol.b = clamp(finCol.b - 0.3, 0, 0.3);
+        finCol.r = clamp(finCol.r - 0.3, 0, 0.2);
+        finCol.g = clamp(finCol.g - 0.3, 0, 0.2);
+        finCol.b = clamp(finCol.b - 0.3, 0, 0.2);
     }
     out_Col = finCol;
     // finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
-
 
     // FOG ----------------------------------------------------------------------------
     vec4 camPos = u_View * fs_Pos;
