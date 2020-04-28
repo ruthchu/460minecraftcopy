@@ -12,8 +12,10 @@ MyGL::MyGL(QWidget *parent)
       m_progLambert(this), m_progFlat(this), m_texture(this),
       m_terrain(this), m_player(glm::vec3(48.f, 170.f, 48.f), m_terrain),
       m_currTime(QDateTime::currentMSecsSinceEpoch()), m_timeSinceStart(0),
-      framebuffer(FrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
-      m_progTint(this), m_progNoOp(this), m_progSky(this),quad(Quad(this))
+      m_framebuffer(FrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
+      m_progTint(this), m_progNoOp(this), m_progDepthThrough(this), m_progShandow(this), quad(Quad(this)),
+      m_depthFrameBuffer(DepthFrameBuffer(this, this->width(), this->height(), this->devicePixelRatio())),
+      m_progSky(this)
 {
     // Connect the timer to a function so that when the timer ticks the function is executed
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(tick()));
@@ -28,7 +30,8 @@ MyGL::MyGL(QWidget *parent)
 MyGL::~MyGL() {
     makeCurrent();
     glDeleteVertexArrays(1, &vao);
-    framebuffer.destroy();
+    m_framebuffer.destroy();
+    m_depthFrameBuffer.destroy();
 }
 
 
@@ -62,7 +65,10 @@ void MyGL::initializeGL()
     glGenVertexArrays(1, &vao);
 
     // Create render buffers
-    framebuffer.create();
+    m_framebuffer.create();
+
+    // Create a depth buffer
+    m_depthFrameBuffer.create();
 
     //Create the instance of the world axes
     m_worldAxes.create();
@@ -71,11 +77,14 @@ void MyGL::initializeGL()
     m_progLambert.create(":/glsl/lambert.vert.glsl", ":/glsl/lambert.frag.glsl");
     // Create and set up the flat lighting shader
     m_progFlat.create(":/glsl/flat.vert.glsl", ":/glsl/flat.frag.glsl");
+    // Create shader for depth map
+    m_progDepthThrough.create(":/glsl/depthThrough.vert.glsl", ":/glsl/depthThrough.frag.glsl");
 
     // Create post processing shader for tinting in water
     m_progTint.create(":/glsl/passthrough.vert.glsl", ":/glsl/screentint.frag.glsl");
     // Create post processing shader for no operation
     m_progNoOp.create(":/glsl/passthrough.vert.glsl", ":/glsl/noOp.frag.glsl");
+    m_progShandow.create(":/glsl/passthrough.vert.glsl", ":/glsl/shadowMap.frag.glsl");
 
     // Create and set up sky shader
     m_progSky.create(":/glsl/sky.vert.glsl", ":/glsl/sky.frag.glsl");
@@ -101,6 +110,11 @@ void MyGL::initializeGL()
 
     // create quad for post processing
     quad.create();
+
+//    m_progNoOp.setDimensions(glm::ivec2(this->width(), this->height()));
+//    m_progTint.setDimensions(glm::ivec2(this->width(), this->height()));
+    m_progShandow.setDimensions(glm::ivec2(this->width(), this->height()));
+
 }
 
 void MyGL::resizeGL(int w, int h) {
@@ -114,21 +128,35 @@ void MyGL::resizeGL(int w, int h) {
     m_progLambert.setViewProjMatrix(viewproj);
     m_progLambert.setViewMatrix(glm::inverse(m_player.mcr_camera.getProj()) * viewproj);
     m_progFlat.setViewProjMatrix(viewproj);
-
+    m_progDepthThrough.setViewProjMatrix(viewproj);
     m_progSky.setViewProjMatrix(viewproj);
+
+//    m_progNoOp.setDimensions(glm::ivec2(w, h));
+//    m_progTint.setDimensions(glm::ivec2(w, h));
+
+    m_progShandow.setDimensions(glm::ivec2(w, h));
+    m_progDepthThrough.setDimensions(glm::ivec2(w, h));
     m_progSky.useMe();
-    this->glUniform2i(m_progSky.unifDimensions, width() * this->devicePixelRatio(),
-                      height() * this->devicePixelRatio());
+    m_progSky.setDimensions(glm::ivec2(w * this->devicePixelRatio(), h * this->devicePixelRatio()));
+#ifdef MAC
+    m_progShandow.setDimensions(glm::ivec2(w * 2 ,h * 2));
+    m_progDepthThrough.setDimensions(glm::ivec2(w * 2, h * 2));
+    m_progSky.useMe();
+    m_progSky.setDimensions(glm::ivec2(w * 2, h * 2));
+#endif
+
     glm::vec3 cam = m_player.mcr_camera.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
 
-    m_progNoOp.setDimensions(glm::ivec2(w, h));
-    m_progTint.setDimensions(glm::ivec2(w, h));
-
     // resize frame buffer
-    framebuffer.resize(w, h, this->devicePixelRatio());
-    framebuffer.destroy();
-    framebuffer.create();
+    m_framebuffer.resize(w, h, this->devicePixelRatio());
+    m_framebuffer.destroy();
+    m_framebuffer.create();
+
+    // resize depth buffer
+    m_depthFrameBuffer.resize(w, h, this->devicePixelRatio());
+    m_depthFrameBuffer.destroy();
+    m_depthFrameBuffer.create();
 
     printGLErrorLog();
 }
@@ -175,32 +203,40 @@ void MyGL::paintGL() {
 
     m_progFlat.setViewProjMatrix(m_player.mcr_camera.getViewProj());
     m_progLambert.setViewProjMatrix(m_player.mcr_camera.getViewProj());
+    m_progSky.setViewProjMatrix(glm::inverse(m_player.mcr_camera.getViewProj()));
+
     m_progLambert.setViewMatrix(glm::inverse(m_player.mcr_camera.getProj()) * m_player.mcr_camera.getViewProj());
 
-    m_progSky.setViewProjMatrix(glm::inverse(m_player.mcr_camera.getViewProj()));
     m_progSky.useMe();
     glm::vec3 cam = m_player.mcr_camera.mcr_position;
     this->glUniform3f(m_progSky.unifEye, cam.x, cam.y, cam.z);
 
-//     Render to our framebuffer rather than the viewport
-    framebuffer.bindFrameBuffer();
-//     Render on the whole framebuffer, complete from the lower left corner to the upper right
+//    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
+//    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, 0.1f, 1000.f);
+    glm::mat4 lightPorj = glm::ortho<float>(-100.f, 100.f, -100.f, 100.f, 0.1f, 1000.f);
+    glm::vec3 lightPos = glm::vec3(40.f, 180.f, -20.f);
+    glm::vec3 lightDir = glm::normalize(glm::vec3(0.5f, -0.6f, 0.75f));
+    glm::mat4 lightView = glm::lookAt(lightPos, lightDir, glm::vec3(0, 1, 0));
+//    glm::mat4 cameraView = glm::lookAt(glm::vec3(41.0529, 172.854 ,-20.898),
+//                                       glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)) + glm::vec3(41.0529, 172.854 ,-20.898),
+//                                       glm::vec3(0, 1 ,0));
+//    cameraView = m_player.mcr_camera.getView();
 
-    int viewW = this->width() * this->devicePixelRatio();
-    int viewH = this->height() * this->devicePixelRatio();
-#ifdef MAC
-    viewW = this->width() * 2;
-    viewH = this->height() * 2;
-#endif
-    glViewport(0,0, viewW, viewH);
+    glm::mat4 lighViewProj = lightPorj * lightView;
+    m_progDepthThrough.setDepthMVP(lighViewProj);
+//    m_progDepthThough.setDepthMVP(glm::normalize(m_player.mcr_camera.getLookVec()));;
+//    m_progLambert.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
 
-    // Clear the screen so that we only see newly drawn images
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    preformLightPerspectivePass();
 
+    m_progLambert.setDepthMVP(lighViewProj);
+    m_progLambert.setViewMatrix(m_player.mcr_camera.getView());
+
+    // SKY
     quad.bufferVBOdata();
     m_progSky.drawQuad(quad);
 
-    renderTerrain();
+    preformPlayerPerspectivePass();
     performTerrainPostprocessRenderPass();
 
     glDisable(GL_DEPTH_TEST);
@@ -210,14 +246,11 @@ void MyGL::paintGL() {
     glEnable(GL_DEPTH_TEST);
 }
 
-// TODO: Change this so it renders the nine zones of generated
-// terrain that surround the player (refer to Terrain::m_generatedTerrain
-// for more info)
-void MyGL::renderTerrain() {
-//     Render to our framebuffer rather than the viewport
-    framebuffer.bindFrameBuffer();
-//     Render on the whole framebuffer, complete from the lower left corner to the upper right
-
+void MyGL::preformLightPerspectivePass()
+{
+    // Bind depth frame buffer
+    m_depthFrameBuffer.bindFrameBuffer();
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
     int viewW = this->width() * this->devicePixelRatio();
     int viewH = this->height() * this->devicePixelRatio();
 #ifdef MAC
@@ -225,34 +258,64 @@ void MyGL::renderTerrain() {
     viewH = this->height() * 2;
 #endif
     glViewport(0,0, viewW, viewH);
-
     // Clear the screen so that we only see newly drawn images
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    renderTerrain(&m_progDepthThrough);
+    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
+}
 
+void MyGL::preformPlayerPerspectivePass()
+{
+    // Bind standard frame buffer
+    m_framebuffer.bindFrameBuffer();
+    prepareViewportForFBO();
+    // Draw sky
     quad.bufferVBOdata();
     m_progSky.drawQuad(quad);
+    // Pass textures to GPU
+    m_progLambert.setTextureSampler2D(0);
+    m_progLambert.setTextureSampler2DShadow(2);
+    // Make each texture their active in their textSlot
+    m_texture.bind(0);
+    m_depthFrameBuffer.bindToTextureSlot(2);
+    // Render with lambert
+    renderTerrain(&m_progLambert);
+    glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
+}
 
+void MyGL::renderTerrain(ShaderProgram *prog) {
     int renderRadius = 1;
     glm::vec2 pPos(m_player.mcr_position.x, m_player.mcr_position.z);
     glm::ivec2 centerTerrain = m_terrain.getTerrainAt(pPos[0], pPos[1]);
-
-    // Bind the texture
-    m_texture.bind(0);
-
     int xmin = centerTerrain[0] - BLOCK_LENGTH_IN_TERRAIN * renderRadius;// - BLOCK_LENGTH_IN_TERRAIN;
     int xmax = centerTerrain[0] + BLOCK_LENGTH_IN_TERRAIN * renderRadius;// + BLOCK_LENGTH_IN_TERRAIN;
     int zmin = centerTerrain[1] - BLOCK_LENGTH_IN_TERRAIN * renderRadius;// - BLOCK_LENGTH_IN_TERRAIN;
     int zmax = centerTerrain[1] + BLOCK_LENGTH_IN_TERRAIN * renderRadius;// + BLOCK_LENGTH_IN_TERRAIN;
-
-    m_terrain.draw(xmin, xmax, zmin, zmax, &m_progLambert);
+    m_terrain.draw(xmin, xmax, zmin, zmax, prog);
 }
 
 void MyGL::performTerrainPostprocessRenderPass()
 {
-    // Render to our framebuffer rather than the viewport
     glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
-    // Render on the whole framebuffer, complete from the lower left corner to the upper right
+    prepareViewportForFBO();
 
+    quad.bufferVBOdata();
+
+    // Render depth map
+//    m_depthFrameBuffer.bindToTextureSlot(2);
+//    m_progShandow.draw(quad, 2);
+
+     m_framebuffer.bindToTextureSlot(1);
+     if (playerIsInLiquid() == 1) {
+        m_progTint.draw(quad, 1);
+     } else {
+        m_progNoOp.draw(quad, 1);
+     }
+}
+
+void MyGL::prepareViewportForFBO()
+{
+    // Render on the whole framebuffer, complete from the lower left corner to the upper right
     int viewW = this->width() * this->devicePixelRatio();
     int viewH = this->height() * this->devicePixelRatio();
 #ifdef MAC
@@ -260,18 +323,8 @@ void MyGL::performTerrainPostprocessRenderPass()
     viewH = this->height() * 2;
 #endif
     glViewport(0,0, viewW, viewH);
-
     // Clear the screen so that we only see newly drawn images
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // bind the texture to slot number 1
-    framebuffer.bindToTextureSlot(1);
-
-    quad.bufferVBOdata();
-    if (playerIsInLiquid() == 1) {
-       m_progTint.draw(quad, 1);
-    } else {
-       m_progNoOp.draw(quad, 1);
-    }
 }
 
 int MyGL::playerIsInLiquid() {

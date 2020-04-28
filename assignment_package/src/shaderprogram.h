@@ -25,9 +25,12 @@ public:
     int unifColor; // A handle for the "uniform" vec4 representing color of geometry in the vertex shader
 
     int unifSampler2D; // A handle to the "uniform" sampler2D that will be used to read the texture containing the scene render
+    int unifSampler2DShadow;
+
     int unifTime; // A handle for the "uniform" float representing time in the shader
     int unifView; // A handle for the "uniform" mat4 to bring from
 
+    int unifDepthMatrixID; // A handle to the "unifrom" mat that projects us from world to light pov
     // Sky
     int unifDimensions;
     int unifEye;
@@ -46,13 +49,14 @@ public:
     // Pass the given color to this shader on the GPU
     void setGeometryColor(glm::vec4 color);
     // Pass a texture to this shader on the GPU
-    void setTextureSampler(int textureSlot);
+    void setTextureSampler2D(int textureSlot);
+    void setTextureSampler2DShadow(int textureSlot);
     // Pass a time variable to this shader on the GPU
     void setTime(int t);
     // Draw the given object to our screen using this ShaderProgram's shaders
     void drawQuad(Drawable &d);
-    void drawOpaque(Drawable &d);
-    void drawTransparent(Drawable &d);
+    virtual void drawOpaque(Drawable &d);
+    virtual void drawTransparent(Drawable &d);
     // Utility function used in create()
     char* textFileRead(const char*);
     // Utility function that prints any shader compilation errors to the console
@@ -60,13 +64,27 @@ public:
     // Utility function that prints any shader linking errors to the console
     void printLinkInfoLog(int prog);
 
+    void setDepthMVP(const glm::vec3 light);
+    void setDepthMVP(const glm::mat4 mat);
+
+    void setDimensions(glm::ivec2 dims);
+
     QString qTextFileRead(const char*);
 
-private:
+protected:
     OpenGLContext* context;   // Since Qt's OpenGL support is done through classes like QOpenGLFunctions_3_2_Core,
                             // we need to pass our OpenGL context to the Drawable in order to call GL functions
                             // from within this class.
 };
 
+class DepthThroughShader : public ShaderProgram
+{
+public:
+    DepthThroughShader(OpenGLContext* context);
+    ~DepthThroughShader();
+
+    void drawOpaque(Drawable &d) override;
+    void drawTransparent(Drawable &d) override;
+};
 
 #endif // SHADERPROGRAM_H

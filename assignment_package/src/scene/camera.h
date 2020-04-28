@@ -8,11 +8,12 @@ class Camera : public Entity {
 private:
     float m_fovy;
     unsigned int m_width, m_height;  // Screen dimensions
-    float m_near_clip;  // Near clip plane distance
-    float m_far_clip;  // Far clip plane distance
     float m_aspect;    // Aspect ratio
 
 public:
+    float m_near_clip;  // Near clip plane distance
+    float m_far_clip;  // Far clip plane distance
+
     Camera(glm::vec3 pos);
     Camera(unsigned int w, unsigned int h, glm::vec3 pos);
     Camera(const Camera &c);
@@ -22,6 +23,7 @@ public:
 
     glm::mat4 getViewProj() const;
     glm::mat4 getProj() const;
+    glm::mat4 getView() const;
 
     // Used for removing and placing blocks
     glm::vec3 getLookVec() const;

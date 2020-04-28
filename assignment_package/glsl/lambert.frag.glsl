@@ -13,8 +13,18 @@
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
 uniform sampler2D u_Texture; // The texture to be read from by this shader
+
+uniform sampler2D u_ShadowMap; // Shadow map texture read from by labert shader
+
 uniform int u_Time; // A time value that changes once every tick
 uniform mat4 u_View;
+
+uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.
+// We've written a static matrix for you to use for HW2,
+// but in HW3 you'll have to generate one yourself
+uniform mat4 u_depthMVP;
+
+uniform ivec2 u_Dimensions; // screen u_Dimensions
 
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
@@ -22,6 +32,8 @@ in vec4 fs_Pos;
 in vec4 fs_Nor;
 in vec4 fs_LightVec;
 in vec4 fs_UV;
+in vec4 gl_FragCoord;
+in vec4 fs_PosLight;
 
 out vec4 out_Col; // This is the final output color that you will see on your
 // screen for the pixel that is currently being processed.
@@ -115,6 +127,29 @@ void main()
     // Compute final shaded color
     vec4 finCol = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
 
+
+    // SHADOW ----------------------------------------------------------------------------
+    // To NDC (Screen space) [-1,1]
+    vec3 shadowCoord = fs_PosLight.xyz / fs_PosLight.w;
+    // To [0,1] for sampling
+    shadowCoord = shadowCoord * 0.5 + 0.5;
+    // Get shadow mapped stored depth
+    float storedDepth = texture(u_ShadowMap, shadowCoord.xy).r;
+    float fragmentDepth = shadowCoord.z;
+    // Check if fragment is in shadow with bias
+    float bias = 0.0001;
+    // bias = max(0.05 * (1.0 - dot(fs_Nor, u_Eye)), 0.005);
+    bool isInShadow = storedDepth < fragmentDepth - bias;
+    if (isInShadow) {
+        finCol.r = clamp(finCol.r - 0.3, 0, 0.3);
+        finCol.g = clamp(finCol.g - 0.3, 0, 0.3);
+        finCol.b = clamp(finCol.b - 0.3, 0, 0.3);
+    }
+    out_Col = finCol;
+    // finCol = vec4(storedDepth, storedDepth, storedDepth, 1.0);
+
+
+    // FOG ----------------------------------------------------------------------------
     vec4 camPos = u_View * fs_Pos;
 
     float depth = -camPos.z;

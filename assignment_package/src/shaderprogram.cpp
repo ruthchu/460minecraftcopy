@@ -4,13 +4,13 @@
 #include <QTextStream>
 #include <QDebug>
 #include <stdexcept>
-
+#include <iostream>
 
 ShaderProgram::ShaderProgram(OpenGLContext *context)
     : vertShader(), fragShader(), prog(),
       attrPos(-1), attrNor(-1), attrCol(-1),
       unifModel(-1), unifModelInvTr(-1), unifViewProj(-1), unifColor(-1),
-      unifSampler2D(-1), unifTime(-1), context(context)
+      unifSampler2D(-1), unifTime(-1), unifDepthMatrixID(-1), context(context)
 {}
 
 void ShaderProgram::create(const char *vertfile, const char *fragfile)
@@ -72,10 +72,16 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
 
     unifSampler2D  = context->glGetUniformLocation(prog, "u_Texture");
     unifTime       = context->glGetUniformLocation(prog, "u_Time");
-    unifView       = context->glGetUniformLocation(prog, "u_View");
+
+    // Shadow Map
+    unifDepthMatrixID = context->glGetUniformLocation(prog, "u_depthMVP");
+    unifSampler2DShadow  = context->glGetUniformLocation(prog, "u_ShadowMap");
+
     // Sky
     unifDimensions = context->glGetUniformLocation(prog, "u_Dimensions");
     unifEye = context->glGetUniformLocation(prog, "u_Eye");
+
+    unifView = context->glGetUniformLocation(prog, "u_View");
 }
 
 void ShaderProgram::useMe()
@@ -159,7 +165,15 @@ void ShaderProgram::setGeometryColor(glm::vec4 color)
     }
 }
 
-void ShaderProgram::setTextureSampler(int textureSlot) {
+void ShaderProgram::setTextureSampler2DShadow(int textureSlot) {
+    useMe();
+    if (unifSampler2D != -1) {
+        context->glUniform1i(unifSampler2DShadow, textureSlot);
+    }
+}
+
+
+void ShaderProgram::setTextureSampler2D(int textureSlot) {
     useMe();
     if (unifSampler2D != -1) {
         context->glUniform1i(unifSampler2D, textureSlot);
@@ -174,6 +188,39 @@ void ShaderProgram::setTime(int t) {
     }
 }
 
+void ShaderProgram::setDepthMVP(const glm::vec3 light)
+{
+    useMe();
+
+    if (unifDepthMatrixID != -1) {
+        glm::mat4 depthProjectionMatrix = glm::ortho<float>(-1.f, 1.f, -1.f, 1.f, 0.1f, 1000.f);
+        glm::mat4 depthViewMatrix = glm::lookAt(light, glm::vec3(0,0,0), glm::vec3(0,1,0));
+        glm::mat4 depthModelMatrix = glm::mat4(1.0);
+        glm::mat4 depthMVP = depthProjectionMatrix * depthViewMatrix * depthModelMatrix;
+        context->glUniformMatrix4fv(unifDepthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
+    }
+}
+
+void ShaderProgram::setDimensions(glm::ivec2 dims)
+{
+    useMe();
+
+    if(unifDimensions != -1)
+    {
+        context->glUniform2i(unifDimensions, dims.x, dims.y);
+    }
+}
+
+void ShaderProgram::setDepthMVP(const glm::mat4 mat)
+{
+    useMe();
+
+    if (unifDepthMatrixID != -1) {
+        glm::mat4 depthMVP = mat;
+        context->glUniformMatrix4fv(unifDepthMatrixID, 1, GL_FALSE, &depthMVP[0][0]);
+    }
+}
+
 void ShaderProgram::drawQuad(Drawable &d)
 {
     useMe();
@@ -182,8 +229,7 @@ void ShaderProgram::drawQuad(Drawable &d)
         throw std::out_of_range("Attempting to draw a drawable with m_count of " + std::to_string(d.elemCountOpaque()) + "!");
     }
 
-    // Set our "u_sampler1" sampler to user Texture Unit 1
-//    context->glUniform1i(unifSampler2D, textureSlot);
+    // Do not set our "u_sampler1" sampler to user Texture Unit 1
 
     // bind
     if (d.bindAllOpaque()) {
@@ -191,9 +237,7 @@ void ShaderProgram::drawQuad(Drawable &d)
         // Pos
         context->glEnableVertexAttribArray(attrPos);
         context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, stride, (void*)(0));
-        // UV
-//        context->glEnableVertexAttribArray(attrUV);
-//        context->glVertexAttribPointer(attrUV, 4, GL_FLOAT, false, stride, (void*)(4 * sizeof(float)));
+        // NO UV
     }
 
     // Bind the index buffer and then draw shapes from it.
@@ -202,8 +246,6 @@ void ShaderProgram::drawQuad(Drawable &d)
     context->glDrawElements(d.drawMode(), d.elemCountOpaque(), GL_UNSIGNED_INT, 0);
 
     if (attrPos != -1) context->glDisableVertexAttribArray(attrPos);
-//    if (attrUV != -1) context->glDisableVertexAttribArray(attrUV);
-
     context->printGLErrorLog();
 }
 
@@ -220,12 +262,16 @@ void ShaderProgram::drawOpaque(Drawable &d)
         int stride = 12 * sizeof (float);
         // Position
         context->glEnableVertexAttribArray(attrPos);
+        context->printGLErrorLog();
         context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, stride, (void*)(0));
+        context->printGLErrorLog();
         // Normal
         context->glEnableVertexAttribArray(attrNor);
+        context->printGLErrorLog();
         context->glVertexAttribPointer(attrNor, 4, GL_FLOAT, false, stride, (void*)(4 * sizeof(float)));
         // Color
         context->glEnableVertexAttribArray(attrCol);
+        context->printGLErrorLog();
         context->glVertexAttribPointer(attrCol, 4, GL_FLOAT, false, stride, (void*)(8 * sizeof(float)));
     }
 
@@ -234,10 +280,20 @@ void ShaderProgram::drawOpaque(Drawable &d)
     d.bindIdx();
     context->glDrawElements(d.drawMode(), d.elemCountOpaque(), GL_UNSIGNED_INT, 0);
 
-    if (attrPos != -1) context->glDisableVertexAttribArray(attrPos);
-    if (attrNor != -1) context->glDisableVertexAttribArray(attrNor);
-    if (attrCol != -1) context->glDisableVertexAttribArray(attrCol);
+    if (attrPos != -1) {
+        context->glDisableVertexAttribArray(attrPos);
+        context->printGLErrorLog();
+    }
+    if (attrNor != -1) {
+        context->glDisableVertexAttribArray(attrNor);
+        context->printGLErrorLog();
+    }
+    if (attrCol != -1) {
+        context->glDisableVertexAttribArray(attrCol);
+        context->printGLErrorLog();
+    }
 
+//    std::cout << "ShaderProgram Opaque" << std::endl;
     context->printGLErrorLog();
 }
 
@@ -271,6 +327,7 @@ void ShaderProgram::drawTransparent(Drawable &d)
     if (attrNor != -1) context->glDisableVertexAttribArray(attrNor);
     if (attrCol != -1) context->glDisableVertexAttribArray(attrCol);
 
+//    std::cout << "ShaderProgram Transparent" << std::endl;
     context->printGLErrorLog();
 }
 
@@ -349,4 +406,70 @@ void ShaderProgram::printLinkInfoLog(int prog)
         qDebug() << "LinkInfoLog:" << endl << infoLog << endl;
         delete [] infoLog;
     }
+}
+
+
+
+DepthThroughShader::DepthThroughShader(OpenGLContext* context)
+    : ShaderProgram(context)
+{}
+
+DepthThroughShader::~DepthThroughShader() {}
+
+//This function, as its name implies, uses the passed in GL widget
+void DepthThroughShader::drawOpaque(Drawable &d)
+{
+    useMe();
+
+    if(d.elemCountOpaque() < 0) {
+        throw std::out_of_range("Attempting to draw a drawable with m_count_t of " + std::to_string(d.elemCountOpaque()) + "!");
+    }
+
+    if (d.bindAllOpaque()) {
+        int stride = 12 * sizeof (float);
+        // Position
+        context->glEnableVertexAttribArray(attrPos);
+        context->printGLErrorLog();
+        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, stride, (void*)(0));
+        context->printGLErrorLog();
+    }
+
+    // Bind the index buffer and then draw shapes from it.
+    // This invokes the shader program, which accesses the vertex buffers.
+    d.bindIdx();
+    context->glDrawElements(d.drawMode(), d.elemCountOpaque(), GL_UNSIGNED_INT, 0);
+
+    if (attrPos != -1) {
+        context->glDisableVertexAttribArray(attrPos);
+        context->printGLErrorLog();
+    }
+
+//    std::cout << "ShaderProgram Opaque" << std::endl;
+    context->printGLErrorLog();
+}
+
+void DepthThroughShader::drawTransparent(Drawable &d)
+{
+    useMe();
+
+    if(d.elemCountTransparent() < 0) {
+        throw std::out_of_range("Attempting to draw a drawable with m_count of " + std::to_string(d.elemCountTransparent()) + "!");
+    }
+
+    if (d.bindAllTransparent()) {
+        int stride = 12 * sizeof (float);
+        // Position
+        context->glEnableVertexAttribArray(attrPos);
+        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, stride, (void*)(0));
+    }
+
+    // Bind the index buffer and then draw shapes from it.
+    // This invokes the shader program, which accesses the vertex buffers.
+    d.bindIdxTransparent();
+    context->glDrawElements(d.drawMode(), d.elemCountTransparent(), GL_UNSIGNED_INT, 0);
+
+    if (attrPos != -1) context->glDisableVertexAttribArray(attrPos);
+
+//    std::cout << "ShaderProgram Transparent" << std::endl;
+    context->printGLErrorLog();
 }

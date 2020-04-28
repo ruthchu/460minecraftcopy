@@ -38,7 +38,6 @@ void FrameBuffer::create() {
 #endif
     mp_context->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, newW, newH, 0, GL_RGB, GL_UNSIGNED_BYTE, (void*)0);
 
-
     // Set the render settings for the texture we've just created.
     // Essentially zero filtering on the "texture" so it appears exactly as rendered
     mp_context->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
