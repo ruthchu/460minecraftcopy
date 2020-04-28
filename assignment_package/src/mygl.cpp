@@ -207,8 +207,8 @@ void MyGL::paintGL() {
 
 //    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, 0.1f, 1000.f);
     glm::mat4 lightPorj = glm::ortho<float>(-100.f, 100.f, -100.f, 100.f, 0.1f, 1000.f);
-    glm::vec3 lightPos = glm::vec3(-40.f, 200.f, 0.f);
-    glm::vec3 lightDir = glm::normalize(glm::vec3(0.5f, -1.f, 0.75f));
+    glm::vec3 lightPos = glm::vec3(40.f, 180.f, -20.f);
+    glm::vec3 lightDir = glm::normalize(glm::vec3(0.5f, -0.6f, 0.75f));
     glm::mat4 lightView = glm::lookAt(lightPos, lightDir, glm::vec3(0, 1, 0));
 //    glm::mat4 cameraView = glm::lookAt(glm::vec3(41.0529, 172.854 ,-20.898),
 //                                       glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)) + glm::vec3(41.0529, 172.854 ,-20.898),
@@ -245,7 +245,13 @@ void MyGL::preformLightPerspectivePass()
     // Bind depth frame buffer
     m_depthFrameBuffer.bindFrameBuffer();
     // Render on the whole framebuffer, complete from the lower left corner to the upper right
-    glViewport(0,0, 1024, 1024);
+    int viewW = this->width() * this->devicePixelRatio();
+    int viewH = this->height() * this->devicePixelRatio();
+#ifdef MAC
+    viewW = this->width() * 2;
+    viewH = this->height() * 2;
+#endif
+    glViewport(0,0, viewW, viewH);
     // Clear the screen so that we only see newly drawn images
     glClear(GL_DEPTH_BUFFER_BIT);
     renderTerrain(&m_progDepthThrough);
