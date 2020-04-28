@@ -109,7 +109,7 @@ void main()
 
     vec3 newSunDir = rotateX(sunDir, u_Time * 0.01);
     newSunDir = normalize(newSunDir);
-    vec3 lightPos = -1000 * newSunDir + u_Eye;
+    vec3 lightPos = 1000 * newSunDir + u_Eye;
     mat4 lightMVP = u_LightProj * lookAt(lightPos, newSunDir, vec3(0, 1, 0));
 
     fs_PosLight =  lightMVP * modelposition;
