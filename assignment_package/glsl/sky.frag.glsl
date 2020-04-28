@@ -330,8 +330,7 @@ void main()
     // convert ray to 2d uv coords
     vec2 uv = sphereToUV(rayDir);
 
-    vec2 offset = vec2(warpFBM(rayDir));
-//    vec2 offset = vec2(snoiseFBM(rayDir));
+    vec2 offset = vec2(snoiseFBM(rayDir));
     uv = uv + offset * 0.1;
 
     vec3 sunsetCol = toSunset(uv.y);
@@ -360,7 +359,7 @@ void main()
     // when the sun is near the "horizon line"
 
     // Mixes the sunset/sunrise and the dusk/dawn color based on the height of the sun
-    float haze = smoothstep(-.175f, -.125f, newSunDir.y);
+    float haze = smoothstep(-.175f, -.25f, newSunDir.y);
     sunMoveCol = mix(duskCol, sunsetCol, haze);
 
     // Shrink or grow the size of the mixed sunrise/dawn color as well as change
@@ -370,7 +369,7 @@ void main()
     float visible;
     if (newSunDir.y < -.05f) {
         visible = smoothstep(-.3f, -.1f, newSunDir.y);
-        haloSize = smoothstep(-.3f, -1.75f, newSunDir.y);
+        haloSize = smoothstep(-.3f, -.175f, newSunDir.y);
         haloCol = mix(col, sunMoveCol, visible);
     }
     if (newSunDir.y > -.05f) {

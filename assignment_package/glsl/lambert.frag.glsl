@@ -26,8 +26,6 @@ in vec4 fs_UV;
 out vec4 out_Col; // This is the final output color that you will see on your
 // screen for the pixel that is currently being processed.
 
-const vec3 fogCol = vec3(178.f / 255.f, 175.f / 255.f, 226.f / 255.f);
-
 const float FOG_NEAR = 90.1f;
 const float FOG_FAR = 100.0f;
 
@@ -76,6 +74,18 @@ vec3 fbm(vec3 p) {
     return sum;
 }
 
+vec3 rotateX(vec3 p, float a) {
+    mat4 rot = mat4(1, 0, 0, 0,
+                    0, cos(a), sin(a), 0,
+                    0, -sin(a), cos(a), 0,
+                    0, 0, 0, 1);
+    vec4 v = rot * vec4(p, 1);
+    return v.xyz;
+}
+
+const vec4 dayCol = vec4(vec3(114.f, 200.f, 252.f) / 255.f, .25f);
+const vec4 nightCol = vec4(vec3(32.f, 24.f, 72.f) / 255.f, .25f);
+
 void main()
 {
     // Material base color (before shading)
@@ -107,8 +117,13 @@ void main()
 
     float depth = -camPos.z;
 
+    float fogMix = normalize(rotateX(normalize(vec3(0, 0.1, 1.0)), u_Time * 0.01)).y;
+
+    vec4 fogCol;
+    fogCol = mix(nightCol, dayCol, smoothstep(.3f, .5f, (fogMix + 1.f) / 2.f));
+
     float fogAmt = smoothstep(FOG_NEAR, FOG_FAR, depth);
 
-    vec3 col = mix(finCol.xyz, fogCol, fogAmt);
-    out_Col = vec4(col, finCol.w);
+    vec4 col = mix(finCol, fogCol, fogAmt);
+    out_Col = col;
 }
