@@ -239,7 +239,7 @@ float snoise(vec3 v){
 }
 
 float fbm(vec3 p) {
-    const int NUM_OCTAVES = 2;
+    const int NUM_OCTAVES = 5;
     float v = 0.0;
     float a = 0.5;
     vec3 shift = vec3(100);
@@ -253,6 +253,7 @@ float fbm(vec3 p) {
 
 /* Warping using fbm. f(p) -> f(g(p)) -> f(p + h(p)) */
 float warpFBM(vec3 p) {
+    p += u_Time * 0.01;
     vec3 q = vec3(fbm(p),
                   fbm(p + vec3(1.1, 3.7, 127.1)),
                   fbm(p + vec3(269.5, 183.3, 765.54)));
@@ -265,7 +266,8 @@ float warpFBM(vec3 p) {
 }
 
 float snoiseFBM(vec3 p) {
-    p += u_Time * 0.01;
+    p.x += cos(u_Time * 0.001);
+    p.y += sin(u_Time * 0.001);
     float sum = 0;
     float freq = 4;
     float amp = 0.5;
