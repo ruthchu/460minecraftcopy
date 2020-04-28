@@ -86,6 +86,107 @@ float Noise::worleyNoise(glm::vec2 uv) {
     return height * scalar + offset;
 }
 
+float Noise::worley2(glm::vec2 uv) {
+    uv *= 1.f; // Now the space is 10x10 instead of 1x1. Change this to any number you want.
+    uv += fbm(uv / 4.f) * 0.50f;
+    glm::vec2 uvInt = glm::floor(uv);
+    glm::vec2 uvFract = glm::fract(uv);
+    float minDist = 1.0; // Minimum distance initialized to max.
+    float minDistSecond = 1.0;
+    for(int y = -1; y <= 1; ++y) {
+        for(int x = -1; x <= 1; ++x) {
+            glm::vec2 neighbor = glm::vec2(float(x), float(y)); // Direction in which neighbor cell lies
+            glm::vec2 point = random2(uvInt + neighbor); // Get the Voronoi centerpoint for the neighboring cell
+            glm::vec2 diff = neighbor + point - uvFract; // Distance between fragment coord and neighbor’s Voronoi point
+            float dist = glm::length(diff);
+            dist = dist * dist;
+            if (dist < minDist) {
+                minDistSecond = minDist;
+                minDist = dist;
+            } else if (dist < minDistSecond) {
+                minDistSecond = dist;
+            }
+        }
+    }
+    float c1 = -1.f;
+    float c2 = 1.f;
+    float height = c1 * minDist + c2 * minDistSecond;
+    float spread = .5f;
+    height = glm::max(0.f, height - spread) / (1.f - spread);
+    float scalar = 0.80f;
+    float offset = (1.0f - scalar) * fbm(uv);
+    if (height > 0.f) {
+        return height + offset;
+    }
+    return 0.f;
+}
+
+float Noise::worley3(glm::vec2 uv) {
+    uv *= 6.f; // Now the space is 10x10 instead of 1x1. Change this to any number you want.
+    uv += fbm(uv / 4.f) * 0.5f;
+    glm::vec2 uvInt = glm::floor(uv);
+    glm::vec2 uvFract = glm::fract(uv);
+    float minDist = 1.f; // Minimum distance initialized to max.
+    float minDistSecond = 1.f;
+    for(int y = -1; y <= 1; ++y) {
+        for(int x = -1; x <= 1; ++x) {
+            glm::vec2 neighbor = glm::vec2(float(x), float(y)); // Direction in which neighbor cell lies
+            glm::vec2 point = random2(uvInt + neighbor); // Get the Voronoi centerpoint for the neighboring cell
+            glm::vec2 diff = neighbor + point - uvFract; // Distance between fragment coord and neighbor’s Voronoi point
+            float dist = glm::length(diff);
+            dist = dist * dist;
+            if (dist < minDist) {
+                minDistSecond = minDist;
+                minDist = dist;
+            } else if (dist < minDistSecond) {
+                minDistSecond = dist;
+            }
+        }
+    }
+    float c1 = -1.f;
+    float c2 = 1.f;
+    float height = c1 * minDist + c2 * minDistSecond;
+    float spread = .53f;
+    height = glm::max(0.f, height - spread) / (1.f - spread);
+    float scalar = 0.8f;
+    float offset = (1.f - scalar) * fbm(uv);
+    height = glm::smoothstep(.1f, .7f, height + offset);
+    return height;
+}
+
+float Noise::worley4(glm::vec2 uv) {
+    uv *= 6.f; // Now the space is 10x10 instead of 1x1. Change this to any number you want.
+    uv += fbm(uv / 4.f) * 0.5f;
+    glm::vec2 uvInt = glm::floor(uv);
+    glm::vec2 uvFract = glm::fract(uv);
+    float minDist = .7f; // Minimum distance initialized to max.
+    float minDistSecond = 1.f;
+    for(int y = -1; y <= 1; ++y) {
+        for(int x = -1; x <= 1; ++x) {
+            glm::vec2 neighbor = glm::vec2(float(x), float(y)); // Direction in which neighbor cell lies
+            glm::vec2 point = random2(uvInt + neighbor); // Get the Voronoi centerpoint for the neighboring cell
+            glm::vec2 diff = neighbor + point - uvFract; // Distance between fragment coord and neighbor’s Voronoi point
+            float dist = glm::length(diff);
+            dist = dist * dist;
+            if (dist < minDist) {
+                minDistSecond = minDist;
+                minDist = dist;
+            } else if (dist < minDistSecond) {
+                minDistSecond = dist;
+            }
+        }
+    }
+    float c1 = -1.f;
+    float c2 = 1.f;
+    float height = c1 * minDist + c2 * minDistSecond;
+    float spread = .53f;
+    height = glm::max(0.f, height - spread) / (1.f - spread);
+    float scalar = 0.8f;
+    float offset = (1.f - scalar) * fbm(uv);
+    height = glm::smoothstep(.1f, .7f, height + offset);
+    return height;
+}
+
 float Noise::mySmoothStep(float a, float b, float t) {
     t = glm::smoothstep(0.f, 1.f, t);
     return glm::mix(a, b, t);

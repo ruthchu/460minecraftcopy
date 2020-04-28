@@ -12,7 +12,7 @@ Texture::~Texture()
 void Texture::create()
 {
     context->printGLErrorLog();
-    QString texturePath = ":/tex/minecraft_textures_all.png";
+    QString texturePath = ":/textures.png";
 
     QImage img(texturePath);
     img.convertToFormat(QImage::Format_ARGB32);

@@ -57,7 +57,7 @@ void Chunk::create()
                 if (t == EMPTY) {
                     continue;
                 } else if (t == DIRT || t == GRASS || t == STONE || t == SNOW ||
-                           t == LAVA) { // Solid blocks
+                           t == LAVA || t == SPIRE || t == SPIRE_TOP) { // Solid blocks
                     // Back face (face with LL vertex at worldPos)
                     BlockType blockBehind = getBlockAt(i, j, std::max(0, k - 1));
                     if (k == 0) {
@@ -488,6 +488,14 @@ glm::vec4 Chunk::getUVs(BlockType &type, Direction face)
         return glm::vec4(3.f, 11.f, 0.f, 0.f) / 16.f;
     } else if (type == SNOW) {
         return glm::vec4(2.f, 11.f, 0.f, 0.f) / 16.f;
+    } else if (type == SPIRE) {
+        return glm::vec4(8.f, 4.f, 0.f, 0.f) / 16.f;
+    } else if (type == SPIRE_TOP) {
+        if (face == YPOS) {
+            return glm::vec4(9.f, 5.f, 0.f, 0.f) / 16.f;
+        } else {
+            return glm::vec4(8.f, 5.f, 0.f, 0.f) / 16.f;
+        }
     } else {
         return glm::vec4(0.f);
     }

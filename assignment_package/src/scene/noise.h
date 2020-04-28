@@ -13,6 +13,9 @@ public:
     static glm::vec2 random2(glm::vec2 p);
     static float perlinNoise(glm::vec2 uv);
     static float worleyNoise(glm::vec2 uv);
+    static float worley2(glm::vec2 uv);
+    static float worley3(glm::vec2 uv);
+    static float worley4(glm::vec2 uv);
     static float fbm(glm::vec2 uv);
 };
 
