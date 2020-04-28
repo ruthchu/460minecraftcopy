@@ -32,7 +32,7 @@ vec3(255, 229, 119) / 255.0,
 vec3(254, 192, 81) / 255.0,
 vec3(255, 137, 103) / 255.0,
 vec3(253, 96, 81) / 255.0,
-vec3(57, 32, 51) / 255.0);
+vec3(255, 179, 208) / 255.0);
 // Dusk palette
 const vec3 dusk[5] = vec3[](
 vec3(144, 96, 144) / 255.0,
@@ -353,21 +353,30 @@ void main()
 
     // Mixing in sunset/sunrise and dusk/dawn color surrounding the sun
     // when the sun is near the "horizon line"
-    if (angle < 180.f) {
-        float haze = smoothstep(-.3f, .2f, newSunDir.y);
-        sunMoveCol = mix(duskCol, sunsetCol, haze);
-        vec3 haloCol;
-        if (newSunDir.y < -.3f) {
-            haloCol = mix(col, sunMoveCol, smoothstep(-.6f, -.3f, newSunDir.y));
-        } else if (newSunDir.y > .25f) {
-            haloCol = mix(sunMoveCol, col, smoothstep(.2f, .4f, newSunDir.y));
-        } else {
-            haloCol = sunMoveCol;
-        }
-        float dist = angle / 180.f;
-        dist = smoothstep(.7f, 1.f, dist);
-        col = mix(haloCol, col, dist);
+
+    // Mixes the sunset/sunrise and the dusk/dawn color based on the height of the sun
+    float haze = smoothstep(-.175f, -.125f, newSunDir.y);
+    sunMoveCol = mix(duskCol, sunsetCol, haze);
+
+    // Shrink or grow the size of the mixed sunrise/dawn color as well as change
+    // it's visibility based on the height of the sun to ensure a smooth sunrise and sunset
+    vec3 haloCol;
+    float haloSize;
+    float visible;
+    if (newSunDir.y < -.05f) {
+        visible = smoothstep(-.3f, -.1f, newSunDir.y);
+        haloSize = smoothstep(-.3f, -1.75f, newSunDir.y);
+        haloCol = mix(col, sunMoveCol, visible);
     }
+    if (newSunDir.y > -.05f) {
+        visible = smoothstep(0.f, .2f, newSunDir.y);
+        haloSize = smoothstep(-.25f, .15f, newSunDir.y);
+        haloCol = mix(sunMoveCol, col, visible);
+    }
+    float disk = angle / 360.f * haloSize;
+    disk = smoothstep(.7f, 1.f, disk);
+    col = mix(haloCol, col, disk);
+
 
     // Draw the sun over everything
     if (angle < sunSize) {
