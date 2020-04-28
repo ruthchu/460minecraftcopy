@@ -14,10 +14,10 @@ void Quad::create()
         this->idx.push_back(i);
     }
 
-    glm::vec4 posUVarr[] = {glm::vec4(-1.f, -1.f, 0.99f, 1.f), glm::vec4(0.f, 0.f, 0.f, 0.f),
-                           glm::vec4(1.f, -1.f, 0.99f, 1.f), glm::vec4(1.f, 0.f, 0.f, 0.f),
-                           glm::vec4(1.f, 1.f, 0.99f, 1.f), glm::vec4(1.f, 1.f, 0.f, 0.f),
-                           glm::vec4(-1.f, 1.f, 0.99f, 1.f), glm::vec4(0.f, 1.f, 0.f, 0.f)};
+    glm::vec4 posUVarr[] = {glm::vec4(-1.f, -1.f, 0.9999f, 1.f), glm::vec4(0.f, 0.f, 0.f, 0.f),
+                           glm::vec4(1.f, -1.f, 0.9999f, 1.f), glm::vec4(1.f, 0.f, 0.f, 0.f),
+                           glm::vec4(1.f, 1.f, 0.9999f, 1.f), glm::vec4(1.f, 1.f, 0.f, 0.f),
+                           glm::vec4(-1.f, 1.f, 0.9999f, 1.f), glm::vec4(0.f, 1.f, 0.f, 0.f)};
 
     for (glm::vec4 d : posUVarr) {
         this->data.push_back(d);

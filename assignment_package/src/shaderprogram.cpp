@@ -73,6 +73,9 @@ void ShaderProgram::create(const char *vertfile, const char *fragfile)
     unifSampler2D  = context->glGetUniformLocation(prog, "u_Texture");
     unifTime       = context->glGetUniformLocation(prog, "u_Time");
     unifView       = context->glGetUniformLocation(prog, "u_View");
+    // Sky
+    unifDimensions = context->glGetUniformLocation(prog, "u_Dimensions");
+    unifEye = context->glGetUniformLocation(prog, "u_Eye");
 }
 
 void ShaderProgram::useMe()
@@ -86,27 +89,27 @@ void ShaderProgram::setModelMatrix(const glm::mat4 &model)
 
     if (unifModel != -1) {
         // Pass a 4x4 matrix into a uniform variable in our shader
-                        // Handle to the matrix variable on the GPU
+        // Handle to the matrix variable on the GPU
         context->glUniformMatrix4fv(unifModel,
-                        // How many matrices to pass
-                           1,
-                        // Transpose the matrix? OpenGL uses column-major, so no.
-                           GL_FALSE,
-                        // Pointer to the first element of the matrix
-                           &model[0][0]);
+                                    // How many matrices to pass
+                                    1,
+                                    // Transpose the matrix? OpenGL uses column-major, so no.
+                                    GL_FALSE,
+                                    // Pointer to the first element of the matrix
+                                    &model[0][0]);
     }
 
     if (unifModelInvTr != -1) {
         glm::mat4 modelinvtr = glm::inverse(glm::transpose(model));
         // Pass a 4x4 matrix into a uniform variable in our shader
-                        // Handle to the matrix variable on the GPU
+        // Handle to the matrix variable on the GPU
         context->glUniformMatrix4fv(unifModelInvTr,
-                        // How many matrices to pass
-                           1,
-                        // Transpose the matrix? OpenGL uses column-major, so no.
-                           GL_FALSE,
-                        // Pointer to the first element of the matrix
-                           &modelinvtr[0][0]);
+                                    // How many matrices to pass
+                                    1,
+                                    // Transpose the matrix? OpenGL uses column-major, so no.
+                                    GL_FALSE,
+                                    // Pointer to the first element of the matrix
+                                    &modelinvtr[0][0]);
     }
 }
 
@@ -116,15 +119,15 @@ void ShaderProgram::setViewProjMatrix(const glm::mat4 &vp)
     useMe();
 
     if(unifViewProj != -1) {
-    // Pass a 4x4 matrix into a uniform variable in our shader
-                    // Handle to the matrix variable on the GPU
-    context->glUniformMatrix4fv(unifViewProj,
-                    // How many matrices to pass
-                       1,
-                    // Transpose the matrix? OpenGL uses column-major, so no.
-                       GL_FALSE,
-                    // Pointer to the first element of the matrix
-                       &vp[0][0]);
+        // Pass a 4x4 matrix into a uniform variable in our shader
+        // Handle to the matrix variable on the GPU
+        context->glUniformMatrix4fv(unifViewProj,
+                                    // How many matrices to pass
+                                    1,
+                                    // Transpose the matrix? OpenGL uses column-major, so no.
+                                    GL_FALSE,
+                                    // Pointer to the first element of the matrix
+                                    &vp[0][0]);
     }
 }
 
@@ -171,6 +174,39 @@ void ShaderProgram::setTime(int t) {
     }
 }
 
+void ShaderProgram::drawQuad(Drawable &d)
+{
+    useMe();
+
+    if(d.elemCountOpaque() < 0) {
+        throw std::out_of_range("Attempting to draw a drawable with m_count of " + std::to_string(d.elemCountOpaque()) + "!");
+    }
+
+    // Set our "u_sampler1" sampler to user Texture Unit 1
+//    context->glUniform1i(unifSampler2D, textureSlot);
+
+    // bind
+    if (d.bindAllOpaque()) {
+        int stride = 2 * 4 * sizeof(float);
+        // Pos
+        context->glEnableVertexAttribArray(attrPos);
+        context->glVertexAttribPointer(attrPos, 4, GL_FLOAT, false, stride, (void*)(0));
+        // UV
+//        context->glEnableVertexAttribArray(attrUV);
+//        context->glVertexAttribPointer(attrUV, 4, GL_FLOAT, false, stride, (void*)(4 * sizeof(float)));
+    }
+
+    // Bind the index buffer and then draw shapes from it.
+    // This invokes the shader program, which accesses the vertex buffers.
+    d.bindIdx();
+    context->glDrawElements(d.drawMode(), d.elemCountOpaque(), GL_UNSIGNED_INT, 0);
+
+    if (attrPos != -1) context->glDisableVertexAttribArray(attrPos);
+//    if (attrUV != -1) context->glDisableVertexAttribArray(attrUV);
+
+    context->printGLErrorLog();
+}
+
 //This function, as its name implies, uses the passed in GL widget
 void ShaderProgram::drawOpaque(Drawable &d)
 {
@@ -180,7 +216,7 @@ void ShaderProgram::drawOpaque(Drawable &d)
         throw std::out_of_range("Attempting to draw a drawable with m_count_t of " + std::to_string(d.elemCountOpaque()) + "!");
     }
 
-   if (d.bindAllOpaque()) {
+    if (d.bindAllOpaque()) {
         int stride = 12 * sizeof (float);
         // Position
         context->glEnableVertexAttribArray(attrPos);
@@ -213,7 +249,7 @@ void ShaderProgram::drawTransparent(Drawable &d)
         throw std::out_of_range("Attempting to draw a drawable with m_count of " + std::to_string(d.elemCountTransparent()) + "!");
     }
 
-   if (d.bindAllTransparent()) {
+    if (d.bindAllTransparent()) {
         int stride = 12 * sizeof (float);
         // Position
         context->glEnableVertexAttribArray(attrPos);

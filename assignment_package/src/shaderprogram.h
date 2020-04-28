@@ -28,6 +28,10 @@ public:
     int unifTime; // A handle for the "uniform" float representing time in the shader
     int unifView; // A handle for the "uniform" mat4 to bring from
 
+    // Sky
+    int unifDimensions;
+    int unifEye;
+
 public:
     ShaderProgram(OpenGLContext* context);
     // Sets up the requisite GL data and shaders from the given .glsl files
@@ -46,6 +50,7 @@ public:
     // Pass a time variable to this shader on the GPU
     void setTime(int t);
     // Draw the given object to our screen using this ShaderProgram's shaders
+    void drawQuad(Drawable &d);
     void drawOpaque(Drawable &d);
     void drawTransparent(Drawable &d);
     // Utility function used in create()
