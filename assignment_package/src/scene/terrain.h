@@ -120,11 +120,14 @@ public:
 
     static int heightGrassland(int x, int z);
     static int heightMountain(int x, int z);
+    static int heightSpire(int x, int z);
+    static int heightHills(int x ,int z);
 
     static void fillBlockData(std::vector<Chunk*> chunks, BlockData *chunksWithData);
 
     static void setBlockAtStatic(int x, int y, int z, BlockType t, Chunk* c);
     static void fillColumnStatic(int x, int y, int z, BlockType t, Chunk* c);
+    static void fillColumnRangeStatic(int x, int y, int yLow, int z, BlockType t, Chunk* c);
     static void fillVBO(Chunk &c, VBOCollection &chunksWithVBO);
 
     void makeRivers(glm::ivec2 zonePosition);
