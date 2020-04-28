@@ -206,7 +206,7 @@ void MyGL::paintGL() {
 //    m_progDepthThough.setDepthMVP(glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)));
 
 //    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10.f, 10.f, -10.f, 10.f, 0.1f, 1000.f);
-    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-50.f, 50.f, -50.f, 50.f, 0.1f, 2000.f);
+    glm::mat4 depthProjectionMatrix = glm::ortho<float>(-50.f, 50.f, -50.f, 50.f, 0.1f, 1000.f);
 //    glm::mat4 cameraView = glm::lookAt(glm::vec3(41.0529, 172.854 ,-20.898), glm::vec3(41.0529, 172.854 ,-21.898), glm::vec3(0, 1 ,0));
     glm::mat4 cameraView = glm::lookAt(glm::vec3(41.0529, 172.854 ,-20.898),
                                        glm::normalize(glm::vec3(0.5f, 1.f, 0.75f)) + glm::vec3(41.0529, 172.854 ,-20.898),
@@ -243,8 +243,8 @@ void MyGL::preformLightPerspectivePass()
     // Bind depth frame buffer
     m_depthFrameBuffer.bindFrameBuffer();
     prepareViewportForFBO();
-    // set unifsampler2D shadow to 2
-    glUniform1i(m_progDepthThrough.unifSampler2DShadow, 2);
+    // Load scene into texture
+    m_depthFrameBuffer.bindToTextureSlot(2);
     renderTerrain(&m_progDepthThrough);
     glBindFramebuffer(GL_FRAMEBUFFER, this->defaultFramebufferObject());
 }

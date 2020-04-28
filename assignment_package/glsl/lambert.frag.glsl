@@ -132,7 +132,7 @@ void main()
 
     // Check if fragment is in shadow with bias
     float bias = 0;
-    bool isInShadow = fragmentDepth - bias > storedDepth;
+    bool isInShadow = fragmentDepth > storedDepth;
 
     if (isInShadow) {
         // magenta
