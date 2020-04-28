@@ -42,7 +42,7 @@ void Lsystem::setRiverStart()
 
     // set segement length
     // set diameter of river
-    int m = ((int) result * 100) % 3;
+    float m = Noise::random1(glm::vec2(inputPosition[0] + 2, inputPosition[1] + 4));
     if (m == 0) {
         currentTurtle.length = 3.f;
     } else if (m == 1) {
@@ -51,14 +51,14 @@ void Lsystem::setRiverStart()
         currentTurtle.length = 5.f;
     }
 
-    int n = Noise::random1(glm::vec2(inputPosition[0] + 9, inputPosition[1] + 9));
+    float n = Noise::random1(glm::vec2(inputPosition[0] + 9, inputPosition[1] + 9));
     //std::cout << "n " << n << std::endl;
-    if (n == 0) {
-        currentTurtle.depth = 6.f;
-    } else if (n == 1) {
+    if (n < 0.33) {
+        currentTurtle.depth = 8.f;
+    } else if (n < 0.66) {
         currentTurtle.depth = 4.f;
     } else {
-        currentTurtle.depth = 3.f;
+        currentTurtle.depth = 5.f;
     }
 }
 
@@ -68,9 +68,9 @@ void Lsystem::makeLava() {
 
 void Lsystem::makeRivers()
 {
-    int noise = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
+    float noise = Noise::random1(glm::vec2(inputPosition[0], inputPosition[1]));
     //std::cout << noise << std::endl;
-    if (noise > 0.6) {
+    if (noise > 0.7) {
         return;
     }
 
@@ -108,10 +108,10 @@ void Lsystem::makeRivers()
         iter = 3;
     }
 
-    srand((unsigned) time(0));
-    if (rand() % 4 == 0) {
-        makeLava();
-    }
+//    srand((unsigned) time(0));
+//    if (rand() % 4 == 0) {
+//        makeLava();
+//    }
 
     QString q = strMaker(iter, "AB+G-K+M");
     //std::cout << q.toUtf8().constData() << std::endl;
@@ -202,6 +202,7 @@ void Lsystem::fRule()
 
     if (currentTurtle.isNewBranch) {
         this->currentTurtle.depth = std::max(this->currentTurtle.depth - 1, 0.f);
+        this->currentTurtle.length = this->currentTurtle.length + 2;
         currentTurtle.isNewBranch = false;
     }
 
