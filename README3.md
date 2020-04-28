@@ -9,7 +9,9 @@ An article discussing FBM as well as interesting warping was found here: https:/
 Further reading on noise was done in Inigo Quilez's website including this one: http://www.iquilezles.org/www/articles/warp/warp.htm
 
 Fog:
-https://webglfundamentals.org/webgl/lessons/webgl-fog.html
+I first made a uniform vec3 representing the coords of the camera as well as a uniform mat4 for the view matrix. In the frag shader,
+I get the coord of the fragment in camera coordinates in order to obtain the depth value in the form of the z component. I then applied
+a simple effect using near and far fog distances as boundaries for a smooth step for linearly interpolating  with the fog color and fog amount.
 
 Biomes: (Ruth Chung)
 I added two biomes. One consists of many tall spires, with water appearing beneath a certain level, and the other consists of mostly flat terrain with sharply protruding hills. In the hills biome, the hills are made of dirt and the ground is made of grass.
